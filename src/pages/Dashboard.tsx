@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Package, TrendingUp, Database } from 'lucide-react';
 
@@ -27,7 +28,7 @@ export const Dashboard = () => {
         <div>
             <h1 className="text-2xl font-bold text-gray-800 mb-6">לוח בקרה</h1>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <Link to="/products" className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer">
                     <div className="flex items-center justify-between">
                         <div>
                             <h3 className="text-gray-500 text-sm font-medium">סה"כ מוצרים</h3>
@@ -39,7 +40,7 @@ export const Dashboard = () => {
                             <Package className="text-emerald-600" size={24} />
                         </div>
                     </div>
-                </div>
+                </Link>
 
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                     <div className="flex items-center justify-between">
