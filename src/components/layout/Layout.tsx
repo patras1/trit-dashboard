@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ShoppingBasket, Settings, Menu, X } from 'lucide-react';
+import { LayoutDashboard, ShoppingBasket, Settings, Menu, X, LogOut } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 const SidebarLink = ({ to, icon: Icon, children, onClick }: { to: string; icon: any; children: React.ReactNode; onClick?: () => void }) => {
     const location = useLocation();
@@ -24,6 +25,7 @@ const SidebarLink = ({ to, icon: Icon, children, onClick }: { to: string; icon: 
 
 export const Layout = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const { user, signOut } = useAuth();
 
     const closeMobileMenu = () => setMobileMenuOpen(false);
 
@@ -46,12 +48,15 @@ export const Layout = () => {
                 <div className="p-4 border-t border-gray-100">
                     <div className="flex items-center gap-3 px-4 py-2">
                         <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-sm">
-                            DP
+                            {user?.email?.charAt(0).toUpperCase() || 'U'}
                         </div>
-                        <div className="text-sm">
-                            <p className="font-medium text-gray-700">Dan Patra</p>
+                        <div className="text-sm flex-1 min-w-0">
+                            <p className="font-medium text-gray-700 truncate" title={user?.email}>{user?.email}</p>
                             <p className="text-gray-500 text-xs">Admin</p>
                         </div>
+                        <button onClick={signOut} className="text-gray-400 hover:text-red-500 transition-colors" title="Logout">
+                            <LogOut size={18} />
+                        </button>
                     </div>
                 </div>
             </aside>
@@ -85,12 +90,15 @@ export const Layout = () => {
                 <div className="p-4 border-t border-gray-100">
                     <div className="flex items-center gap-3 px-4 py-2">
                         <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-sm">
-                            DP
+                            {user?.email?.charAt(0).toUpperCase() || 'U'}
                         </div>
-                        <div className="text-sm">
-                            <p className="font-medium text-gray-700">Dan Patra</p>
+                        <div className="text-sm flex-1 min-w-0">
+                            <p className="font-medium text-gray-700 truncate" title={user?.email}>{user?.email}</p>
                             <p className="text-gray-500 text-xs">Admin</p>
                         </div>
+                        <button onClick={signOut} className="text-gray-400 hover:text-red-500 transition-colors" title="Logout">
+                            <LogOut size={18} />
+                        </button>
                     </div>
                 </div>
             </aside>
