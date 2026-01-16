@@ -51,18 +51,18 @@ export const ProductDetails = () => {
     };
 
     if (loading) {
-        return <div className="p-8 text-center text-gray-500">Loading product details...</div>;
+        return <div className="p-8 text-center text-gray-500">טוען פרטי מוצר...</div>;
     }
 
     if (!product) {
         return (
             <div className="p-8 text-center">
-                <p className="text-gray-500 mb-4">Product not found</p>
+                <p className="text-gray-500 mb-4">מוצר לא נמצא</p>
                 <button
                     onClick={() => navigate('/products')}
                     className="text-emerald-600 hover:underline"
                 >
-                    Back to products
+                    חזרה למוצרים
                 </button>
             </div>
         );
@@ -74,8 +74,8 @@ export const ProductDetails = () => {
                 onClick={() => navigate('/products')}
                 className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors"
             >
-                <ArrowRight size={18} />
-                <span>Back to List</span>
+                <ArrowRight size={18} className="rotate-180" />
+                <span>חזרה לרשימה</span>
             </button>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -91,7 +91,7 @@ export const ProductDetails = () => {
                         ) : (
                             <div className="text-gray-300 flex flex-col items-center">
                                 <ShoppingBag size={64} />
-                                <span className="mt-2 text-sm">No Image</span>
+                                <span className="mt-2 text-sm">אין תמונה</span>
                             </div>
                         )}
                     </div>
@@ -123,7 +123,7 @@ export const ProductDetails = () => {
                             <div className="flex flex-wrap gap-4 mt-6 text-sm text-gray-500">
                                 <div className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-md border border-gray-100">
                                     <Tag size={14} />
-                                    <span>{product.category || 'No Category'}</span>
+                                    <span>{product.category || 'ללא קטגוריה'}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-md border border-gray-100">
                                     <Database size={14} />
@@ -137,47 +137,47 @@ export const ProductDetails = () => {
                         </div>
 
                         <div className="border-t border-gray-100 pt-8">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Values per 100g</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">ערכים ל-100 גרם</h3>
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                 <NutrientCard
-                                    label="Calories"
+                                    label="קלוריות"
                                     value={getNutrientValue(product.nutrition_per_100g, NUTRITION_KEYS.calories)}
-                                    unit="kcal"
+                                    unit="קק״ל"
                                 />
                                 <NutrientCard
-                                    label="Protein"
+                                    label="חלבונים"
                                     value={getNutrientValue(product.nutrition_per_100g, NUTRITION_KEYS.protein)}
-                                    unit="g"
+                                    unit="גרם"
                                 />
                                 <NutrientCard
-                                    label="Total Fat"
+                                    label="שומנים"
                                     value={getNutrientValue(product.nutrition_per_100g, NUTRITION_KEYS.fat)}
-                                    unit="g"
+                                    unit="גרם"
                                 />
                                 <NutrientCard
-                                    label="Carbs"
+                                    label="פחמימות"
                                     value={getNutrientValue(product.nutrition_per_100g, NUTRITION_KEYS.carbs)}
-                                    unit="g"
+                                    unit="גרם"
                                 />
                                 <NutrientCard
-                                    label="Sodium"
+                                    label="נתרן"
                                     value={getNutrientValue(product.nutrition_per_100g, NUTRITION_KEYS.sodium)}
-                                    unit="mg"
+                                    unit="מ״ג"
                                 />
                                 <NutrientCard
-                                    label="Sugars"
+                                    label="סוכרים"
                                     value={getNutrientValue(product.nutrition_per_100g, NUTRITION_KEYS.sugar)}
-                                    unit="g"
+                                    unit="גרם"
                                 />
                                 <NutrientCard
-                                    label="Sat. Fat"
+                                    label="שומן רווי"
                                     value={getNutrientValue(product.nutrition_per_100g, NUTRITION_KEYS.satFat)}
-                                    unit="g"
+                                    unit="גרם"
                                 />
                                 <NutrientCard
-                                    label="Cholesterol"
+                                    label="כולסטרול"
                                     value={getNutrientValue(product.nutrition_per_100g, NUTRITION_KEYS.cholesterol)}
-                                    unit="mg"
+                                    unit="מ״ג"
                                 />
                             </div>
                         </div>
@@ -185,7 +185,7 @@ export const ProductDetails = () => {
                         {/* Raw JSON for debug */}
                         <div className="border-t border-gray-100 pt-8">
                             <details className="text-xs text-gray-400 cursor-pointer">
-                                <summary className="hover:text-gray-600 transition-colors">Raw Data Source</summary>
+                                <summary className="hover:text-gray-600 transition-colors">מקור נתונים גולמי</summary>
                                 <pre className="mt-4 p-4 bg-gray-50 rounded-lg overflow-x-auto">
                                     {JSON.stringify(product, null, 2)}
                                 </pre>

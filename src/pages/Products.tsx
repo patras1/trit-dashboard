@@ -1,7 +1,8 @@
 
+
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 interface Product {
     barcode: string;
@@ -14,11 +15,15 @@ interface Product {
 }
 
 import { getNutrientValue, NUTRITION_KEYS } from '../lib/utils';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export const ProductsPage = () => {
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const categoryFilter = searchParams.get('category');
+
     const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<{ name: string; count: number }[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(0);
     const [total, setTotal] = useState(0);
@@ -37,17 +42,47 @@ export const ProductsPage = () => {
     }, [search]);
 
     useEffect(() => {
-        fetchProducts();
-    }, [page, debouncedSearch]);
+        fetchData();
+    }, [page, debouncedSearch, categoryFilter]);
 
-    const fetchProducts = async () => {
+    const fetchData = async () => {
         setLoading(true);
+
+        // Fetch categories if not already loaded (only once)
+        if (categories.length === 0) {
+            const { data: catData } = await supabase
+                .from('foods')
+                .select('category');
+
+            if (catData) {
+                const categoryCounts: Record<string, number> = {};
+                catData.forEach(p => {
+                    const cat = p.category || 'ללא קטגוריה';
+                    categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+                });
+
+                const sortedCategories = Object.entries(categoryCounts)
+                    .map(([name, count]) => ({ name, count }))
+                    .sort((a, b) => b.count - a.count);
+
+                setCategories(sortedCategories);
+            }
+        }
+
         let query = supabase
             .from('foods')
             .select('*', { count: 'exact' });
 
         if (debouncedSearch) {
             query = query.or(`name_he.ilike.%${debouncedSearch}%,name_en.ilike.%${debouncedSearch}%,barcode.eq.${debouncedSearch}`);
+        }
+
+        if (categoryFilter) {
+            if (categoryFilter === 'ללא קטגוריה') {
+                query = query.is('category', null);
+            } else {
+                query = query.eq('category', categoryFilter);
+            }
         }
 
         const { data, count, error } = await query
@@ -63,11 +98,22 @@ export const ProductsPage = () => {
         setLoading(false);
     };
 
+    const toggleCategory = (catName: string) => {
+        const newParams = new URLSearchParams(searchParams);
+        if (categoryFilter === catName) {
+            newParams.delete('category');
+        } else {
+            newParams.set('category', catName);
+        }
+        setSearchParams(newParams);
+        setPage(0);
+    };
+
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <h1 className="text-2xl font-bold text-gray-800">מאגר מוצרים</h1>
-                <div className="relative w-64">
+                <div className="relative w-full md:w-64">
                     <input
                         type="text"
                         value={search}
@@ -77,6 +123,36 @@ export const ProductsPage = () => {
                     />
                     <Search className="absolute right-3 top-2.5 text-gray-400" size={18} />
                 </div>
+            </div>
+
+            {/* Category Chips */}
+            <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+                <button
+                    onClick={() => {
+                        const newParams = new URLSearchParams(searchParams);
+                        newParams.delete('category');
+                        setSearchParams(newParams);
+                        setPage(0);
+                    }}
+                    className={`shrink-0 whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${!categoryFilter
+                            ? 'bg-emerald-600 text-white border-emerald-600'
+                            : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                        }`}
+                >
+                    הכל
+                </button>
+                {categories.map((cat) => (
+                    <button
+                        key={cat.name}
+                        onClick={() => toggleCategory(cat.name)}
+                        className={`shrink-0 whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${categoryFilter === cat.name
+                                ? 'bg-emerald-600 text-white border-emerald-600'
+                                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                            }`}
+                    >
+                        {cat.name} <span className={`mr-1 text-xs ${categoryFilter === cat.name ? 'text-emerald-200' : 'text-gray-400'}`}>({cat.count})</span>
+                    </button>
+                ))}
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -173,3 +249,4 @@ export const ProductsPage = () => {
         </div>
     );
 };
+

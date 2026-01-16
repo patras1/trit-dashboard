@@ -6,6 +6,7 @@ import { Package, TrendingUp, Database } from 'lucide-react';
 
 export const Dashboard = () => {
     const [totalProducts, setTotalProducts] = useState<number | null>(null);
+    const [categories, setCategories] = useState<{ name: string; count: number }[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -14,55 +15,110 @@ export const Dashboard = () => {
 
     const fetchStats = async () => {
         setLoading(true);
-        const { count, error } = await supabase
+
+        // Fetch total count
+        const { count, error: countError } = await supabase
             .from('foods')
             .select('*', { count: 'exact', head: true });
 
-        if (!error && count !== null) {
+        if (!countError && count !== null) {
             setTotalProducts(count);
         }
+
+        // Fetch categories
+        const { data: products, error: productsError } = await supabase
+            .from('foods')
+            .select('category');
+
+        if (!productsError && products) {
+            const categoryCounts: Record<string, number> = {};
+            products.forEach(p => {
+                const cat = p.category || 'ללא קטגוריה';
+                categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+            });
+
+            const sortedCategories = Object.entries(categoryCounts)
+                .map(([name, count]) => ({ name, count }))
+                .sort((a, b) => b.count - a.count);
+
+            setCategories(sortedCategories);
+        }
+
         setLoading(false);
     };
 
     return (
-        <div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-6">לוח בקרה</h1>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Link to="/products" className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h3 className="text-gray-500 text-sm font-medium">סה"כ מוצרים</h3>
-                            <p className="text-3xl font-bold text-gray-900 mt-2">
-                                {loading ? '...' : totalProducts?.toLocaleString('he-IL')}
-                            </p>
+        <div className="space-y-8">
+            <div>
+                <h1 className="text-2xl font-bold text-gray-800 mb-6">לוח בקרה</h1>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <Link to="/products" className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h3 className="text-gray-500 text-sm font-medium">סה"כ מוצרים</h3>
+                                <p className="text-3xl font-bold text-gray-900 mt-2">
+                                    {loading ? '...' : totalProducts?.toLocaleString('he-IL')}
+                                </p>
+                            </div>
+                            <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                                <Package className="text-emerald-600" size={24} />
+                            </div>
                         </div>
-                        <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
-                            <Package className="text-emerald-600" size={24} />
+                    </Link>
+
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h3 className="text-gray-500 text-sm font-medium">עם ערכים תזונתיים</h3>
+                                <p className="text-3xl font-bold text-gray-900 mt-2">-</p>
+                            </div>
+                            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                                <TrendingUp className="text-blue-600" size={24} />
+                            </div>
                         </div>
                     </div>
-                </Link>
 
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h3 className="text-gray-500 text-sm font-medium">עם ערכים תזונתיים</h3>
-                            <p className="text-3xl font-bold text-gray-900 mt-2">-</p>
-                        </div>
-                        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                            <TrendingUp className="text-blue-600" size={24} />
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h3 className="text-gray-500 text-sm font-medium">מקור נתונים</h3>
+                                <p className="text-lg font-bold text-gray-900 mt-2">Shufersal</p>
+                            </div>
+                            <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                                <Database className="text-purple-600" size={24} />
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h3 className="text-gray-500 text-sm font-medium">מקור נתונים</h3>
-                            <p className="text-lg font-bold text-gray-900 mt-2">Shufersal</p>
-                        </div>
-                        <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                            <Database className="text-purple-600" size={24} />
-                        </div>
+            {/* Categories Section */}
+            <div>
+                <h2 className="text-xl font-bold text-gray-800 mb-4">קטגוריות ({categories.length})</h2>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-y md:divide-y-0 md:divide-x md:divide-x-reverse divide-gray-100">
+                        {categories.map((cat) => (
+                            <Link
+                                to={`/products?category=${encodeURIComponent(cat.name)}`}
+                                key={cat.name}
+                                className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0 cursor-pointer text-inherit no-underline"
+                            >
+                                <span className="text-gray-700 font-medium">{cat.name}</span>
+                                <span className="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                                    {cat.count}
+                                </span>
+                            </Link>
+                        ))}
+                        {categories.length === 0 && !loading && (
+                            <div className="p-8 text-center text-gray-500 col-span-full">
+                                לא נמצאו קטגוריות
+                            </div>
+                        )}
+                        {loading && categories.length === 0 && (
+                            <div className="p-8 text-center text-gray-500 col-span-full">
+                                טוען קטגוריות...
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
