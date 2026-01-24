@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Search, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Product {
     barcode: string;
@@ -135,8 +135,8 @@ export const ProductsPage = () => {
                         setPage(0);
                     }}
                     className={`shrink-0 whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${!categoryFilter
-                            ? 'bg-emerald-600 text-white border-emerald-600'
-                            : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                        ? 'bg-emerald-600 text-white border-emerald-600'
+                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
                         }`}
                 >
                     הכל
@@ -146,8 +146,8 @@ export const ProductsPage = () => {
                         key={cat.name}
                         onClick={() => toggleCategory(cat.name)}
                         className={`shrink-0 whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${categoryFilter === cat.name
-                                ? 'bg-emerald-600 text-white border-emerald-600'
-                                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                            ? 'bg-emerald-600 text-white border-emerald-600'
+                            : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
                             }`}
                     >
                         {cat.name} <span className={`mr-1 text-xs ${categoryFilter === cat.name ? 'text-emerald-200' : 'text-gray-400'}`}>({cat.count})</span>
