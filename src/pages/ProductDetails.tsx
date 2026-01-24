@@ -60,7 +60,7 @@ export const ProductDetails = () => {
                 <p className="text-gray-500 mb-4">מוצר לא נמצא</p>
                 <button
                     onClick={() => navigate('/products')}
-                    className="text-emerald-600 hover:underline"
+                    className="text-primary hover:underline"
                 >
                     חזרה למוצרים
                 </button>
@@ -109,7 +109,7 @@ export const ProductDetails = () => {
                                     </p>
                                 </div>
                                 <div className="text-right">
-                                    <span className="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium">
+                                    <span className="inline-block px-3 py-1 bg-primary-light text-primary rounded-full text-sm font-medium">
                                         {getNutrientValue(product.nutrition_per_100g, NUTRITION_KEYS.calories) || 0} kcal
                                     </span>
                                     {product.price?.price && (

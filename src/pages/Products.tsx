@@ -144,7 +144,7 @@ export const ProductsPage = () => {
                 {categoryFilters.length > 0 && (
                     <div className="flex flex-wrap items-center gap-2 mt-1.5">
                         {categoryFilters.map(cat => (
-                            <span key={cat} className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            <span key={cat} className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-primary-light text-primary border border-primary/20">
                                 {cat}
                                 <button
                                     onClick={() => {
@@ -155,7 +155,7 @@ export const ProductsPage = () => {
                                         setSearchParams(newParams);
                                         setPage(0);
                                     }}
-                                    className="hover:bg-emerald-200 rounded-full p-0.5 transition-colors cursor-pointer"
+                                    className="hover:bg-primary/10 rounded-full p-0.5 transition-colors cursor-pointer"
                                 >
                                     <X size={14} />
                                 </button>
