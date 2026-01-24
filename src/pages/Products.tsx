@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { MultiSelect } from '../components/ui/MultiSelect';
 
 interface Product {
     barcode: string;
@@ -20,7 +21,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 export const ProductsPage = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
-    const categoryFilter = searchParams.get('category');
+    const categoryFilters = searchParams.getAll('category');
 
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<{ name: string; count: number }[]>([]);
@@ -43,7 +44,7 @@ export const ProductsPage = () => {
 
     useEffect(() => {
         fetchData();
-    }, [page, debouncedSearch, categoryFilter]);
+    }, [page, debouncedSearch, searchParams.toString()]);
 
     const fetchData = async () => {
         setLoading(true);
@@ -77,11 +78,17 @@ export const ProductsPage = () => {
             query = query.or(`name_he.ilike.%${debouncedSearch}%,name_en.ilike.%${debouncedSearch}%,barcode.eq.${debouncedSearch}`);
         }
 
-        if (categoryFilter) {
-            if (categoryFilter === 'ללא קטגוריה') {
+        if (categoryFilters.length > 0) {
+            const regularCategories = categoryFilters.filter(c => c !== 'ללא קטגוריה');
+            const hasUncategorized = categoryFilters.includes('ללא קטגוריה');
+
+            if (hasUncategorized && regularCategories.length > 0) {
+                const inList = `(${regularCategories.map(c => `"${c}"`).join(',')})`;
+                query = query.or(`category.is.null,category.in.${inList}`);
+            } else if (hasUncategorized) {
                 query = query.is('category', null);
             } else {
-                query = query.eq('category', categoryFilter);
+                query = query.in('category', regularCategories);
             }
         }
 
@@ -98,16 +105,7 @@ export const ProductsPage = () => {
         setLoading(false);
     };
 
-    const toggleCategory = (catName: string) => {
-        const newParams = new URLSearchParams(searchParams);
-        if (categoryFilter === catName) {
-            newParams.delete('category');
-        } else {
-            newParams.set('category', catName);
-        }
-        setSearchParams(newParams);
-        setPage(0);
-    };
+
 
     return (
         <div className="space-y-6">
@@ -125,34 +123,57 @@ export const ProductsPage = () => {
                 </div>
             </div>
 
-            {/* Category Chips */}
-            <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
-                <button
-                    onClick={() => {
-                        const newParams = new URLSearchParams(searchParams);
-                        newParams.delete('category');
-                        setSearchParams(newParams);
-                        setPage(0);
-                    }}
-                    className={`shrink-0 whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${!categoryFilter
-                        ? 'bg-emerald-600 text-white border-emerald-600'
-                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-                        }`}
-                >
-                    הכל
-                </button>
-                {categories.map((cat) => (
-                    <button
-                        key={cat.name}
-                        onClick={() => toggleCategory(cat.name)}
-                        className={`shrink-0 whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${categoryFilter === cat.name
-                            ? 'bg-emerald-600 text-white border-emerald-600'
-                            : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-                            }`}
-                    >
-                        {cat.name} <span className={`mr-1 text-xs ${categoryFilter === cat.name ? 'text-emerald-200' : 'text-gray-400'}`}>({cat.count})</span>
-                    </button>
-                ))}
+            {/* Filters Row */}
+            <div className="flex flex-wrap items-start gap-4">
+                <div className="z-20"> {/* Added z-index to ensure dropdown opens over other elements if needed, though mostly handled by absolute positioning in component */}
+                    <MultiSelect
+                        options={categories.map(c => ({ label: c.name, value: c.name, count: c.count }))}
+                        selected={categoryFilters}
+                        onChange={(selected) => {
+                            const newParams = new URLSearchParams(searchParams);
+                            newParams.delete('category');
+                            selected.forEach(c => newParams.append('category', c));
+                            setSearchParams(newParams);
+                            setPage(0);
+                        }}
+                        placeholder="סינון לפי קטגוריה"
+                    />
+                </div>
+
+                {/* Selected Chips */}
+                {categoryFilters.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                        {categoryFilters.map(cat => (
+                            <span key={cat} className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                {cat}
+                                <button
+                                    onClick={() => {
+                                        const newParams = new URLSearchParams(searchParams);
+                                        const newFilters = categoryFilters.filter(c => c !== cat);
+                                        newParams.delete('category');
+                                        newFilters.forEach(c => newParams.append('category', c));
+                                        setSearchParams(newParams);
+                                        setPage(0);
+                                    }}
+                                    className="hover:bg-emerald-200 rounded-full p-0.5 transition-colors cursor-pointer"
+                                >
+                                    <X size={14} />
+                                </button>
+                            </span>
+                        ))}
+                        <button
+                            onClick={() => {
+                                const newParams = new URLSearchParams(searchParams);
+                                newParams.delete('category');
+                                setSearchParams(newParams);
+                                setPage(0);
+                            }}
+                            className="text-sm text-gray-500 hover:text-gray-700 underline px-2"
+                        >
+                            נקה הכל
+                        </button>
+                    </div>
+                )}
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">

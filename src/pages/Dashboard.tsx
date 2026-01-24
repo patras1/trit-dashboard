@@ -95,30 +95,37 @@ export const Dashboard = () => {
             {/* Categories Section */}
             <div>
                 <h2 className="text-xl font-bold text-gray-800 mb-4">קטגוריות ({categories.length})</h2>
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-y md:divide-y-0 md:divide-x md:divide-x-reverse divide-gray-100">
-                        {categories.map((cat) => (
-                            <Link
-                                to={`/products?category=${encodeURIComponent(cat.name)}`}
-                                key={cat.name}
-                                className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0 cursor-pointer text-inherit no-underline"
-                            >
-                                <span className="text-gray-700 font-medium">{cat.name}</span>
-                                <span className="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                                    {cat.count}
-                                </span>
-                            </Link>
-                        ))}
-                        {categories.length === 0 && !loading && (
-                            <div className="p-8 text-center text-gray-500 col-span-full">
-                                לא נמצאו קטגוריות
+                <div className="md:w-1/3">
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-[400px]">
+                        <div className="p-4 border-b border-gray-100 bg-gray-50">
+                            <h3 className="font-semibold text-gray-700">פירוט קטגוריות</h3>
+                        </div>
+                        <div className="overflow-y-auto flex-1">
+                            <div className="flex flex-col divide-y divide-gray-100">
+                                {categories.map((cat) => (
+                                    <Link
+                                        to={`/products?category=${encodeURIComponent(cat.name)}`}
+                                        key={cat.name}
+                                        className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer text-inherit no-underline"
+                                    >
+                                        <span className="text-gray-700 font-medium truncate ml-2" title={cat.name}>{cat.name}</span>
+                                        <span className="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full shrink-0">
+                                            {cat.count}
+                                        </span>
+                                    </Link>
+                                ))}
+                                {categories.length === 0 && !loading && (
+                                    <div className="p-8 text-center text-gray-500">
+                                        לא נמצאו קטגוריות
+                                    </div>
+                                )}
+                                {loading && categories.length === 0 && (
+                                    <div className="p-8 text-center text-gray-500">
+                                        טוען קטגוריות...
+                                    </div>
+                                )}
                             </div>
-                        )}
-                        {loading && categories.length === 0 && (
-                            <div className="p-8 text-center text-gray-500 col-span-full">
-                                טוען קטגוריות...
-                            </div>
-                        )}
+                        </div>
                     </div>
                 </div>
             </div>
