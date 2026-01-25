@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { coachService } from '../lib/api';
-import { Search, Save, Edit, ChevronRight } from 'lucide-react';
+import { Save, Edit, ChevronRight } from 'lucide-react';
 import { IdentityTab } from '../components/coach/IdentityTab';
 import { BehaviorEngineTab } from '../components/coach/BehaviorEngineTab';
 import { ProgramsTab } from '../components/coach/ProgramsTab';
@@ -142,14 +142,7 @@ export const CoachesPage = () => {
                         ))}
                     </select>
 
-                    <div className="relative hidden lg:block">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-lg" size={18} />
-                        <input
-                            className="pl-10 pr-4 py-2 bg-[#f2f3f3] border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/50 outline-none"
-                            placeholder="Search parameters..."
-                            type="text"
-                        />
-                    </div>
+
                     <button
                         onClick={handleSave}
                         disabled={saving}
