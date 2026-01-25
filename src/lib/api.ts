@@ -19,3 +19,24 @@ export const coachService = {
         return response.json();
     }
 };
+
+export const clientService = {
+    async list(coachId?: string) {
+        const url = coachId ? `${API_BASE_URL}/client/list?coach_id=${coachId}` : `${API_BASE_URL}/client/list`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Failed to fetch clients');
+        return response.json();
+    },
+
+    async get(clientId: string) {
+        const response = await fetch(`${API_BASE_URL}/client/${clientId}`);
+        if (!response.ok) throw new Error('Failed to fetch client');
+        return response.json();
+    },
+
+    async getStats() {
+        const response = await fetch(`${API_BASE_URL}/client/stats`);
+        if (!response.ok) throw new Error('Failed to fetch client stats');
+        return response.json();
+    }
+};

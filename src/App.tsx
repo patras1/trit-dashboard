@@ -4,6 +4,7 @@ import { Dashboard } from './pages/Dashboard';
 import { ProductsPage } from './pages/Products';
 import { ProductDetails } from './pages/ProductDetails';
 import { CoachesPage } from './pages/Coaches';
+import { ClientsPage } from './pages/Clients';
 import { SettingsPage } from './pages/Settings';
 import { Login } from './pages/Login';
 import { AuthProvider } from './contexts/AuthContext';
@@ -28,6 +29,7 @@ function App() {
               <Route path="products" element={<ProductsPage />} />
               <Route path="products/:barcode" element={<ProductDetails />} />
               <Route path="coaches" element={<CoachesPage />} />
+              <Route path="clients" element={<ClientsPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
           </Routes>
