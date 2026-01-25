@@ -37,9 +37,9 @@ export const Layout = () => {
                 <div className="p-6 flex flex-col gap-6">
                     {/* Brand */}
                     {/* Brand */}
-                    <div className="flex flex-col gap-0">
+                    <div className="flex flex-col gap-0 items-center">
                         <h1 className="text-primary text-4xl font-black leading-none tracking-tight">trit.</h1>
-                        <p className="text-text-muted text-lg font-bold ml-0.5">Studio</p>
+                        <p className="text-text-muted text-lg font-bold">Studio</p>
                     </div>
 
                     {/* Nav Links */}
@@ -85,9 +85,9 @@ export const Layout = () => {
             <aside className={`fixed top-0 left-0 h-full w-64 bg-white border-r border-[#dfe2e2] z-50 transform transition-transform duration-300 lg:hidden ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}>
                 <div className="p-6 border-b border-[#dfe2e2] flex items-center justify-between">
-                    <div className="flex flex-col gap-0">
+                    <div className="flex flex-col gap-0 items-center">
                         <h1 className="text-primary text-4xl font-black leading-none tracking-tight">trit.</h1>
-                        <p className="text-text-muted text-lg font-bold ml-0.5">Studio</p>
+                        <p className="text-text-muted text-lg font-bold">Studio</p>
                     </div>
                     <button onClick={closeMobileMenu} className="p-2 text-text-muted hover:text-text-main">
                         <X size={24} />
