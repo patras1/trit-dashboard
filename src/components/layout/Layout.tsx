@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, User, BookOpen, Settings, Menu, X, LogOut, Activity } from 'lucide-react';
+import { LayoutDashboard, Users, User, BookOpen, Settings, Menu, X, LogOut } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 
@@ -36,14 +36,10 @@ export const Layout = () => {
             <aside className="w-64 border-r border-[#dfe2e2] bg-white hidden lg:flex flex-col shrink-0">
                 <div className="p-6 flex flex-col gap-6">
                     {/* Brand */}
-                    <div className="flex gap-3 items-center">
-                        <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                            <Activity size={24} />
-                        </div>
-                        <div className="flex flex-col">
-                            <h1 className="text-text-main text-base font-bold leading-tight">trit.</h1>
-                            <p className="text-text-muted text-xs font-normal">Management Portal</p>
-                        </div>
+                    {/* Brand */}
+                    <div className="flex flex-col gap-0">
+                        <h1 className="text-primary text-4xl font-black leading-none tracking-tight">trit.</h1>
+                        <p className="text-text-muted text-lg font-bold ml-0.5">Studio</p>
                     </div>
 
                     {/* Nav Links */}
@@ -89,14 +85,9 @@ export const Layout = () => {
             <aside className={`fixed top-0 left-0 h-full w-64 bg-white border-r border-[#dfe2e2] z-50 transform transition-transform duration-300 lg:hidden ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}>
                 <div className="p-6 border-b border-[#dfe2e2] flex items-center justify-between">
-                    <div className="flex gap-3 items-center">
-                        <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                            <Activity size={24} />
-                        </div>
-                        <div className="flex flex-col">
-                            <h1 className="text-text-main text-base font-bold leading-tight">trit.</h1>
-                            <p className="text-text-muted text-xs font-normal">Management Portal</p>
-                        </div>
+                    <div className="flex flex-col gap-0">
+                        <h1 className="text-primary text-4xl font-black leading-none tracking-tight">trit.</h1>
+                        <p className="text-text-muted text-lg font-bold ml-0.5">Studio</p>
                     </div>
                     <button onClick={closeMobileMenu} className="p-2 text-text-muted hover:text-text-main">
                         <X size={24} />
@@ -131,7 +122,10 @@ export const Layout = () => {
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Mobile Header */}
                 <header className="lg:hidden bg-white border-b border-[#dfe2e2] p-4 flex items-center justify-between">
-                    <h1 className="text-xl font-bold text-text-main">trit.</h1>
+                    <div className="flex items-baseline gap-1.5">
+                        <h1 className="text-2xl font-black text-primary tracking-tight">trit.</h1>
+                        <span className="text-base font-bold text-text-muted">Studio</span>
+                    </div>
                     <button
                         onClick={() => setMobileMenuOpen(true)}
                         className="p-2 text-text-muted hover:text-text-main"
