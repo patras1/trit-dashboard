@@ -38,7 +38,7 @@ export const Layout = () => {
                     {/* Brand */}
                     {/* Brand */}
                     <div className="flex flex-col gap-0 items-center">
-                        <h1 className="text-primary text-4xl font-black leading-none tracking-tight">trit.</h1>
+                        <h1 dir="ltr" className="text-primary text-4xl font-black leading-none tracking-tight">trit.</h1>
                         <p className="text-text-muted text-lg font-bold">Studio</p>
                     </div>
 
@@ -86,7 +86,7 @@ export const Layout = () => {
                 }`}>
                 <div className="p-6 border-b border-[#dfe2e2] flex items-center justify-between">
                     <div className="flex flex-col gap-0 items-center">
-                        <h1 className="text-primary text-4xl font-black leading-none tracking-tight">trit.</h1>
+                        <h1 dir="ltr" className="text-primary text-4xl font-black leading-none tracking-tight">trit.</h1>
                         <p className="text-text-muted text-lg font-bold">Studio</p>
                     </div>
                     <button onClick={closeMobileMenu} className="p-2 text-text-muted hover:text-text-main">
@@ -123,7 +123,7 @@ export const Layout = () => {
                 {/* Mobile Header */}
                 <header className="lg:hidden bg-white border-b border-[#dfe2e2] p-4 flex items-center justify-between">
                     <div className="flex items-baseline gap-1.5">
-                        <h1 className="text-2xl font-black text-primary tracking-tight">trit.</h1>
+                        <h1 dir="ltr" className="text-2xl font-black text-primary tracking-tight">trit.</h1>
                         <span className="text-base font-bold text-text-muted">Studio</span>
                     </div>
                     <button
