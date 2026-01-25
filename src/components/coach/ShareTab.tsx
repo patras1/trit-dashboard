@@ -38,22 +38,22 @@ export const ShareTab = ({ coach }: ShareTabProps) => {
                 <div className="flex-1 flex flex-col gap-8 w-full">
                     {/* PageHeading */}
                     <div className="flex flex-col gap-2">
-                        <h1 className="text-text-main dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">{t('coach_share.title')}</h1>
-                        <p className="text-text-muted dark:text-[#a0aeae] text-base font-normal leading-normal max-w-xl">
+                        <h1 className="text-text-main  text-4xl font-black leading-tight tracking-[-0.033em]">{t('coach_share.title')}</h1>
+                        <p className="text-text-muted  text-base font-normal leading-normal max-w-xl">
                             {t('coach_share.description')}
                         </p>
                     </div>
 
                     {/* Shareable Link Card */}
-                    <div className="bg-white dark:bg-[#1f2424] p-6 rounded-xl shadow-sm border border-[#f2f3f3] dark:border-[#2d3333]">
-                        <h2 className="text-text-main dark:text-white text-lg font-bold mb-4 flex items-center gap-2">
+                    <div className="bg-white  p-6 rounded-xl shadow-sm border border-[#f2f3f3] ">
+                        <h2 className="text-text-main  text-lg font-bold mb-4 flex items-center gap-2">
                             <Link className="text-primary" size={20} />
                             {t('coach_share.link_card.title')}
                         </h2>
-                        <div className="flex flex-col md:flex-row items-center gap-4 bg-background-light dark:bg-[#171b1b] p-3 rounded-lg border border-[#e2e8e8] dark:border-[#2d3333]">
+                        <div className="flex flex-col md:flex-row items-center gap-4 bg-background-light  p-3 rounded-lg border border-[#e2e8e8] ">
                             <div className="flex-1 overflow-hidden">
-                                <p className="text-text-main dark:text-white text-sm font-bold truncate">{t('coach_share.link_card.label')}</p>
-                                <p className="text-text-muted dark:text-[#a0aeae] text-xs font-mono truncate">{shareUrl}</p>
+                                <p className="text-text-main  text-sm font-bold truncate">{t('coach_share.link_card.label')}</p>
+                                <p className="text-text-muted  text-xs font-mono truncate">{shareUrl}</p>
                             </div>
                             <button
                                 onClick={handleCopy}
@@ -67,27 +67,27 @@ export const ShareTab = ({ coach }: ShareTabProps) => {
 
                     {/* Social Media Grid */}
                     <div className="flex flex-col gap-4">
-                        <h3 className="text-text-main dark:text-white text-lg font-bold px-1">{t('coach_share.social.title')}</h3>
+                        <h3 className="text-text-main  text-lg font-bold px-1">{t('coach_share.social.title')}</h3>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                            <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white dark:bg-[#1f2424] border border-[#f2f3f3] dark:border-[#2d3333] hover:border-primary transition-colors group">
+                            <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white  border border-[#f2f3f3]  hover:border-primary transition-colors group">
                                 <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#1877F2]/10 text-[#1877F2]">
                                     <Facebook size={20} />
                                 </div>
                                 <span className="text-xs font-semibold">Facebook</span>
                             </button>
-                            <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white dark:bg-[#1f2424] border border-[#f2f3f3] dark:border-[#2d3333] hover:border-primary transition-colors group">
+                            <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white  border border-[#f2f3f3]  hover:border-primary transition-colors group">
                                 <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#E4405F]/10 text-[#E4405F]">
                                     <Instagram size={20} />
                                 </div>
                                 <span className="text-xs font-semibold">Instagram</span>
                             </button>
-                            <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white dark:bg-[#1f2424] border border-[#f2f3f3] dark:border-[#2d3333] hover:border-primary transition-colors group">
-                                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#000000]/10 dark:bg-white/10 text-[#000000] dark:text-white">
+                            <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white  border border-[#f2f3f3]  hover:border-primary transition-colors group">
+                                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#000000]/10  text-[#000000] ">
                                     <X size={20} />
                                 </div>
                                 <span className="text-xs font-semibold">X (Twitter)</span>
                             </button>
-                            <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white dark:bg-[#1f2424] border border-[#f2f3f3] dark:border-[#2d3333] hover:border-primary transition-colors group">
+                            <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white  border border-[#f2f3f3]  hover:border-primary transition-colors group">
                                 <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#25D366]/10 text-[#25D366]">
                                     <MessageCircle size={20} />
                                 </div>
@@ -99,31 +99,31 @@ export const ShareTab = ({ coach }: ShareTabProps) => {
                     {/* Post Templates Section */}
                     <div className="flex flex-col gap-4">
                         <div className="flex justify-between items-center px-1">
-                            <h3 className="text-text-main dark:text-white text-lg font-bold">{t('coach_share.templates.title')}</h3>
+                            <h3 className="text-text-main  text-lg font-bold">{t('coach_share.templates.title')}</h3>
                             <button className="text-xs text-primary font-bold cursor-pointer hover:underline">{t('coach_share.templates.customize')}</button>
                         </div>
                         <div className="space-y-4">
                             {/* Template 1 */}
-                            <div className="p-5 bg-white dark:bg-[#1f2424] rounded-xl border border-[#f2f3f3] dark:border-[#2d3333] flex flex-col gap-3">
+                            <div className="p-5 bg-white  rounded-xl border border-[#f2f3f3]  flex flex-col gap-3">
                                 <div className="flex justify-between items-start">
-                                    <span className="text-[10px] uppercase tracking-widest font-bold text-text-muted bg-background-light dark:bg-[#171b1b] px-2 py-0.5 rounded">{t('coach_share.templates.enthusiast.label')}</span>
+                                    <span className="text-[10px] uppercase tracking-widest font-bold text-text-muted bg-background-light  px-2 py-0.5 rounded">{t('coach_share.templates.enthusiast.label')}</span>
                                     <button className="text-primary hover:text-primary/70 transition-colors">
                                         <Copy size={16} />
                                     </button>
                                 </div>
-                                <p className="text-sm text-text-main dark:text-gray-200 leading-relaxed italic">
+                                <p className="text-sm text-text-main  leading-relaxed italic">
                                     {t('coach_share.templates.enthusiast.text', { url: shareUrl })}
                                 </p>
                             </div>
                             {/* Template 2 */}
-                            <div className="p-5 bg-white dark:bg-[#1f2424] rounded-xl border border-[#f2f3f3] dark:border-[#2d3333] flex flex-col gap-3">
+                            <div className="p-5 bg-white  rounded-xl border border-[#f2f3f3]  flex flex-col gap-3">
                                 <div className="flex justify-between items-start">
-                                    <span className="text-[10px] uppercase tracking-widest font-bold text-text-muted bg-background-light dark:bg-[#171b1b] px-2 py-0.5 rounded">{t('coach_share.templates.professional.label')}</span>
+                                    <span className="text-[10px] uppercase tracking-widest font-bold text-text-muted bg-background-light  px-2 py-0.5 rounded">{t('coach_share.templates.professional.label')}</span>
                                     <button className="text-primary hover:text-primary/70 transition-colors">
                                         <Copy size={16} />
                                     </button>
                                 </div>
-                                <p className="text-sm text-text-main dark:text-gray-200 leading-relaxed italic">
+                                <p className="text-sm text-text-main  leading-relaxed italic">
                                     {t('coach_share.templates.professional.text')}
                                 </p>
                             </div>
@@ -205,7 +205,7 @@ export const ShareTab = ({ coach }: ShareTabProps) => {
 
             {/* Footer / Feedback Element (Floating Toast) */}
             {copied && (
-                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-white dark:bg-[#1f2424] px-6 py-3 rounded-full shadow-2xl border border-[#f2f3f3] dark:border-[#2d3333] z-[100] animate-bounce">
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-white  px-6 py-3 rounded-full shadow-2xl border border-[#f2f3f3]  z-[100] animate-bounce">
                     <CheckCircle className="text-primary" size={20} />
                     <span className="text-sm font-bold">{t('coach_share.link_card.toast_copied')}</span>
                 </div>

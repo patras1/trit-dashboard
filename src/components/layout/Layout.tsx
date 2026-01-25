@@ -41,7 +41,7 @@ export const Layout = () => {
                             <Activity size={24} />
                         </div>
                         <div className="flex flex-col">
-                            <h1 className="text-text-main text-base font-bold leading-tight">AI Nutrition</h1>
+                            <h1 className="text-text-main text-base font-bold leading-tight">trit.</h1>
                             <p className="text-text-muted text-xs font-normal">Management Portal</p>
                         </div>
                     </div>
@@ -94,7 +94,7 @@ export const Layout = () => {
                             <Activity size={24} />
                         </div>
                         <div className="flex flex-col">
-                            <h1 className="text-text-main text-base font-bold leading-tight">AI Nutrition</h1>
+                            <h1 className="text-text-main text-base font-bold leading-tight">trit.</h1>
                             <p className="text-text-muted text-xs font-normal">Management Portal</p>
                         </div>
                     </div>
@@ -131,7 +131,7 @@ export const Layout = () => {
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Mobile Header */}
                 <header className="lg:hidden bg-white border-b border-[#dfe2e2] p-4 flex items-center justify-between">
-                    <h1 className="text-xl font-bold text-text-main">AI Nutrition</h1>
+                    <h1 className="text-xl font-bold text-text-main">trit.</h1>
                     <button
                         onClick={() => setMobileMenuOpen(true)}
                         className="p-2 text-text-muted hover:text-text-main"
