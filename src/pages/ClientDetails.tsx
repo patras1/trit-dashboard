@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { clientService, coachService } from '../lib/api';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User, Plus, X } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User, Plus, X, Trash2 } from 'lucide-react';
 
 export const ClientDetails = () => {
     const { id } = useParams<{ id: string }>();
@@ -44,6 +44,18 @@ export const ClientDetails = () => {
         } catch (error) {
             console.error('Failed to add measurement', error);
             alert('Error adding measurement');
+        }
+    };
+
+    const handleDeleteMeasurement = async (measurementId: string) => {
+        if (!confirm('Are you sure you want to delete this entry?')) return;
+
+        try {
+            await clientService.deleteMeasurement(measurementId);
+            if (id) fetchClientData(id);
+        } catch (error) {
+            console.error('Failed to delete measurement', error);
+            alert('Error deleting measurement');
         }
     };
 
@@ -180,15 +192,25 @@ export const ClientDetails = () => {
                                             <th className="px-4 py-3">Weight (kg)</th>
                                             <th className="px-4 py-3">Body Fat %</th>
                                             <th className="px-4 py-3">Notes</th>
+                                            <th className="px-4 py-3 w-10"></th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100">
                                         {client.recent_measurements.map((m: any) => (
-                                            <tr key={m.id}>
+                                            <tr key={m.id} className="group">
                                                 <td className="px-4 py-3">{new Date(m.date).toLocaleDateString()}</td>
                                                 <td className="px-4 py-3 font-medium text-text-main">{m.weight_kg}</td>
                                                 <td className="px-4 py-3">{m.body_fat_percent || '-'}%</td>
                                                 <td className="px-4 py-3 text-text-muted truncate max-w-xs">{m.notes}</td>
+                                                <td className="px-4 py-3 text-right">
+                                                    <button
+                                                        onClick={() => handleDeleteMeasurement(m.id)}
+                                                        className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1"
+                                                        title="Delete entry"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>

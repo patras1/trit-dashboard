@@ -62,5 +62,13 @@ export const clientService = {
         });
         if (!response.ok) throw new Error('Failed to add measurement');
         return response.json();
+    },
+
+    async deleteMeasurement(measurementId: string) {
+        const response = await fetch(`${API_BASE_URL}/client/measurements/${measurementId}`, {
+            method: 'DELETE',
+        });
+        if (!response.ok) throw new Error('Failed to delete measurement');
+        return true;
     }
 };
