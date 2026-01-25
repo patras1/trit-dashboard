@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { clientService, coachService } from '../lib/api';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User, Plus, X, Trash2 } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export const ClientDetails = () => {
     const { id } = useParams<{ id: string }>();
@@ -219,6 +220,87 @@ export const ClientDetails = () => {
                         ) : (
                             <p className="text-text-muted">No measurements recorded yet.</p>
                         )}
+                    </div>
+                </div>
+
+                {/* Charts Section */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Weight Progress Chart */}
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                        <h3 className="font-bold text-lg text-text-main mb-6">Weight Progress</h3>
+                        <div className="h-64 w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={[...(client.recent_measurements || [])].reverse()}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                                    <XAxis
+                                        dataKey="date"
+                                        tickFormatter={(date) => new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                        stroke="#9CA3AF"
+                                        tick={{ fontSize: 12 }}
+                                        tickLine={false}
+                                        axisLine={false}
+                                    />
+                                    <YAxis
+                                        stroke="#9CA3AF"
+                                        tick={{ fontSize: 12 }}
+                                        tickLine={false}
+                                        axisLine={false}
+                                        domain={['auto', 'auto']}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                        labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="weight_kg"
+                                        stroke="#0D9488"
+                                        strokeWidth={3}
+                                        dot={{ fill: '#0D9488', strokeWidth: 2, r: 4, stroke: '#fff' }}
+                                        activeDot={{ r: 6, strokeWidth: 0 }}
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    {/* Body Fat Progress Chart */}
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                        <h3 className="font-bold text-lg text-text-main mb-6">Body Fat % Progress</h3>
+                        <div className="h-64 w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={[...(client.recent_measurements || [])].reverse()}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                                    <XAxis
+                                        dataKey="date"
+                                        tickFormatter={(date) => new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                        stroke="#9CA3AF"
+                                        tick={{ fontSize: 12 }}
+                                        tickLine={false}
+                                        axisLine={false}
+                                    />
+                                    <YAxis
+                                        stroke="#9CA3AF"
+                                        tick={{ fontSize: 12 }}
+                                        tickLine={false}
+                                        axisLine={false}
+                                        domain={['auto', 'auto']}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                        labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="body_fat_percent"
+                                        stroke="#7C3AED"
+                                        strokeWidth={3}
+                                        dot={{ fill: '#7C3AED', strokeWidth: 2, r: 4, stroke: '#fff' }}
+                                        activeDot={{ r: 6, strokeWidth: 0 }}
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
                 </div>
 
