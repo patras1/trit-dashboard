@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { coachService } from '../lib/api';
-import { Save, Edit, ChevronRight } from 'lucide-react';
+import { Edit, ChevronRight } from 'lucide-react';
 import { IdentityTab } from '../components/coach/IdentityTab';
 import { BehaviorEngineTab } from '../components/coach/BehaviorEngineTab';
 import { ProgramsTab } from '../components/coach/ProgramsTab';
@@ -143,14 +143,22 @@ export const CoachesPage = () => {
                     </select>
 
 
-                    <button
-                        onClick={handleSave}
-                        disabled={saving}
-                        className="bg-primary hover:bg-primary-hover text-white px-6 py-2 rounded-lg text-sm font-bold transition-all shadow-sm flex items-center gap-2 disabled:opacity-50"
-                    >
-                        <Save size={16} />
-                        {saving ? 'Saving...' : 'Save Changes'}
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={handleSave}
+                            disabled={saving}
+                            className="bg-[#f2f3f3] hover:bg-gray-200 text-text-main px-6 py-2 rounded-lg text-sm font-bold transition-all shadow-sm flex items-center gap-2 disabled:opacity-50"
+                        >
+                            <span>Save Draft</span>
+                        </button>
+                        <button
+                            onClick={handleSave}
+                            disabled={saving}
+                            className="bg-primary hover:bg-primary-hover text-white px-6 py-2 rounded-lg text-sm font-bold transition-all shadow-sm flex items-center gap-2 disabled:opacity-50"
+                        >
+                            <span>Publish</span>
+                        </button>
+                    </div>
                 </div>
             </header>
 
