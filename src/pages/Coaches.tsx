@@ -7,6 +7,7 @@ import { ProgramsTab } from '../components/coach/ProgramsTab';
 import { VoiceToneTab } from '../components/coach/VoiceToneTab';
 import { QuestsGamificationTab } from '../components/coach/QuestsGamificationTab';
 import { SimulateTab } from '../components/coach/SimulateTab';
+import { ShareTab } from '../components/coach/ShareTab';
 
 interface Coach {
     id: string;
@@ -120,6 +121,12 @@ export const CoachesPage = () => {
                         >
                             Simulate
                         </button>
+                        <button
+                            onClick={() => setActiveTab('share')}
+                            className={`text-sm font-medium py-4 -mb-4 border-b-2 transition-colors ${activeTab === 'share' ? 'text-primary border-primary font-bold' : 'text-text-muted border-transparent hover:text-primary'}`}
+                        >
+                            Share
+                        </button>
                     </nav>
                 </div>
 
@@ -174,7 +181,8 @@ export const CoachesPage = () => {
                                     activeTab === 'behavior' ? 'Behavior Engine' :
                                         activeTab === 'programs' ? 'Programs' :
                                             activeTab === 'quests' ? 'Quests & Gamification' :
-                                                activeTab === 'simulate' ? 'Simulate' : 'Voice & Tone'}
+                                                activeTab === 'simulate' ? 'Simulate' :
+                                                    activeTab === 'share' ? 'Share' : 'Voice & Tone'}
                             </span>
                         </div>
 
@@ -206,6 +214,11 @@ export const CoachesPage = () => {
                         {/* TAB CONTENT: SIMULATE */}
                         {activeTab === 'simulate' && (
                             <SimulateTab />
+                        )}
+
+                        {/* TAB CONTENT: SHARE */}
+                        {activeTab === 'share' && (
+                            <ShareTab coach={selectedCoach} />
                         )}
                     </div>
                 )}
