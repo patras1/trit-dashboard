@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { clientService, coachService } from '../lib/api';
 import { Users, Search, Plus, MoreHorizontal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface Client {
     id: string;
@@ -21,7 +21,7 @@ interface Coach {
 
 export const ClientsPage = () => {
     const { t, i18n } = useTranslation();
-    // const navigate = useNavigate(); // Removed for now as unused
+    const navigate = useNavigate();
     const [clients, setClients] = useState<Client[]>([]);
     const [filteredClients, setFilteredClients] = useState<Client[]>([]);
     const [coaches, setCoaches] = useState<Coach[]>([]);
@@ -142,7 +142,10 @@ export const ClientsPage = () => {
                             <option value="completed">{t('clients.status_completed')}</option>
                         </select>
 
-                        <button className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-4 py-2.5 rounded-lg transition-colors text-sm font-medium">
+                        <button
+                            onClick={() => navigate('/clients/new')}
+                            className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-4 py-2.5 rounded-lg transition-colors text-sm font-medium"
+                        >
                             <Plus size={18} />
                             <span className="hidden md:inline">{t('clients.add_client')}</span>
                         </button>
@@ -170,7 +173,7 @@ export const ClientsPage = () => {
                                             <tr
                                                 key={client.id}
                                                 className="hover:bg-gray-50 transition-colors cursor-pointer"
-                                                onClick={() => console.log('Navigate to client', client.id)}
+                                                onClick={() => navigate(`/clients/${client.id}`)}
                                             >
                                                 <td className={`px-6 py-4 ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}>
                                                     <div>

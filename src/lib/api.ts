@@ -38,5 +38,17 @@ export const clientService = {
         const response = await fetch(`${API_BASE_URL}/client/stats`);
         if (!response.ok) throw new Error('Failed to fetch client stats');
         return response.json();
+    },
+
+    async create(clientData: any) {
+        const response = await fetch(`${API_BASE_URL}/client/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(clientData),
+        });
+        if (!response.ok) throw new Error('Failed to create client');
+        return response.json();
     }
 };
