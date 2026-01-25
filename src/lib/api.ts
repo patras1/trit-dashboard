@@ -50,5 +50,17 @@ export const clientService = {
         });
         if (!response.ok) throw new Error('Failed to create client');
         return response.json();
+    },
+
+    async addMeasurement(clientId: string, data: any) {
+        const response = await fetch(`${API_BASE_URL}/client/${clientId}/measurements`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) throw new Error('Failed to add measurement');
+        return response.json();
     }
 };

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { clientService, coachService } from '../lib/api';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User, Plus, X } from 'lucide-react';
 
 export const ClientDetails = () => {
     const { id } = useParams<{ id: string }>();
@@ -11,10 +11,41 @@ export const ClientDetails = () => {
     const [client, setClient] = useState<any>(null);
     const [coach, setCoach] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [showAddMeasurement, setShowAddMeasurement] = useState(false);
+    const [newMeasurement, setNewMeasurement] = useState({
+        weight_kg: '',
+        body_fat_percent: '',
+        notes: '',
+        date: new Date().toISOString().split('T')[0]
+    });
 
     useEffect(() => {
         if (id) fetchClientData(id);
     }, [id]);
+
+    const handleAddMeasurement = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!id) return;
+
+        try {
+            await clientService.addMeasurement(id, {
+                ...newMeasurement,
+                weight_kg: parseFloat(newMeasurement.weight_kg),
+                body_fat_percent: newMeasurement.body_fat_percent ? parseFloat(newMeasurement.body_fat_percent) : null
+            });
+            setShowAddMeasurement(false);
+            setNewMeasurement({
+                weight_kg: '',
+                body_fat_percent: '',
+                notes: '',
+                date: new Date().toISOString().split('T')[0]
+            });
+            fetchClientData(id); // Refresh data
+        } catch (error) {
+            console.error('Failed to add measurement', error);
+            alert('Error adding measurement');
+        }
+    };
 
     const fetchClientData = async (clientId: string) => {
         try {
@@ -129,7 +160,16 @@ export const ClientDetails = () => {
 
                     {/* Right Column: Progress / Measurements History */}
                     <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                        <h3 className="font-bold text-lg text-text-main mb-4">Recent Progress</h3>
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="font-bold text-lg text-text-main">Recent Progress</h3>
+                            <button
+                                onClick={() => setShowAddMeasurement(true)}
+                                className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                            >
+                                <Plus size={16} />
+                                <span>Add Progress</span>
+                            </button>
+                        </div>
 
                         {client.recent_measurements && client.recent_measurements.length > 0 ? (
                             <div className="overflow-x-auto">
@@ -159,6 +199,84 @@ export const ClientDetails = () => {
                         )}
                     </div>
                 </div>
+
+                {/* Add Measurement Modal */}
+                {showAddMeasurement && (
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                            <div className="flex items-center justify-between p-4 border-b border-gray-100">
+                                <h3 className="font-bold text-text-main">Add Progress Entry</h3>
+                                <button onClick={() => setShowAddMeasurement(false)} className="text-text-muted hover:text-text-main">
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleAddMeasurement} className="p-4 space-y-4">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-medium text-text-muted">Date</label>
+                                    <input
+                                        type="date"
+                                        required
+                                        value={newMeasurement.date}
+                                        onChange={e => setNewMeasurement({ ...newMeasurement, date: e.target.value })}
+                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-1 focus:ring-primary outline-none text-sm"
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-medium text-text-muted">Weight (kg)</label>
+                                        <input
+                                            type="number"
+                                            step="0.1"
+                                            required
+                                            value={newMeasurement.weight_kg}
+                                            onChange={e => setNewMeasurement({ ...newMeasurement, weight_kg: e.target.value })}
+                                            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-1 focus:ring-primary outline-none text-sm"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-medium text-text-muted">Body Fat %</label>
+                                        <input
+                                            type="number"
+                                            step="0.1"
+                                            value={newMeasurement.body_fat_percent}
+                                            onChange={e => setNewMeasurement({ ...newMeasurement, body_fat_percent: e.target.value })}
+                                            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-1 focus:ring-primary outline-none text-sm"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-xs font-medium text-text-muted">Notes</label>
+                                    <textarea
+                                        rows={3}
+                                        value={newMeasurement.notes}
+                                        onChange={e => setNewMeasurement({ ...newMeasurement, notes: e.target.value })}
+                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-1 focus:ring-primary outline-none text-sm resize-none"
+                                        placeholder="Optional progress notes..."
+                                    />
+                                </div>
+
+                                <div className="pt-2 flex justify-end gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowAddMeasurement(false)}
+                                        className="px-4 py-2 text-sm font-medium text-text-muted hover:bg-gray-100 rounded-lg transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="px-4 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-lg transition-colors"
+                                    >
+                                        Save Entry
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
             </main>
         </div>
     );
