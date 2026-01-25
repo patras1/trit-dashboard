@@ -1,9 +1,25 @@
 @import "tailwindcss";
 
 @theme {
-    --color-primary: #4A7A75;
-    --color-primary-hover: #3B635F;
-    --color-primary-light: #EFF6F4;
-    --color-text-main: #1F2937;
-    --color-text-muted: #6B7280;
+    --color-primary: #4b7c77;
+    --color-primary-hover: #3a615d;
+    --color-primary-light: #f0fdfc;
+    --color-text-main: #131515;
+    --color-text-muted: #6f7b7a;
+    --color-background-light: #f6f7f7;
+    --color-background-dark: #161c1b;
+}
+
+/* RTL Support */
+[dir="rtl"] {
+    direction: rtl;
+}
+
+[dir="ltr"] {
+    direction: ltr;
+}
+
+/* Ensure smooth transitions when switching direction */
+html {
+    transition: none;
 }
