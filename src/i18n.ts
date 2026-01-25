@@ -59,6 +59,23 @@ const resources = {
                 "clients": "Client List",
                 "settings": "Settings"
             },
+            "clients": {
+                "title": "Client List",
+                "search_placeholder": "Search clients...",
+                "all_coaches": "All Coaches",
+                "all_statuses": "All Statuses",
+                "add_client": "Add Client",
+                "status_active": "Active",
+                "status_paused": "Paused",
+                "status_completed": "Completed",
+                "no_clients_found": "No clients found",
+                "table": {
+                    "name": "Name",
+                    "status": "Status",
+                    "coach": "Coach",
+                    "joined": "Joined Date"
+                }
+            },
             "coaches": {
                 "title": "Coach Editor",
                 "save_draft": "Save Draft",
@@ -419,6 +436,23 @@ const resources = {
                 "coaches": "עורך מאמנים",
                 "clients": "רשימת לקוחות",
                 "settings": "הגדרות"
+            },
+            "clients": {
+                "title": "רשימת לקוחות",
+                "search_placeholder": "חיפוש לקוחות...",
+                "all_coaches": "כל המאמנים",
+                "all_statuses": "כל הסטטוסים",
+                "add_client": "הוסף לקוח",
+                "status_active": "פעיל",
+                "status_paused": "מושהה",
+                "status_completed": "הושלם",
+                "no_clients_found": "לא נמצאו לקוחות",
+                "table": {
+                    "name": "שם",
+                    "status": "סטטוס",
+                    "coach": "מאמן",
+                    "joined": "תאריך הצטרפות"
+                }
             },
             "coaches": {
                 "title": "עורך מאמנים",
