@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Users, User, BookOpen, Settings, Menu, X, LogOut, Activity } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const SidebarLink = ({ to, icon: Icon, children, onClick }: { to: string; icon: any; children: React.ReactNode; onClick?: () => void }) => {
     const location = useLocation();
@@ -12,8 +13,8 @@ const SidebarLink = ({ to, icon: Icon, children, onClick }: { to: string; icon: 
             to={to}
             onClick={onClick}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive
-                    ? 'bg-primary/10 text-primary font-bold'
-                    : 'text-text-muted hover:bg-background-light'
+                ? 'bg-primary/10 text-primary font-bold'
+                : 'text-text-muted hover:bg-background-light'
                 }`}
         >
             <Icon size={20} />
@@ -25,6 +26,7 @@ const SidebarLink = ({ to, icon: Icon, children, onClick }: { to: string; icon: 
 export const Layout = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { user, signOut } = useAuth();
+    const { t } = useTranslation();
 
     const closeMobileMenu = () => setMobileMenuOpen(false);
 
@@ -46,11 +48,11 @@ export const Layout = () => {
 
                     {/* Nav Links */}
                     <nav className="flex flex-col gap-1">
-                        <SidebarLink to="/" icon={LayoutDashboard}>Dashboard</SidebarLink>
-                        <SidebarLink to="/products" icon={BookOpen}>Products</SidebarLink>
-                        <SidebarLink to="/coaches" icon={User}>Coach Editor</SidebarLink>
-                        <SidebarLink to="/clients" icon={Users}>Client List</SidebarLink>
-                        <SidebarLink to="/settings" icon={Settings}>Settings</SidebarLink>
+                        <SidebarLink to="/" icon={LayoutDashboard}>{t('nav.dashboard')}</SidebarLink>
+                        <SidebarLink to="/products" icon={BookOpen}>{t('nav.products')}</SidebarLink>
+                        <SidebarLink to="/coaches" icon={User}>{t('nav.coaches')}</SidebarLink>
+                        <SidebarLink to="/clients" icon={Users}>{t('nav.clients')}</SidebarLink>
+                        <SidebarLink to="/settings" icon={Settings}>{t('nav.settings')}</SidebarLink>
                     </nav>
                 </div>
 
@@ -102,11 +104,11 @@ export const Layout = () => {
                 </div>
 
                 <nav className="flex-1 p-4 space-y-1">
-                    <SidebarLink to="/" icon={LayoutDashboard} onClick={closeMobileMenu}>Dashboard</SidebarLink>
-                    <SidebarLink to="/products" icon={BookOpen} onClick={closeMobileMenu}>Products</SidebarLink>
-                    <SidebarLink to="/coaches" icon={User} onClick={closeMobileMenu}>Coach Editor</SidebarLink>
-                    <SidebarLink to="/clients" icon={Users} onClick={closeMobileMenu}>Client List</SidebarLink>
-                    <SidebarLink to="/settings" icon={Settings} onClick={closeMobileMenu}>Settings</SidebarLink>
+                    <SidebarLink to="/" icon={LayoutDashboard} onClick={closeMobileMenu}>{t('nav.dashboard')}</SidebarLink>
+                    <SidebarLink to="/products" icon={BookOpen} onClick={closeMobileMenu}>{t('nav.products')}</SidebarLink>
+                    <SidebarLink to="/coaches" icon={User} onClick={closeMobileMenu}>{t('nav.coaches')}</SidebarLink>
+                    <SidebarLink to="/clients" icon={Users} onClick={closeMobileMenu}>{t('nav.clients')}</SidebarLink>
+                    <SidebarLink to="/settings" icon={Settings} onClick={closeMobileMenu}>{t('nav.settings')}</SidebarLink>
                 </nav>
 
                 <div className="p-4 border-t border-[#dfe2e2]">

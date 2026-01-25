@@ -1,4 +1,5 @@
 import { MessageSquare, Settings } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Coach {
     id: string;
@@ -20,14 +21,16 @@ interface VoiceToneTabProps {
 }
 
 export const VoiceToneTab = ({ coach, onChange }: VoiceToneTabProps) => {
+    const { t, i18n } = useTranslation();
+
     return (
         <div className="animate-in fade-in duration-300">
             {/* Page Heading */}
             <div className="flex flex-wrap justify-between items-end gap-6 mb-8">
                 <div className="max-w-2xl">
-                    <h1 className="text-text-main text-4xl font-black tracking-tight mb-2">Voice & Tone</h1>
+                    <h1 className="text-text-main text-4xl font-black tracking-tight mb-2">{t('coach_voice.title')}</h1>
                     <p className="text-text-muted text-lg leading-relaxed">
-                        Configure the linguistic style and communication patterns of the AI coach.
+                        {t('coach_voice.description')}
                     </p>
                 </div>
             </div>
@@ -37,82 +40,82 @@ export const VoiceToneTab = ({ coach, onChange }: VoiceToneTabProps) => {
                 <div className="bg-white border border-[#dfe2e2] p-6 rounded-xl shadow-sm">
                     <h3 className="font-bold text-lg text-text-main border-b border-[#dfe2e2] pb-4 mb-6 flex items-center gap-2">
                         <MessageSquare size={20} className="text-primary" />
-                        Voice Personalization
+                        {t('coach_voice.voice_personalization')}
                     </h3>
 
                     <div className="space-y-6">
                         {/* Base Tone */}
                         <div>
-                            <label className="block text-sm font-bold text-text-main mb-1">Base Tone</label>
+                            <label className="block text-sm font-bold text-text-main mb-1">{t('coach_voice.base_tone.label')}</label>
                             <select
                                 value={coach.tone}
                                 onChange={(e) => onChange({ ...coach, tone: e.target.value })}
-                                className="w-full md:w-1/2 bg-background-light border-none rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/50 text-text-main outline-none"
+                                className={`w-full md:w-1/2 bg-background-light border-none rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/50 text-text-main outline-none ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}
                             >
-                                <option value="calm">Calm & Reassuring</option>
-                                <option value="direct">Direct & No-Nonsense</option>
-                                <option value="motivational">High Energy & Motivational</option>
-                                <option value="friendly">Friendly & Conversational</option>
-                                <option value="professional">Professional & Formal</option>
+                                <option value="calm">{t('coach_voice.base_tone.options.calm')}</option>
+                                <option value="direct">{t('coach_voice.base_tone.options.direct')}</option>
+                                <option value="motivational">{t('coach_voice.base_tone.options.motivational')}</option>
+                                <option value="friendly">{t('coach_voice.base_tone.options.friendly')}</option>
+                                <option value="professional">{t('coach_voice.base_tone.options.professional')}</option>
                             </select>
-                            <p className="text-xs text-text-muted mt-2">Sets the fundamental communication style for generated messages.</p>
+                            <p className="text-xs text-text-muted mt-2">{t('coach_voice.base_tone.hint')}</p>
                         </div>
 
                         {/* Language */}
                         <div>
-                            <label className="block text-sm font-bold text-text-main mb-1">Primary Language</label>
+                            <label className="block text-sm font-bold text-text-main mb-1">{t('coach_voice.primary_language.label')}</label>
                             <select
                                 value={coach.language}
                                 onChange={(e) => onChange({ ...coach, language: e.target.value })}
-                                className="w-full md:w-1/2 bg-background-light border-none rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/50 text-text-main outline-none"
+                                className={`w-full md:w-1/2 bg-background-light border-none rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/50 text-text-main outline-none ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}
                             >
-                                <option value="en">English</option>
-                                <option value="es">Spanish</option>
-                                <option value="fr">French</option>
-                                <option value="de">German</option>
-                                <option value="it">Italian</option>
-                                <option value="pt">Portuguese</option>
+                                <option value="en">{t('coach_voice.primary_language.options.en')}</option>
+                                <option value="es">{t('coach_voice.primary_language.options.es')}</option>
+                                <option value="fr">{t('coach_voice.primary_language.options.fr')}</option>
+                                <option value="de">{t('coach_voice.primary_language.options.de')}</option>
+                                <option value="it">{t('coach_voice.primary_language.options.it')}</option>
+                                <option value="pt">{t('coach_voice.primary_language.options.pt')}</option>
                             </select>
-                            <p className="text-xs text-text-muted mt-2">Default language for all coach communications.</p>
+                            <p className="text-xs text-text-muted mt-2">{t('coach_voice.primary_language.hint')}</p>
                         </div>
 
                         {/* Response Length Preference */}
                         <div>
-                            <label className="block text-sm font-bold text-text-main mb-1">Response Length</label>
+                            <label className="block text-sm font-bold text-text-main mb-1">{t('coach_voice.response_length.label')}</label>
                             <select
-                                className="w-full md:w-1/2 bg-background-light border-none rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/50 text-text-main outline-none"
+                                className={`w-full md:w-1/2 bg-background-light border-none rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/50 text-text-main outline-none ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}
                                 defaultValue="balanced"
                             >
-                                <option value="concise">Concise (1-2 sentences)</option>
-                                <option value="balanced">Balanced (2-4 sentences)</option>
-                                <option value="detailed">Detailed (Paragraph form)</option>
+                                <option value="concise">{t('coach_voice.response_length.options.concise')}</option>
+                                <option value="balanced">{t('coach_voice.response_length.options.balanced')}</option>
+                                <option value="detailed">{t('coach_voice.response_length.options.detailed')}</option>
                             </select>
-                            <p className="text-xs text-text-muted mt-2">Average length of coach responses to user queries.</p>
+                            <p className="text-xs text-text-muted mt-2">{t('coach_voice.response_length.hint')}</p>
                         </div>
 
                         {/* Emoji Usage */}
                         <div>
-                            <label className="block text-sm font-bold text-text-main mb-1">Emoji Usage</label>
+                            <label className="block text-sm font-bold text-text-main mb-1">{t('coach_voice.emoji_usage.label')}</label>
                             <select
-                                className="w-full md:w-1/2 bg-background-light border-none rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/50 text-text-main outline-none"
+                                className={`w-full md:w-1/2 bg-background-light border-none rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/50 text-text-main outline-none ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}
                                 defaultValue="moderate"
                             >
-                                <option value="none">None (Text only)</option>
-                                <option value="minimal">Minimal (Occasional)</option>
-                                <option value="moderate">Moderate (Balanced)</option>
-                                <option value="frequent">Frequent (Every message)</option>
+                                <option value="none">{t('coach_voice.emoji_usage.options.none')}</option>
+                                <option value="minimal">{t('coach_voice.emoji_usage.options.minimal')}</option>
+                                <option value="moderate">{t('coach_voice.emoji_usage.options.moderate')}</option>
+                                <option value="frequent">{t('coach_voice.emoji_usage.options.frequent')}</option>
                             </select>
-                            <p className="text-xs text-text-muted mt-2">How often the coach uses emojis in messages.</p>
+                            <p className="text-xs text-text-muted mt-2">{t('coach_voice.emoji_usage.hint')}</p>
                         </div>
 
                         {/* Language Model Info */}
                         <div>
-                            <label className="block text-sm font-bold text-text-main mb-1">Language Model</label>
+                            <label className="block text-sm font-bold text-text-main mb-1">{t('coach_voice.language_model.label')}</label>
                             <div className="flex items-center gap-2 mb-2">
                                 <span className="text-xs font-mono bg-primary/10 text-primary px-2 py-1 rounded">GPT-4-Turbo</span>
-                                <span className="text-xs text-text-muted">Currently active</span>
+                                <span className="text-xs text-text-muted">{t('coach_voice.language_model.active')}</span>
                             </div>
-                            <p className="text-xs text-text-muted">The AI model powering this coach's responses.</p>
+                            <p className="text-xs text-text-muted">{t('coach_voice.language_model.hint')}</p>
                         </div>
                     </div>
                 </div>
@@ -122,55 +125,55 @@ export const VoiceToneTab = ({ coach, onChange }: VoiceToneTabProps) => {
                     <div className="flex justify-between items-center mb-6 border-b border-[#dfe2e2] pb-4">
                         <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
                             <Settings size={20} className="text-text-muted" />
-                            Advanced Prompt Engineering
+                            {t('coach_voice.advanced_settings.title')}
                         </h3>
-                        <span className="bg-gray-100 text-gray-500 text-xs px-2 py-1 rounded font-mono">Coming Soon</span>
+                        <span className="bg-gray-100 text-gray-500 text-xs px-2 py-1 rounded font-mono">{t('coach_voice.advanced_settings.coming_soon')}</span>
                     </div>
 
                     <div className="space-y-6">
                         <div>
-                            <label className="block text-sm font-bold text-text-main mb-1">System Prompt Template</label>
+                            <label className="block text-sm font-bold text-text-main mb-1">{t('coach_voice.advanced_settings.system_prompt')}</label>
                             <textarea
                                 disabled
                                 placeholder="You are a tough but fair coach. You prefer short sentences..."
-                                className="w-full bg-background-light border-none rounded-lg p-4 h-32 resize-none text-xs font-mono text-text-muted cursor-not-allowed"
+                                className={`w-full bg-background-light border-none rounded-lg p-4 h-32 resize-none text-xs font-mono text-text-muted cursor-not-allowed ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}
                             ></textarea>
-                            <p className="text-xs text-text-muted mt-2">Custom system prompt for advanced users (v2.0)</p>
+                            <p className="text-xs text-text-muted mt-2">{t('coach_voice.advanced_settings.system_prompt_hint')}</p>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-text-main mb-1">Vocabulary Preferences</label>
+                            <label className="block text-sm font-bold text-text-main mb-1">{t('coach_voice.advanced_settings.vocabulary')}</label>
                             <input
                                 disabled
                                 type="text"
                                 placeholder="gains, fuel, power, shred, optimize..."
-                                className="w-full bg-background-light border-none rounded-lg px-4 py-2.5 text-sm text-text-muted cursor-not-allowed"
+                                className={`w-full bg-background-light border-none rounded-lg px-4 py-2.5 text-sm text-text-muted cursor-not-allowed ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}
                             />
-                            <p className="text-xs text-text-muted mt-2">Preferred terms and phrases for this coach (v2.0)</p>
+                            <p className="text-xs text-text-muted mt-2">{t('coach_voice.advanced_settings.vocabulary_hint')}</p>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-text-main mb-1">Forbidden Words</label>
+                            <label className="block text-sm font-bold text-text-main mb-1">{t('coach_voice.advanced_settings.forbidden')}</label>
                             <input
                                 disabled
                                 type="text"
                                 placeholder="diet, cheat, guilt, bad food..."
-                                className="w-full bg-background-light border-none rounded-lg px-4 py-2.5 text-sm text-text-muted cursor-not-allowed"
+                                className={`w-full bg-background-light border-none rounded-lg px-4 py-2.5 text-sm text-text-muted cursor-not-allowed ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}
                             />
-                            <p className="text-xs text-text-muted mt-2">Words the coach should avoid using (v2.0)</p>
+                            <p className="text-xs text-text-muted mt-2">{t('coach_voice.advanced_settings.forbidden_hint')}</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Example Messages Preview */}
                 <div className="bg-white border border-[#dfe2e2] p-6 rounded-xl shadow-sm">
-                    <h3 className="font-bold text-lg text-text-main mb-4">Example Messages</h3>
-                    <p className="text-xs text-text-muted mb-4">Preview how this coach might respond with current settings</p>
+                    <h3 className="font-bold text-lg text-text-main mb-4">{t('coach_voice.example_messages.title')}</h3>
+                    <p className="text-xs text-text-muted mb-4">{t('coach_voice.example_messages.hint')}</p>
 
                     <div className="space-y-4">
                         {/* Example 1 */}
                         <div className="bg-background-light p-4 rounded-lg border-l-4 border-primary">
-                            <p className="text-xs font-bold text-text-muted mb-1">Scenario: User missed protein goal</p>
+                            <p className="text-xs font-bold text-text-muted mb-1">{t('coach_voice.example_messages.protein_hack')}</p>
                             <p className="text-sm text-text-main leading-relaxed">
                                 {coach.tone === 'motivational' && "No worries! Tomorrow's a fresh start. Let's crush that protein goal together! 💪"}
                                 {coach.tone === 'direct' && "You missed your protein target today. Plan your meals better tomorrow."}
@@ -182,7 +185,7 @@ export const VoiceToneTab = ({ coach, onChange }: VoiceToneTabProps) => {
 
                         {/* Example 2 */}
                         <div className="bg-background-light p-4 rounded-lg border-l-4 border-primary">
-                            <p className="text-xs font-bold text-text-muted mb-1">Scenario: User achieved weekly streak</p>
+                            <p className="text-xs font-bold text-text-muted mb-1">{t('coach_voice.example_messages.streak_hack')}</p>
                             <p className="text-sm text-text-main leading-relaxed">
                                 {coach.tone === 'motivational' && "INCREDIBLE! 7 days of consistency! This is how champions are built! 🔥🎉"}
                                 {coach.tone === 'direct' && "Well done. You've completed 7 consecutive days. Keep it up."}

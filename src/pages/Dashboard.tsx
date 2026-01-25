@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Package, TrendingUp, Database } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export const Dashboard = () => {
+    const { t, i18n } = useTranslation();
     const [totalProducts, setTotalProducts] = useState<number | null>(null);
     const [categories, setCategories] = useState<{ name: string; count: number }[]>([]);
     const [loading, setLoading] = useState(true);
@@ -33,7 +35,7 @@ export const Dashboard = () => {
         if (!productsError && products) {
             const categoryCounts: Record<string, number> = {};
             products.forEach(p => {
-                const cat = p.category || 'ללא קטגוריה';
+                const cat = p.category || (i18n.language === 'he' ? 'ללא קטגוריה' : 'Uncategorized');
                 categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
             });
 
@@ -48,16 +50,16 @@ export const Dashboard = () => {
     };
 
     return (
-        <div className="space-y-8">
+        <div className="p-6 md:p-8 space-y-8">
             <div>
-                <h1 className="text-2xl font-bold text-text-main mb-6">לוח בקרה</h1>
+                <h1 className="text-2xl font-bold text-text-main mb-6">{t('dashboard')}</h1>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <Link to="/products" className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md hover:border-primary/30 transition-all cursor-pointer">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h3 className="text-text-muted text-sm font-medium">סה"כ מוצרים</h3>
+                                <h3 className="text-text-muted text-sm font-medium">{t('stats.total_products')}</h3>
                                 <p className="text-3xl font-bold text-text-main mt-2">
-                                    {loading ? '...' : totalProducts?.toLocaleString('he-IL')}
+                                    {loading ? '...' : totalProducts?.toLocaleString(i18n.language === 'he' ? 'he-IL' : 'en-US')}
                                 </p>
                             </div>
                             <div className="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center">
@@ -69,7 +71,7 @@ export const Dashboard = () => {
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h3 className="text-text-muted text-sm font-medium">עם ערכים תזונתיים</h3>
+                                <h3 className="text-text-muted text-sm font-medium">{t('stats.with_nutrition')}</h3>
                                 <p className="text-3xl font-bold text-text-main mt-2">-</p>
                             </div>
                             <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
@@ -81,7 +83,7 @@ export const Dashboard = () => {
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h3 className="text-text-muted text-sm font-medium">מקור נתונים</h3>
+                                <h3 className="text-text-muted text-sm font-medium">{t('stats.data_source')}</h3>
                                 <p className="text-lg font-bold text-text-main mt-2">Shufersal</p>
                             </div>
                             <div className="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center">
@@ -98,7 +100,7 @@ export const Dashboard = () => {
                 <div className="md:w-1/3">
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-[400px]">
                         <div className="p-4 border-b border-gray-100 bg-gray-50">
-                            <h3 className="font-semibold text-text-main">קטגוריות</h3>
+                            <h3 className="font-semibold text-text-main">{t('stats.categories')}</h3>
                         </div>
                         <div className="overflow-y-auto flex-1">
                             <div className="flex flex-col divide-y divide-gray-100">
@@ -116,12 +118,12 @@ export const Dashboard = () => {
                                 ))}
                                 {categories.length === 0 && !loading && (
                                     <div className="p-8 text-center text-text-muted">
-                                        לא נמצאו קטגוריות
+                                        {i18n.language === 'he' ? 'לא נמצאו קטגוריות' : 'No categories found'}
                                     </div>
                                 )}
                                 {loading && categories.length === 0 && (
                                     <div className="p-8 text-center text-text-muted">
-                                        טוען קטגוריות...
+                                        {i18n.language === 'he' ? 'טוען קטגוריות...' : 'Loading categories...'}
                                     </div>
                                 )}
                             </div>

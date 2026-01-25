@@ -1,4 +1,5 @@
 import { User, Info, Activity } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Coach {
     id: string;
@@ -20,37 +21,39 @@ interface IdentityTabProps {
 }
 
 export const IdentityTab = ({ coach, onChange }: IdentityTabProps) => {
+    const { t, i18n } = useTranslation();
+
     return (
         <div className="animate-in fade-in duration-300 max-w-4xl">
             {/* Core Identity Section */}
             <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden mb-8">
                 <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
                     <User size={20} className="text-primary" />
-                    <h3 className="text-text-main text-base font-bold">Core Identity</h3>
+                    <h3 className="text-text-main text-base font-bold">{t('coach_identity.core_identity')}</h3>
                 </div>
                 <div className="p-6 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="flex flex-col gap-2">
-                            <label className="text-sm font-semibold text-text-main">Coach Name</label>
+                            <label className="text-sm font-semibold text-text-main">{t('coach_identity.coach_name')}</label>
                             <input
-                                className="w-full bg-background-light border-none rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/50 text-text-main outline-none"
-                                placeholder="Enter coach name"
+                                className={`w-full bg-background-light border-none rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/50 text-text-main outline-none ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}
+                                placeholder={t('coach_identity.coach_name_placeholder')}
                                 type="text"
                                 value={coach.name}
                                 onChange={(e) => onChange({ ...coach, name: e.target.value })}
                             />
-                            <p className="text-text-muted text-[11px]">The public name visible to your clients.</p>
+                            <p className="text-text-muted text-[11px]">{t('coach_identity.coach_name_hint')}</p>
                         </div>
                         <div className="flex flex-col gap-2">
-                            <label className="text-sm font-semibold text-text-main">Descriptor</label>
+                            <label className="text-sm font-semibold text-text-main">{t('coach_identity.descriptor')}</label>
                             <input
-                                className="w-full bg-background-light border-none rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/50 text-text-main outline-none"
-                                placeholder="e.g. AI Nutrition Expert"
+                                className={`w-full bg-background-light border-none rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/50 text-text-main outline-none ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}
+                                placeholder={t('coach_identity.descriptor_placeholder')}
                                 type="text"
                                 value={coach.descriptor}
                                 onChange={(e) => onChange({ ...coach, descriptor: e.target.value })}
                             />
-                            <p className="text-text-muted text-[11px]">A short tagline describing the coach's persona.</p>
+                            <p className="text-text-muted text-[11px]">{t('coach_identity.descriptor_hint')}</p>
                         </div>
                     </div>
                 </div>
@@ -60,40 +63,40 @@ export const IdentityTab = ({ coach, onChange }: IdentityTabProps) => {
             <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
                 <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
                     <Info size={20} className="text-primary" />
-                    <h3 className="text-text-main text-base font-bold">Visual Brand</h3>
+                    <h3 className="text-text-main text-base font-bold">{t('coach_identity.visual_brand')}</h3>
                 </div>
                 <div className="p-6 space-y-8">
                     {/* Avatar Selection */}
                     <div className="flex items-start gap-6">
                         <div className="flex flex-col items-center gap-2">
-                            <label className="text-sm font-semibold text-text-main w-full">Coach Avatar</label>
+                            <label className="text-sm font-semibold text-text-main w-full">{t('coach_identity.avatar_label')}</label>
                             <div className="size-24 rounded-full border-4 border-primary/10 flex items-center justify-center bg-background-light relative group cursor-pointer overflow-hidden">
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                    <span className="text-white text-sm">Upload</span>
+                                    <span className="text-white text-sm">{t('coach_identity.upload')}</span>
                                 </div>
                                 <User size={48} className="text-primary" />
                             </div>
                         </div>
                         <div className="flex-1 flex flex-col gap-2 mt-7">
-                            <label className="text-sm font-semibold text-text-main">Avatar Image URL</label>
+                            <label className="text-sm font-semibold text-text-main">{t('coach_identity.image_url_label')}</label>
                             <div className="flex gap-2">
                                 <input
-                                    className="flex-1 bg-background-light border-none rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/50 text-text-main outline-none"
-                                    placeholder="Paste URL here"
+                                    className={`flex-1 bg-background-light border-none rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/50 text-text-main outline-none ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}
+                                    placeholder={t('coach_identity.image_url_placeholder')}
                                     type="text"
                                 />
                                 <button className="bg-background-light px-3 rounded-lg text-primary hover:bg-primary/10 transition-colors">
                                     <Info size={20} />
                                 </button>
                             </div>
-                            <p className="text-text-muted text-[11px]">Recommended size: 512x512px. PNG or JPG.</p>
+                            <p className="text-text-muted text-[11px]">{t('coach_identity.image_url_hint')}</p>
                         </div>
                     </div>
 
                     {/* Color Config */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="space-y-4">
-                            <label className="text-sm font-semibold text-text-main">Theme Color</label>
+                            <label className="text-sm font-semibold text-text-main">{t('coach_identity.theme_color')}</label>
                             <div className="flex items-center gap-3">
                                 <div className="size-10 rounded-lg bg-primary shadow-inner border border-black/5"></div>
                                 <div className="flex flex-col flex-1">
@@ -116,7 +119,7 @@ export const IdentityTab = ({ coach, onChange }: IdentityTabProps) => {
                             </div>
                         </div>
                         <div className="space-y-4">
-                            <label className="text-sm font-semibold text-text-main">Accent Color</label>
+                            <label className="text-sm font-semibold text-text-main">{t('coach_identity.accent_color')}</label>
                             <div className="flex items-center gap-3">
                                 <div className="size-10 rounded-lg bg-[#E2AD32] shadow-inner border border-black/5"></div>
                                 <div className="flex flex-col flex-1">
@@ -149,12 +152,12 @@ export const IdentityTab = ({ coach, onChange }: IdentityTabProps) => {
                         <Activity size={20} />
                     </div>
                     <div>
-                        <h4 className="text-sm font-bold">Live Preview</h4>
-                        <p className="text-text-muted text-xs">See how your changes look in the client app.</p>
+                        <h4 className="text-sm font-bold">{t('coach_identity.preview_title')}</h4>
+                        <p className="text-text-muted text-xs">{t('coach_identity.preview_desc')}</p>
                     </div>
                 </div>
                 <button className="bg-white px-4 py-2 rounded-lg text-xs font-bold border border-[#dfe2e2] hover:shadow-sm transition-all">
-                    Launch Simulator
+                    {t('coach_identity.launch_simulator')}
                 </button>
             </div>
         </div>

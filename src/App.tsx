@@ -9,6 +9,7 @@ import { Login } from './pages/Login';
 import { AuthProvider } from './contexts/AuthContext';
 import { DirectionProvider } from './contexts/DirectionContext';
 import { RequireAuth } from './components/auth/RequireAuth';
+import './i18n';
 
 function App() {
   return (
