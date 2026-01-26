@@ -4,6 +4,7 @@ import { clientService } from '../lib/api';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User, Plus, X, Trash2, Activity, Thermometer, Pill, FileText, HeartPulse, Target, Utensils, BookOpen, Brain, Dumbbell, TrendingDown, Clock, History as HistoryIcon } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { NewPhaseModal } from './NewPhase';
 
 export const ClientDetails = () => {
     const { id } = useParams<{ id: string }>();
@@ -20,12 +21,15 @@ export const ClientDetails = () => {
     const [showAddCondition, setShowAddCondition] = useState(false);
     const [showAddMedication, setShowAddMedication] = useState(false);
     const [showAddBloodTest, setShowAddBloodTest] = useState(false);
+    const [selectedBloodTest, setSelectedBloodTest] = useState<any>(null);
 
     // Strategy State
     const [goals, setGoals] = useState<any[]>([]);
     const [prescriptions, setPrescriptions] = useState<any[]>([]);
     const [protocols, setProtocols] = useState<any[]>([]);
+    const [selectedPrescriptionId, setSelectedPrescriptionId] = useState<string | null>(null);
     const [showAddProtocol, setShowAddProtocol] = useState(false);
+    const [showAddPhase, setShowAddPhase] = useState(false);
     const [newProtocol, setNewProtocol] = useState({
         name: '',
         type: 'nutrition',
@@ -85,6 +89,10 @@ export const ClientDetails = () => {
         alt: '',
         ast: '',
         ferritin: '',
+        hemoglobin: '',
+        vitamin_b12: '',
+        vitamin_d: '',
+        folate: '',
         ldl: '',
         hdl: '',
         clinician_notes: ''
@@ -129,9 +137,30 @@ export const ClientDetails = () => {
         e.preventDefault();
         if (!id) return;
         try {
-            await clientService.addBloodTest(id, newBloodTest);
+            // Sanitize numeric fields - convert empty strings to null
+            const sanitizedData = {
+                ...newBloodTest,
+                glucose: newBloodTest.glucose ? parseFloat(newBloodTest.glucose) : null,
+                hba1c: newBloodTest.hba1c ? parseFloat(newBloodTest.hba1c) : null,
+                alt: newBloodTest.alt ? parseFloat(newBloodTest.alt) : null,
+                ast: newBloodTest.ast ? parseFloat(newBloodTest.ast) : null,
+                ferritin: newBloodTest.ferritin ? parseFloat(newBloodTest.ferritin) : null,
+                hemoglobin: newBloodTest.hemoglobin ? parseFloat(newBloodTest.hemoglobin) : null,
+                vitamin_b12: newBloodTest.vitamin_b12 ? parseFloat(newBloodTest.vitamin_b12) : null,
+                vitamin_d: newBloodTest.vitamin_d ? parseFloat(newBloodTest.vitamin_d) : null,
+                folate: newBloodTest.folate ? parseFloat(newBloodTest.folate) : null,
+                ldl: newBloodTest.ldl ? parseFloat(newBloodTest.ldl) : null,
+                hdl: newBloodTest.hdl ? parseFloat(newBloodTest.hdl) : null
+            };
+
+            await clientService.addBloodTest(id, sanitizedData);
             setShowAddBloodTest(false);
-            setNewBloodTest({ date: new Date().toISOString().split('T')[0], glucose: '', hba1c: '', alt: '', ast: '', ferritin: '', ldl: '', hdl: '', clinician_notes: '' });
+            setNewBloodTest({
+                date: new Date().toISOString().split('T')[0],
+                glucose: '', hba1c: '', alt: '', ast: '', ferritin: '',
+                hemoglobin: '', vitamin_b12: '', vitamin_d: '', folate: '',
+                ldl: '', hdl: '', clinician_notes: ''
+            });
             fetchMedicalData(id);
         } catch (error) {
             console.error('Failed to add blood test', error);
@@ -344,16 +373,22 @@ export const ClientDetails = () => {
 
     const fetchStrategyData = async (clientId: string) => {
         try {
-            const [clientGoals, clientPlans, clientProtocols] = await Promise.all([
+            const [goalsData, prescriptionsData, protocolsData] = await Promise.all([
                 clientService.getGoals(clientId),
                 clientService.getPrescriptions(clientId),
                 clientService.getProtocols(clientId)
             ]);
-            setGoals(clientGoals);
-            setPrescriptions(clientPlans);
-            setProtocols(clientProtocols);
+            setGoals(goalsData);
+            setPrescriptions(prescriptionsData);
+            setProtocols(protocolsData);
+
+            // Set active prescription as default selected
+            const active = prescriptionsData.find((p: any) => p.is_active);
+            if (active && !selectedPrescriptionId) {
+                setSelectedPrescriptionId(active.id);
+            }
         } catch (error) {
-            console.error('Failed to load strategy data', error);
+            console.error('Failed to fetch strategy data', error);
         }
     };
 
@@ -622,9 +657,9 @@ export const ClientDetails = () => {
                             </div>
 
                             {client.recent_measurements && client.recent_measurements.length > 0 ? (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm text-left">
-                                        <thead className="bg-gray-50 text-gray-500 font-medium">
+                                <div className="max-h-[300px] overflow-y-auto pr-2">
+                                    <table className="w-full text-sm text-left border-separate border-spacing-0">
+                                        <thead className="bg-gray-50 text-gray-500 font-medium sticky top-0 z-10 shadow-sm">
                                             <tr>
                                                 <th className="px-4 py-3">Date</th>
                                                 <th className="px-4 py-3">Weight (kg)</th>
@@ -744,24 +779,24 @@ export const ClientDetails = () => {
 
                 {activeTab === 'medical' && (
                     <div className="space-y-6">
-                        <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                            <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
-                                <Activity size={20} className="text-primary" />
-                                Medical Conditions
-                            </h3>
-                            <button
-                                onClick={() => setShowAddCondition(true)}
-                                className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
-                            >
-                                <Plus size={16} />
-                                Add Condition
-                            </button>
-                        </div>
-                        {/* List Conditions */}
-                        {medicalConditions.length === 0 ? (
-                            <div className="text-center p-8 text-text-muted">No medical conditions recorded.</div>
-                        ) : (
-                            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        {/* Medical Conditions */}
+                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                            <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50/30">
+                                <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                                    <Activity size={20} className="text-primary" />
+                                    Medical Conditions
+                                </h3>
+                                <button
+                                    onClick={() => setShowAddCondition(true)}
+                                    className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                                >
+                                    <Plus size={16} />
+                                    Add Condition
+                                </button>
+                            </div>
+                            {medicalConditions.length === 0 ? (
+                                <div className="text-center p-8 text-text-muted">No medical conditions recorded.</div>
+                            ) : (
                                 <table className="w-full text-sm text-left">
                                     <thead className="bg-gray-50 text-gray-500 font-medium">
                                         <tr>
@@ -788,27 +823,27 @@ export const ClientDetails = () => {
                                         ))}
                                     </tbody>
                                 </table>
-                            </div>
-                        )}
+                            )}
+                        </div>
 
                         {/* Medications */}
-                        <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                            <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
-                                <Pill size={20} className="text-primary" />
-                                Medications
-                            </h3>
-                            <button
-                                onClick={() => setShowAddMedication(true)}
-                                className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
-                            >
-                                <Plus size={16} />
-                                Add Medication
-                            </button>
-                        </div>
-                        {medications.length === 0 ? (
-                            <div className="text-center p-8 text-text-muted">No medications recorded.</div>
-                        ) : (
-                            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                            <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50/30">
+                                <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                                    <Pill size={20} className="text-primary" />
+                                    Medications
+                                </h3>
+                                <button
+                                    onClick={() => setShowAddMedication(true)}
+                                    className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                                >
+                                    <Plus size={16} />
+                                    Add Medication
+                                </button>
+                            </div>
+                            {medications.length === 0 ? (
+                                <div className="text-center p-8 text-text-muted">No medications recorded.</div>
+                            ) : (
                                 <table className="w-full text-sm text-left">
                                     <thead className="bg-gray-50 text-gray-500 font-medium">
                                         <tr>
@@ -835,27 +870,27 @@ export const ClientDetails = () => {
                                         ))}
                                     </tbody>
                                 </table>
-                            </div>
-                        )}
+                            )}
+                        </div>
 
                         {/* Blood Tests */}
-                        <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                            <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
-                                <Thermometer size={20} className="text-primary" />
-                                Blood Tests
-                            </h3>
-                            <button
-                                onClick={() => setShowAddBloodTest(true)}
-                                className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
-                            >
-                                <Plus size={16} />
-                                Add Blood Test
-                            </button>
-                        </div>
-                        {bloodTests.length === 0 ? (
-                            <div className="text-center p-8 text-text-muted">No blood tests recorded.</div>
-                        ) : (
-                            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                            <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50/30">
+                                <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                                    <Thermometer size={20} className="text-primary" />
+                                    Blood Tests
+                                </h3>
+                                <button
+                                    onClick={() => setShowAddBloodTest(true)}
+                                    className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                                >
+                                    <Plus size={16} />
+                                    Add Blood Test
+                                </button>
+                            </div>
+                            {bloodTests.length === 0 ? (
+                                <div className="text-center p-8 text-text-muted">No blood tests recorded.</div>
+                            ) : (
                                 <table className="w-full text-sm text-left">
                                     <thead className="bg-gray-50 text-gray-500 font-medium">
                                         <tr>
@@ -879,8 +914,12 @@ export const ClientDetails = () => {
                                             };
 
                                             return (
-                                                <tr key={item.id} className="hover:bg-gray-50">
-                                                    <td className="px-4 py-3">{new Date(item.date).toLocaleDateString()}</td>
+                                                <tr
+                                                    key={item.id}
+                                                    className="hover:bg-blue-50 cursor-pointer transition-colors"
+                                                    onClick={() => setSelectedBloodTest(item)}
+                                                >
+                                                    <td className="px-4 py-3 font-medium text-text-main">{new Date(item.date).toLocaleDateString()}</td>
                                                     <td className="px-4 py-3">
                                                         {item.glucose || '-'}
                                                         <div className="ml-1 inline">{getTrend(item.glucose, prev?.glucose)}</div>
@@ -889,19 +928,22 @@ export const ClientDetails = () => {
                                                         {item.hba1c || '-'}%
                                                         <div className="ml-1 inline">{getTrend(item.hba1c, prev?.hba1c)}</div>
                                                     </td>
-                                                    <td className="px-4 py-3">{item.ldl}/{item.hdl}</td>
+                                                    <td className="px-4 py-3">{item.ldl || '-'}/{item.hdl || '-'}</td>
                                                     <td className="px-4 py-3 text-right">
-                                                        <button onClick={() => { if (confirm('Delete?')) clientService.deleteBloodTest(item.id).then(() => fetchMedicalData(id!)) }} className="text-gray-400 hover:text-red-500 transition-colors">
-                                                            <Trash2 size={14} />
-                                                        </button>
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <ChevronRight size={16} className="text-gray-300" />
+                                                            <button onClick={(e) => { e.stopPropagation(); if (confirm('Delete?')) clientService.deleteBloodTest(item.id).then(() => fetchMedicalData(id!)) }} className="p-1 text-gray-400 hover:text-red-500 transition-colors">
+                                                                <Trash2 size={14} />
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             );
                                         })}
                                     </tbody>
                                 </table>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 )}
 
@@ -1000,26 +1042,40 @@ export const ClientDetails = () => {
 
                         {/* Plan Change Log - New Section */}
                         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 overflow-hidden">
-                            <h3 className="font-bold text-lg text-text-main mb-6 flex items-center gap-2">
-                                <HistoryIcon size={20} className="text-primary" />
-                                Plan Change Log
-                            </h3>
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                                    <HistoryIcon size={20} className="text-primary" />
+                                    Plan Change Log
+                                </h3>
+                                <button
+                                    onClick={() => setShowAddPhase(true)}
+                                    className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-4 py-2 rounded-lg text-sm font-bold transition-all border border-primary/20 shadow-sm"
+                                >
+                                    <Plus size={16} />
+                                    New Phase
+                                </button>
+                            </div>
                             <div className="relative border-l-2 border-primary/20 ml-3 pl-8 space-y-8">
                                 {prescriptions.slice().sort((a: any, b: any) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime()).map((plan: any, index: number, arr: any[]) => {
                                     const nextPlan = arr[index + 1];
                                     const kcalDiff = nextPlan ? plan.calories_target - nextPlan.calories_target : 0;
                                     const proteinDiff = nextPlan ? plan.protein_grams - nextPlan.protein_grams : 0;
+                                    const isSelected = selectedPrescriptionId === plan.id;
 
                                     return (
-                                        <div key={plan.id} className="relative">
+                                        <div
+                                            key={plan.id}
+                                            className={`relative cursor-pointer transition-all ${isSelected ? 'scale-[1.02]' : 'hover:scale-[1.01]'}`}
+                                            onClick={() => setSelectedPrescriptionId(plan.id)}
+                                        >
                                             {/* Date indicator dot */}
-                                            <div className="absolute -left-[41px] top-1.5 w-6 h-6 rounded-full bg-white border-4 border-primary shadow-sm z-10" />
+                                            <div className={`absolute -left-[41px] top-1.5 w-6 h-6 rounded-full bg-white border-4 ${isSelected ? 'border-primary shadow-md' : 'border-gray-200'} z-10 transition-colors`} />
 
-                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                            <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl border-2 transition-all ${isSelected ? 'bg-primary/5 border-primary shadow-sm' : 'bg-transparent border-transparent hover:bg-gray-50'}`}>
                                                 <div>
                                                     <div className="flex items-center gap-3">
-                                                        <p className="font-bold text-text-main">{new Date(plan.start_date).toLocaleDateString()}</p>
-                                                        <span className="text-[10px] px-2 py-0.5 rounded bg-gray-100 text-gray-600 font-bold uppercase">{plan.phase_name}</span>
+                                                        <p className={`font-bold ${isSelected ? 'text-primary' : 'text-text-main'}`}>{new Date(plan.start_date).toLocaleDateString()}</p>
+                                                        <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${isSelected ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}>{plan.phase_name}</span>
                                                     </div>
                                                     <p className="text-xs text-text-muted mt-1 italic">Consultation adjustment</p>
                                                 </div>
@@ -1041,6 +1097,7 @@ export const ClientDetails = () => {
                                                             </p>
                                                         )}
                                                     </div>
+                                                    <ChevronRight size={16} className={`transition-transform duration-300 ${isSelected ? 'text-primary rotate-90' : 'text-gray-300'}`} />
                                                 </div>
                                             </div>
                                         </div>
@@ -1049,23 +1106,9 @@ export const ClientDetails = () => {
                             </div>
                         </div>
 
-                        {/* Current Nutrition Plan Display - Refined UI */}
-                        <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm mt-8">
-                            <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
-                                <FileText size={20} className="text-primary" />
-                                Current Nutrition Prescriptions
-                            </h3>
-                            <button
-                                onClick={() => alert('Strategy Editing Coming Soon')}
-                                className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-4 py-2 rounded-lg text-sm font-bold transition-all border border-primary/20 shadow-sm"
-                            >
-                                <Plus size={16} />
-                                New Phase
-                            </button>
-                        </div>
 
-                        {prescriptions.filter((p: any) => p.is_active).map((plan: any) => (
-                            <div key={plan.id} className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-primary shadow-xl p-8 relative overflow-hidden">
+                        {prescriptions.filter((p: any) => p.id === selectedPrescriptionId).map((plan: any) => (
+                            <div key={plan.id} className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-primary shadow-xl p-8 relative overflow-hidden animate-in slide-in-from-bottom-4 duration-500">
                                 {/* Decor */}
                                 <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none">
                                     <Activity size={200} />
@@ -1075,7 +1118,11 @@ export const ClientDetails = () => {
                                     <div>
                                         <div className="flex items-center gap-3 mb-2">
                                             <h4 className="font-black text-2xl text-text-main tracking-tight">{plan.phase_name || 'Nutrition Plan'}</h4>
-                                            <span className="bg-green-500 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">Current Active Plan</span>
+                                            {plan.is_active ? (
+                                                <span className="bg-green-500 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">Current Active Plan</span>
+                                            ) : (
+                                                <span className="bg-gray-400 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">Historical Phase</span>
+                                            )}
                                         </div>
                                         <div className="flex items-center gap-2 text-text-muted">
                                             <Calendar size={14} />
@@ -1330,8 +1377,16 @@ export const ClientDetails = () => {
                             <form onSubmit={handleAddBloodTest} className="space-y-4">
                                 <div><label className="block text-sm font-medium text-gray-700">Date</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.date} onChange={e => setNewBloodTest({ ...newBloodTest, date: e.target.value })} /></div>
                                 <div className="grid grid-cols-2 gap-4">
+                                    <div><label className="block text-sm font-medium text-gray-700">Hemoglobin</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.hemoglobin} onChange={e => setNewBloodTest({ ...newBloodTest, hemoglobin: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Ferritin</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.ferritin} onChange={e => setNewBloodTest({ ...newBloodTest, ferritin: e.target.value })} /></div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div><label className="block text-sm font-medium text-gray-700">Vitamin B12</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.vitamin_b12} onChange={e => setNewBloodTest({ ...newBloodTest, vitamin_b12: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Vitamin D</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.vitamin_d} onChange={e => setNewBloodTest({ ...newBloodTest, vitamin_d: e.target.value })} /></div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div><label className="block text-sm font-medium text-gray-700">Folate</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.folate} onChange={e => setNewBloodTest({ ...newBloodTest, folate: e.target.value })} /></div>
                                     <div><label className="block text-sm font-medium text-gray-700">Glucose</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.glucose} onChange={e => setNewBloodTest({ ...newBloodTest, glucose: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">HbA1c %</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.hba1c} onChange={e => setNewBloodTest({ ...newBloodTest, hba1c: e.target.value })} /></div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div><label className="block text-sm font-medium text-gray-700">LDL</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.ldl} onChange={e => setNewBloodTest({ ...newBloodTest, ldl: e.target.value })} /></div>
@@ -1514,6 +1569,103 @@ export const ClientDetails = () => {
 
                                 <div className="flex justify-end gap-2 pt-4 border-t"><button type="button" onClick={() => setShowAddSession(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save Session Log</button></div>
                             </form>
+                        </div>
+                    </div>
+                )}
+                {/* Add Phase Modal */}
+                {showAddPhase && id && (
+                    <NewPhaseModal
+                        clientId={id}
+                        clientName={client?.full_name || 'Client'}
+                        onClose={() => setShowAddPhase(false)}
+                        onSuccess={() => {
+                            setShowAddPhase(false);
+                            fetchStrategyData(id);
+                        }}
+                    />
+                )}
+                {/* Blood Test Details Modal */}
+                {selectedBloodTest && (
+                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                        <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+                            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-red-50 text-red-600 rounded-xl">
+                                        <Thermometer size={24} />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-xl font-black text-text-main">Blood Analysis Results</h2>
+                                        <p className="text-text-muted text-sm">{new Date(selectedBloodTest.date).toLocaleDateString(undefined, { dateStyle: 'long' })}</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => setSelectedBloodTest(null)} className="p-2 text-gray-400 hover:text-text-main hover:bg-gray-100 rounded-xl transition-all">
+                                    <X size={24} />
+                                </button>
+                            </div>
+
+                            <div className="p-6 space-y-8">
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Hemoglobin (Hb)</p>
+                                        <p className="text-2xl font-black text-blue-800">{selectedBloodTest.hemoglobin || 'N/A'}</p>
+                                        <p className="text-[10px] font-bold text-text-muted mt-1">g/dL</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">B12</p>
+                                        <p className="text-2xl font-black text-purple-600">{selectedBloodTest.vitamin_b12 || 'N/A'}</p>
+                                        <p className="text-[10px] font-bold text-text-muted mt-1">pg/mL</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Vitamin D</p>
+                                        <p className="text-2xl font-black text-orange-400">{selectedBloodTest.vitamin_d || 'N/A'}</p>
+                                        <p className="text-[10px] font-bold text-text-muted mt-1">ng/mL</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Folate</p>
+                                        <p className="text-2xl font-black text-green-700">{selectedBloodTest.folate || 'N/A'}</p>
+                                        <p className="text-[10px] font-bold text-text-muted mt-1">ng/mL</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Ferritin</p>
+                                        <p className="text-2xl font-black text-orange-600">{selectedBloodTest.ferritin || 'N/A'}</p>
+                                        <p className="text-[10px] font-bold text-text-muted mt-1">ng/mL</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Glucose</p>
+                                        <p className="text-2xl font-black text-text-main">{selectedBloodTest.glucose || 'N/A'}</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">HbA1c</p>
+                                        <p className="text-2xl font-black text-primary">{selectedBloodTest.hba1c ? `${selectedBloodTest.hba1c}%` : 'N/A'}</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">LDL (Bad)</p>
+                                        <p className="text-2xl font-black text-red-600">{selectedBloodTest.ldl || 'N/A'}</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">HDL (Good)</p>
+                                        <p className="text-2xl font-black text-green-600">{selectedBloodTest.hdl || 'N/A'}</p>
+                                    </div>
+                                </div>
+
+                                {selectedBloodTest.clinician_notes && (
+                                    <div className="bg-blue-50 p-5 rounded-2xl border border-blue-100">
+                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">Clinician Interpretation</h4>
+                                        <p className="text-sm font-medium text-blue-900 leading-relaxed italic">
+                                            "{selectedBloodTest.clinician_notes}"
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-end">
+                                <button
+                                    onClick={() => setSelectedBloodTest(null)}
+                                    className="px-8 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-all shadow-lg"
+                                >
+                                    Done
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}
