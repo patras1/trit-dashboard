@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { clientService, coachService } from '../lib/api';
+import { clientService } from '../lib/api';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User, Plus, X, Trash2 } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User, Plus, X, Trash2, Activity, Thermometer, Pill, FileText, HeartPulse, Target, Utensils, BookOpen, Brain, Dumbbell, TrendingDown, Clock, History as HistoryIcon } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export const ClientDetails = () => {
@@ -10,15 +10,134 @@ export const ClientDetails = () => {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const [client, setClient] = useState<any>(null);
-    const [coach, setCoach] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('overview'); // overview, medical, diary, plan, consultations
+
+    // Medical State
+    const [medicalConditions, setMedicalConditions] = useState<any[]>([]);
+    const [medications, setMedications] = useState<any[]>([]);
+    const [bloodTests, setBloodTests] = useState<any[]>([]);
+    const [showAddCondition, setShowAddCondition] = useState(false);
+    const [showAddMedication, setShowAddMedication] = useState(false);
+    const [showAddBloodTest, setShowAddBloodTest] = useState(false);
+
+    // Strategy State
+    const [goals, setGoals] = useState<any[]>([]);
+    const [prescriptions, setPrescriptions] = useState<any[]>([]);
+    const [protocols, setProtocols] = useState<any[]>([]);
+    const [showAddProtocol, setShowAddProtocol] = useState(false);
+    const [newProtocol, setNewProtocol] = useState({
+        name: '',
+        type: 'nutrition',
+        details: '',
+        start_date: new Date().toISOString().split('T')[0]
+    });
+
+    // Tracking & Consultations State
+    const [sessionNotes, setSessionNotes] = useState<any[]>([]);
+    const [psychCheckins, setPsychCheckins] = useState<any[]>([]);
+    const [activityLogs, setActivityLogs] = useState<any[]>([]);
+    const [showAddSession, setShowAddSession] = useState(false);
+
     const [showAddMeasurement, setShowAddMeasurement] = useState(false);
+    const [showAddDiary, setShowAddDiary] = useState(false); // Make sure this is here
     const [newMeasurement, setNewMeasurement] = useState({
         weight_kg: '',
         body_fat_percent: '',
+        waist_circ_cm: '',
+        navel_circ_cm: '',
+        sleep_hours: '',
+        sleep_quality: '',
         notes: '',
         date: new Date().toISOString().split('T')[0]
     });
+
+    // New Session Form State
+    const [newSession, setNewSession] = useState({
+        date: new Date().toISOString().split('T')[0],
+        observations: '',
+        changes_made: '',
+        reason_for_change: '',
+        constants: '',
+        next_checkpoint: ''
+    });
+
+    // Medical Form State
+    const [newCondition, setNewCondition] = useState({
+        condition_name: '',
+        diagnosed_date: new Date().toISOString().split('T')[0],
+        status: 'active',
+        notes: ''
+    });
+    const [newMedication, setNewMedication] = useState({
+        name: '',
+        dosage: '',
+        start_date: new Date().toISOString().split('T')[0],
+        end_date: '',
+        reason: '',
+        is_supplement: false,
+        notes: ''
+    });
+    const [newBloodTest, setNewBloodTest] = useState({
+        date: new Date().toISOString().split('T')[0],
+        glucose: '',
+        hba1c: '',
+        alt: '',
+        ast: '',
+        ferritin: '',
+        ldl: '',
+        hdl: '',
+        clinician_notes: ''
+    });
+
+    // Diary Form State
+    const [newDiaryEntry, setNewDiaryEntry] = useState({
+        food_name: '',
+        quantity_grams: '',
+        notes: '',
+        date: new Date().toISOString().split('T')[0],
+        meal_type: 'snack'
+    });
+
+    const handleAddCondition = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!id) return;
+        try {
+            await clientService.addMedicalCondition(id, newCondition);
+            setShowAddCondition(false);
+            setNewCondition({ condition_name: '', diagnosed_date: new Date().toISOString().split('T')[0], status: 'active', notes: '' });
+            fetchMedicalData(id);
+        } catch (error) {
+            console.error('Failed to add condition', error);
+        }
+    };
+
+    const handleAddMedication = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!id) return;
+        try {
+            await clientService.addMedication(id, newMedication);
+            setShowAddMedication(false);
+            setNewMedication({ name: '', dosage: '', start_date: new Date().toISOString().split('T')[0], end_date: '', reason: '', is_supplement: false, notes: '' });
+            fetchMedicalData(id);
+        } catch (error) {
+            console.error('Failed to add medication', error);
+        }
+    };
+
+    const handleAddBloodTest = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!id) return;
+        try {
+            await clientService.addBloodTest(id, newBloodTest);
+            setShowAddBloodTest(false);
+            setNewBloodTest({ date: new Date().toISOString().split('T')[0], glucose: '', hba1c: '', alt: '', ast: '', ferritin: '', ldl: '', hdl: '', clinician_notes: '' });
+            fetchMedicalData(id);
+        } catch (error) {
+            console.error('Failed to add blood test', error);
+        }
+    };
+
 
     useEffect(() => {
         if (id) fetchClientData(id);
@@ -32,12 +151,20 @@ export const ClientDetails = () => {
             await clientService.addMeasurement(id, {
                 ...newMeasurement,
                 weight_kg: parseFloat(newMeasurement.weight_kg),
-                body_fat_percent: newMeasurement.body_fat_percent ? parseFloat(newMeasurement.body_fat_percent) : null
+                body_fat_percent: newMeasurement.body_fat_percent ? parseFloat(newMeasurement.body_fat_percent) : null,
+                waist_circ_cm: newMeasurement.waist_circ_cm ? parseFloat(newMeasurement.waist_circ_cm) : null,
+                navel_circ_cm: newMeasurement.navel_circ_cm ? parseFloat(newMeasurement.navel_circ_cm) : null,
+                sleep_hours: newMeasurement.sleep_hours ? parseFloat(newMeasurement.sleep_hours) : null,
+                sleep_quality: newMeasurement.sleep_quality ? parseInt(newMeasurement.sleep_quality) : null
             });
             setShowAddMeasurement(false);
             setNewMeasurement({
                 weight_kg: '',
                 body_fat_percent: '',
+                waist_circ_cm: '',
+                navel_circ_cm: '',
+                sleep_hours: '',
+                sleep_quality: '',
                 notes: '',
                 date: new Date().toISOString().split('T')[0]
             });
@@ -60,22 +187,176 @@ export const ClientDetails = () => {
         }
     };
 
+    // Diary state
+    // const [showAddDiary, setShowAddDiary] = useState(false); // Moved up
+    const [diaryEntries, setDiaryEntries] = useState<any[]>([]);
+
+    const fetchDiaryEntries = async (clientId: string) => {
+        try {
+            // Fetch all entries (date param optional)
+            const entries = await clientService.getDiary(clientId, '');
+            setDiaryEntries(entries);
+        } catch (error) {
+            console.error('Failed to load diary entries', error);
+        }
+    };
+
+    const handleAddDiary = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!id) return;
+        try {
+            await clientService.addDiaryEntry(id, {
+                ...newDiaryEntry,
+                quantity_grams: parseFloat(newDiaryEntry.quantity_grams)
+            });
+            setShowAddDiary(false);
+            setNewDiaryEntry({
+                food_name: '',
+                quantity_grams: '',
+                notes: '',
+                date: new Date().toISOString().split('T')[0],
+                meal_type: 'snack'
+            });
+            fetchDiaryEntries(id);
+        } catch (error) {
+            console.error('Failed to add diary entry', error);
+            alert('Error adding diary entry');
+        }
+    };
+
+    const handleDeleteDiary = async (entryId: string) => {
+        if (!confirm('Delete this diary entry?')) return;
+        try {
+            await clientService.deleteDiaryEntry(entryId);
+            if (id) fetchDiaryEntries(id);
+        } catch (error) {
+            console.error('Failed to delete diary entry', error);
+            alert('Error deleting diary entry');
+        }
+    };
+
+    // Fetch client data and diary entries
     const fetchClientData = async (clientId: string) => {
         try {
             const clientData = await clientService.get(clientId);
             setClient(clientData);
-
             if (clientData.assigned_coach_id) {
-                const coaches = await coachService.list();
-                const assignedCoach = coaches.find((c: any) => c.id === clientData.assigned_coach_id);
-                setCoach(assignedCoach);
+                // const coaches = await coachService.list();
+                // const assignedCoach = coaches.find((c: any) => c.id === clientData.assigned_coach_id);
+                // setCoach(assignedCoach);
             }
+            // Load diary entries for this client
+            await fetchDiaryEntries(clientId);
         } catch (error) {
             console.error('Failed to load client details', error);
         } finally {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (activeTab === 'medical' && id) {
+            fetchMedicalData(id);
+        } else if (activeTab === 'plan' && id) {
+            fetchStrategyData(id);
+        } else if (activeTab === 'consultations' && id) {
+            fetchTrackingData(id);
+        }
+    }, [activeTab, id]);
+
+    const fetchTrackingData = async (clientId: string) => {
+        try {
+            const [sessions, psych, activity] = await Promise.all([
+                clientService.getSessionNotes(clientId),
+                clientService.getPsychCheckins(clientId),
+                clientService.getActivityLogs(clientId)
+            ]);
+            setSessionNotes(sessions);
+            setPsychCheckins(psych);
+            setActivityLogs(activity);
+        } catch (error) {
+            console.error('Failed to load tracking data', error);
+        }
+    };
+
+    const handleAddSession = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!id) return;
+        try {
+            await clientService.addSessionNote(id, newSession);
+            setShowAddSession(false);
+            setNewSession({ date: new Date().toISOString().split('T')[0], observations: '', changes_made: '', reason_for_change: '', constants: '', next_checkpoint: '' });
+            fetchTrackingData(id);
+        } catch (error) {
+            console.error('Failed to add session note', error);
+        }
+    };
+
+    const handleGoalStatusChange = async (goalId: string, status: string) => {
+        if (!confirm(`Are you sure you want to mark this phase as ${status}?`)) return;
+        try {
+            await clientService.updateGoal(goalId, { status: status });
+            if (id) fetchStrategyData(id);
+        } catch (error) {
+            console.error('Failed to update goal status', error);
+            alert('Error updating phase status');
+        }
+    };
+
+    const handleAddProtocol = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await clientService.addProtocol(id!, newProtocol);
+            setShowAddProtocol(false);
+            setNewProtocol({ name: '', type: 'nutrition', details: '', start_date: new Date().toISOString().split('T')[0] });
+            fetchStrategyData(id!);
+        } catch (error) {
+            console.error('Failed to add protocol', error);
+            alert('Error adding protocol');
+        }
+    };
+
+    const handleUpdateProtocolStatus = async (protocolId: string, status: string) => {
+        try {
+            await clientService.updateProtocol(protocolId, { status: status });
+            fetchStrategyData(id!);
+        } catch (error) {
+            console.error('Failed to update protocol status', error);
+        }
+    };
+
+    const fetchMedicalData = async (clientId: string) => {
+        try {
+            const [conditions, meds, bloods] = await Promise.all([
+                clientService.getMedicalConditions(clientId),
+                clientService.getMedications(clientId),
+                clientService.getBloodTests(clientId)
+            ]);
+            setMedicalConditions(conditions);
+            setMedications(meds);
+            setBloodTests(bloods);
+        } catch (error) {
+            console.error('Failed to load medical data', error);
+        }
+    };
+
+
+
+    const fetchStrategyData = async (clientId: string) => {
+        try {
+            const [clientGoals, clientPlans, clientProtocols] = await Promise.all([
+                clientService.getGoals(clientId),
+                clientService.getPrescriptions(clientId),
+                clientService.getProtocols(clientId)
+            ]);
+            setGoals(clientGoals);
+            setPrescriptions(clientPlans);
+            setProtocols(clientProtocols);
+        } catch (error) {
+            console.error('Failed to load strategy data', error);
+        }
+    };
+
 
     if (loading) return <div className="p-8 text-center">{t('common.loading')}</div>;
     if (!client) return <div className="p-8 text-center">Client not found</div>;
@@ -142,74 +423,365 @@ export const ClientDetails = () => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Left Column: Profile Info */}
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-6">
-                        <h3 className="font-bold text-lg text-text-main">Profile Overview</h3>
-
-                        <div className="space-y-4">
-                            <div>
-                                <label className="text-xs text-text-muted block mb-1">Email</label>
-                                <p className="text-sm font-medium">{client.email}</p>
-                            </div>
-                            <div>
-                                <label className="text-xs text-text-muted block mb-1">Phone</label>
-                                <p className="text-sm font-medium">{client.phone || '-'}</p>
-                            </div>
-                            <div>
-                                <label className="text-xs text-text-muted block mb-1">Assigned Coach</label>
-                                <p className="text-sm font-medium">{coach?.name || client.assigned_coach_id}</p>
-                            </div>
-                            <div>
-                                <label className="text-xs text-text-muted block mb-1">Target Weight</label>
-                                <p className="text-sm font-medium">{client.target_weight_kg} kg</p>
-                            </div>
-                            <div>
-                                <label className="text-xs text-text-muted block mb-1">Activity Level</label>
-                                <p className="text-sm font-medium capitalize">{client.activity_level.replace('_', ' ')}</p>
-                            </div>
+                {/* Middle Stats - Primary KPI Row */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Weight Delta</p>
+                            <p className="text-2xl font-black text-text-main flex items-baseline gap-1">
+                                {client.starting_weight_kg - client.recent_measurements?.[0]?.weight_kg > 0 ? '-' : '+'}
+                                {Math.abs(client.starting_weight_kg - (client.recent_measurements?.[0]?.weight_kg || client.starting_weight_kg)).toFixed(1)}
+                                <span className="text-xs font-bold text-text-muted">kg</span>
+                            </p>
+                        </div>
+                        <div className={`p-2 rounded-xl scale-110 ${client.starting_weight_kg - (client.recent_measurements?.[0]?.weight_kg || client.starting_weight_kg) > 0 ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'}`}>
+                            <TrendingDown size={20} />
                         </div>
                     </div>
 
-                    {/* Right Column: Progress / Measurements History */}
-                    <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="font-bold text-lg text-text-main">Recent Progress</h3>
+                    <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Active Phase</p>
+                            <p className="text-lg font-black text-text-main truncate max-w-[120px]">
+                                {goals.find((g: any) => g.status === 'active')?.phase_name || 'No Active Phase'}
+                            </p>
+                        </div>
+                        <div className="p-2 rounded-xl bg-blue-50 text-blue-600 scale-110">
+                            <Target size={20} />
+                        </div>
+                    </div>
+
+                    <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Last Contact</p>
+                            <p className="text-lg font-black text-text-main">
+                                {sessionNotes.length > 0 ? new Date(Math.max(...sessionNotes.map((n: any) => new Date(n.date).getTime()))).toLocaleDateString() : 'N/A'}
+                            </p>
+                        </div>
+                        <div className="p-2 rounded-xl bg-purple-50 text-purple-600 scale-110">
+                            <Clock size={20} />
+                        </div>
+                    </div>
+
+                    <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between overflow-hidden">
+                        <div className="z-10">
+                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Adherence Signal</p>
+                            <div className="flex items-center gap-1.5">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                    <div key={i} className={`w-3 h-3 rounded-full ${i <= 4 ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]' : 'bg-gray-200'}`} />
+                                ))}
+                            </div>
+                        </div>
+                        <div className="absolute -right-2 opacity-10 rotate-12">
+                            <Activity size={60} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Tabs */}
+                <div className="flex border-b border-gray-200 mb-6 overflow-x-auto">
+                    {[
+                        { id: 'overview', label: 'Overview', icon: User },
+                        { id: 'medical', label: 'Medical & Health', icon: HeartPulse },
+                        { id: 'diary', label: 'Food Diary', icon: Calendar },
+                        { id: 'plan', label: 'Nutrition Plan', icon: FileText },
+                        { id: 'consultations', label: 'Consultations', icon: BookOpen },
+                    ].map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`flex items-center gap-2 px-6 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.id
+                                ? 'border-primary text-primary'
+                                : 'border-transparent text-text-muted hover:text-text-main'
+                                }`}
+                        >
+                            <tab.icon size={18} />
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+
+                {activeTab === 'overview' && (<>
+                    {/* Insights / Derived Metrics Row */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <p className="text-xs text-text-muted font-bold uppercase">Total Loss</p>
+                            <p className="text-2xl font-bold text-primary">{client?.starting_weight_kg && client?.recent_measurements?.[0]?.weight_kg ? (client.starting_weight_kg - client.recent_measurements[0].weight_kg).toFixed(1) : '0'} kg</p>
+                            <p className="text-xs text-green-600 font-medium">
+                                {client?.starting_weight_kg && client?.recent_measurements?.[0]?.weight_kg
+                                    ? ((client.starting_weight_kg - client.recent_measurements[0].weight_kg) / (Math.max(1, (new Date().getTime() - new Date(client.created_at).getTime()) / (1000 * 60 * 60 * 24 * 7)))).toFixed(1) + ' kg/wk avg'
+                                    : '0 kg/wk avg'
+                                }
+                            </p>
+                        </div>
+                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <p className="text-xs text-text-muted font-bold uppercase">Active Phase</p>
+                            <p className="text-lg font-bold text-gray-800">{goals.find(g => g.status === 'active')?.phase_name || 'General'}</p>
+                            <div className="flex items-center gap-2">
+                                <span className={`w-2 h-2 rounded-full ${goals.find(g => g.status === 'active') ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                                <p className="text-xs text-text-muted">{goals.find(g => g.status === 'active')?.priority || 'Maintenance'}</p>
+                            </div>
+                        </div>
+                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <p className="text-xs text-text-muted font-bold uppercase">Last Contact</p>
+                            <p className={`text-2xl font-bold ${!sessionNotes.length || (new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24) > 14
+                                ? 'text-red-500'
+                                : 'text-gray-800'
+                                }`}>
+                                {sessionNotes.length
+                                    ? Math.floor((new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24)) + 'd ago'
+                                    : 'Never'}
+                            </p>
+                            <p className="text-xs text-text-muted">
+                                {sessionNotes.length > 0 && Math.floor((new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24)) > 14 ? 'Check-in Overdue' : 'On Track'}
+                            </p>
+                        </div>
+                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <p className="text-xs text-text-muted font-bold uppercase">Adherence Signal</p>
+                            <p className={`text-lg font-bold ${!psychCheckins.length ? 'text-gray-400' : psychCheckins[0]?.motivation_status === 'high' ? 'text-green-600' : 'text-orange-500'}`}>
+                                {psychCheckins.length ? (
+                                    <span className="flex items-center gap-1">
+                                        {psychCheckins[0].motivation_status === 'high' ? <Activity size={16} /> : <Activity size={16} className="rotate-180" />}
+                                        {psychCheckins[0].motivation_status.toUpperCase()}
+                                    </span>
+                                ) : 'NO DATA'}
+                            </p>
+                            <p className="text-xs text-text-muted">
+                                {psychCheckins.length ? `Hunger: ${psychCheckins[0].psychological_hunger_scale}/5` : 'Needs Check-in'}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Left Column: Metabolic & Strategy Profile */}
+                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-6">
+                            <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                                <Activity size={20} className="text-primary" />
+                                Metabolic Profile
+                            </h3>
+
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-gray-50 p-3 rounded-lg">
+                                        <label className="text-xs text-text-muted block mb-1">Target Calories</label>
+                                        <p className="text-lg font-bold text-primary">{prescriptions.find(p => p.is_active)?.calories_target || 'N/A'}</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-3 rounded-lg">
+                                        <label className="text-xs text-text-muted block mb-1">Target Change/Wk</label>
+                                        <p className="text-lg font-bold text-gray-800">{goals.find(g => g.status === 'active')?.expected_weekly_change_kg || 0.5} kg</p>
+                                    </div>
+                                </div>
+
+                                <div className="border-t border-gray-100 pt-4">
+                                    <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Current Protocol</label>
+                                    <div className="space-y-2 text-sm">
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Protein</span>
+                                            <span className="font-medium">{prescriptions.find(p => p.is_active)?.protein_grams || '-'}g</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Steps/Cardio</span>
+                                            <span className="font-medium">{activityLogs.find(a => a.is_current)?.distance_km_week ? `${activityLogs.find(a => a.is_current).distance_km_week}km/wk` : client.activity_level}</span>
+                                        </div>
+                                        {prescriptions.find(p => p.is_active)?.is_intermittent_fasting && (
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-600">Fasting</span>
+                                                <span className="font-medium text-purple-600">{prescriptions.find(p => p.is_active).fasting_protocol}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="border-t border-gray-100 pt-4">
+                                    <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Red Flags (Latest)</label>
+                                    {!psychCheckins.length ? (
+                                        <p className="text-sm text-text-muted italic">No recent check-ins.</p>
+                                    ) : (
+                                        <div className="flex flex-wrap gap-2">
+                                            {psychCheckins[0]?.evening_hunger && <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-md font-bold">Evening Hunger</span>}
+                                            {psychCheckins[0]?.stress_level === 'high' && <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-md font-bold">High Stress</span>}
+                                            {psychCheckins[0]?.adherence_difficulty && <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-md font-bold">Diff: {psychCheckins[0].adherence_difficulty}</span>}
+                                            {!psychCheckins[0]?.evening_hunger && psychCheckins[0]?.stress_level !== 'high' && <span className="text-sm text-green-600 font-medium">No alerts flagged.</span>}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right Column: Progress / Measurements History */}
+                        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="font-bold text-lg text-text-main">Recent Progress</h3>
+                                <button
+                                    onClick={() => setShowAddMeasurement(true)}
+                                    className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                                >
+                                    <Plus size={16} />
+                                    <span>Add Progress</span>
+                                </button>
+                            </div>
+
+                            {client.recent_measurements && client.recent_measurements.length > 0 ? (
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm text-left">
+                                        <thead className="bg-gray-50 text-gray-500 font-medium">
+                                            <tr>
+                                                <th className="px-4 py-3">Date</th>
+                                                <th className="px-4 py-3">Weight (kg)</th>
+                                                <th className="px-4 py-3">Body Fat %</th>
+                                                <th className="px-4 py-3">Notes</th>
+                                                <th className="px-4 py-3 w-10"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100">
+                                            {client.recent_measurements.map((m: any) => (
+                                                <tr key={m.id} className="group">
+                                                    <td className="px-4 py-3">{new Date(m.date).toLocaleDateString()}</td>
+                                                    <td className="px-4 py-3 font-medium text-text-main">{m.weight_kg}</td>
+                                                    <td className="px-4 py-3">{m.body_fat_percent || '-'}%</td>
+                                                    <td className="px-4 py-3 text-text-muted truncate max-w-xs">{m.notes}</td>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <button
+                                                            onClick={() => handleDeleteMeasurement(m.id)}
+                                                            className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1"
+                                                            title="Delete entry"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ) : (
+                                <p className="text-text-muted">No measurements recorded yet.</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Charts Section */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Weight Progress Chart */}
+                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                            <h3 className="font-bold text-lg text-text-main mb-6">Weight Progress</h3>
+                            <div className="h-64 w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={[...(client.recent_measurements || [])].reverse()}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                                        <XAxis
+                                            dataKey="date"
+                                            tickFormatter={(date) => new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                            stroke="#9CA3AF"
+                                            tick={{ fontSize: 12 }}
+                                            tickLine={false}
+                                            axisLine={false}
+                                        />
+                                        <YAxis
+                                            stroke="#9CA3AF"
+                                            tick={{ fontSize: 12 }}
+                                            tickLine={false}
+                                            axisLine={false}
+                                            domain={['auto', 'auto']}
+                                        />
+                                        <Tooltip
+                                            contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                            labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                                        />
+                                        <Line
+                                            type="monotone"
+                                            dataKey="weight_kg"
+                                            stroke="#0D9488"
+                                            strokeWidth={3}
+                                            dot={{ fill: '#0D9488', strokeWidth: 2, r: 4, stroke: '#fff' }}
+                                            activeDot={{ r: 6, strokeWidth: 0 }}
+                                        />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+
+                        {/* Body Fat Progress Chart */}
+                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                            <h3 className="font-bold text-lg text-text-main mb-6">Body Fat % Progress</h3>
+                            <div className="h-64 w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={[...(client.recent_measurements || [])].reverse()}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                                        <XAxis
+                                            dataKey="date"
+                                            tickFormatter={(date) => new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                            stroke="#9CA3AF"
+                                            tick={{ fontSize: 12 }}
+                                            tickLine={false}
+                                            axisLine={false}
+                                        />
+                                        <YAxis
+                                            stroke="#9CA3AF"
+                                            tick={{ fontSize: 12 }}
+                                            tickLine={false}
+                                            axisLine={false}
+                                            domain={['auto', 'auto']}
+                                        />
+                                        <Tooltip
+                                            contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                            labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                                        />
+                                        <Line
+                                            type="monotone"
+                                            dataKey="body_fat_percent"
+                                            stroke="#7C3AED"
+                                            strokeWidth={3}
+                                            dot={{ fill: '#7C3AED', strokeWidth: 2, r: 4, stroke: '#fff' }}
+                                            activeDot={{ r: 6, strokeWidth: 0 }}
+                                        />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    </div>
+                </>)}
+
+                {activeTab === 'medical' && (
+                    <div className="space-y-6">
+                        <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                                <Activity size={20} className="text-primary" />
+                                Medical Conditions
+                            </h3>
                             <button
-                                onClick={() => setShowAddMeasurement(true)}
+                                onClick={() => setShowAddCondition(true)}
                                 className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
                             >
                                 <Plus size={16} />
-                                <span>Add Progress</span>
+                                Add Condition
                             </button>
                         </div>
-
-                        {client.recent_measurements && client.recent_measurements.length > 0 ? (
-                            <div className="overflow-x-auto">
+                        {/* List Conditions */}
+                        {medicalConditions.length === 0 ? (
+                            <div className="text-center p-8 text-text-muted">No medical conditions recorded.</div>
+                        ) : (
+                            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                                 <table className="w-full text-sm text-left">
                                     <thead className="bg-gray-50 text-gray-500 font-medium">
                                         <tr>
-                                            <th className="px-4 py-3">Date</th>
-                                            <th className="px-4 py-3">Weight (kg)</th>
-                                            <th className="px-4 py-3">Body Fat %</th>
+                                            <th className="px-4 py-3">Diagnosed</th>
+                                            <th className="px-4 py-3">Condition</th>
+                                            <th className="px-4 py-3">Status</th>
                                             <th className="px-4 py-3">Notes</th>
-                                            <th className="px-4 py-3 w-10"></th>
+                                            <th className="px-4 py-3"></th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100">
-                                        {client.recent_measurements.map((m: any) => (
-                                            <tr key={m.id} className="group">
-                                                <td className="px-4 py-3">{new Date(m.date).toLocaleDateString()}</td>
-                                                <td className="px-4 py-3 font-medium text-text-main">{m.weight_kg}</td>
-                                                <td className="px-4 py-3">{m.body_fat_percent || '-'}%</td>
-                                                <td className="px-4 py-3 text-text-muted truncate max-w-xs">{m.notes}</td>
+                                        {medicalConditions.map((item: any) => (
+                                            <tr key={item.id} className="hover:bg-gray-50">
+                                                <td className="px-4 py-3">{new Date(item.diagnosed_date).toLocaleDateString()}</td>
+                                                <td className="px-4 py-3 font-medium text-text-main">{item.condition_name}</td>
+                                                <td className="px-4 py-3 capitalize">{item.status}</td>
+                                                <td className="px-4 py-3 text-text-muted">{item.notes}</td>
                                                 <td className="px-4 py-3 text-right">
-                                                    <button
-                                                        onClick={() => handleDeleteMeasurement(m.id)}
-                                                        className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1"
-                                                        title="Delete entry"
-                                                    >
-                                                        <Trash2 size={16} />
+                                                    <button onClick={() => { if (confirm('Delete?')) clientService.deleteMedicalCondition(item.id).then(() => fetchMedicalData(id!)) }} className="text-gray-400 hover:text-red-500 transition-colors">
+                                                        <Trash2 size={14} />
                                                     </button>
                                                 </td>
                                             </tr>
@@ -217,92 +789,415 @@ export const ClientDetails = () => {
                                     </tbody>
                                 </table>
                             </div>
+                        )}
+
+                        {/* Medications */}
+                        <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                                <Pill size={20} className="text-primary" />
+                                Medications
+                            </h3>
+                            <button
+                                onClick={() => setShowAddMedication(true)}
+                                className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                            >
+                                <Plus size={16} />
+                                Add Medication
+                            </button>
+                        </div>
+                        {medications.length === 0 ? (
+                            <div className="text-center p-8 text-text-muted">No medications recorded.</div>
                         ) : (
-                            <p className="text-text-muted">No measurements recorded yet.</p>
+                            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="bg-gray-50 text-gray-500 font-medium">
+                                        <tr>
+                                            <th className="px-4 py-3">Start Date</th>
+                                            <th className="px-4 py-3">Medication</th>
+                                            <th className="px-4 py-3">Dosage</th>
+                                            <th className="px-4 py-3">Reason</th>
+                                            <th className="px-4 py-3"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {medications.map((item: any) => (
+                                            <tr key={item.id} className="hover:bg-gray-50">
+                                                <td className="px-4 py-3">{new Date(item.start_date).toLocaleDateString()}</td>
+                                                <td className="px-4 py-3 font-medium text-text-main">{item.name}</td>
+                                                <td className="px-4 py-3">{item.dosage}</td>
+                                                <td className="px-4 py-3 text-text-muted">{item.reason}</td>
+                                                <td className="px-4 py-3 text-right">
+                                                    <button onClick={() => { if (confirm('Delete?')) clientService.deleteMedication(item.id).then(() => fetchMedicalData(id!)) }} className="text-gray-400 hover:text-red-500 transition-colors">
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+
+                        {/* Blood Tests */}
+                        <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                                <Thermometer size={20} className="text-primary" />
+                                Blood Tests
+                            </h3>
+                            <button
+                                onClick={() => setShowAddBloodTest(true)}
+                                className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                            >
+                                <Plus size={16} />
+                                Add Blood Test
+                            </button>
+                        </div>
+                        {bloodTests.length === 0 ? (
+                            <div className="text-center p-8 text-text-muted">No blood tests recorded.</div>
+                        ) : (
+                            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="bg-gray-50 text-gray-500 font-medium">
+                                        <tr>
+                                            <th className="px-4 py-3">Date</th>
+                                            <th className="px-4 py-3">Glucose</th>
+                                            <th className="px-4 py-3">HbA1c</th>
+                                            <th className="px-4 py-3">Lipids (LDL/HDL)</th>
+                                            <th className="px-4 py-3"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {bloodTests.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((item: any, index: number, arr: any[]) => {
+                                            const prev = arr[index + 1];
+                                            const getTrend = (curr: any, prev: any) => {
+                                                if (!curr || !prev) return null;
+                                                const diff = parseFloat(curr) - parseFloat(prev);
+                                                if (Math.abs(diff) < 0.1) return <span className="text-gray-400">→</span>;
+                                                return diff > 0
+                                                    ? <span className="text-red-500 text-xs">↑ {diff.toFixed(1)}</span>
+                                                    : <span className="text-green-500 text-xs">↓ {Math.abs(diff).toFixed(1)}</span>;
+                                            };
+
+                                            return (
+                                                <tr key={item.id} className="hover:bg-gray-50">
+                                                    <td className="px-4 py-3">{new Date(item.date).toLocaleDateString()}</td>
+                                                    <td className="px-4 py-3">
+                                                        {item.glucose || '-'}
+                                                        <div className="ml-1 inline">{getTrend(item.glucose, prev?.glucose)}</div>
+                                                    </td>
+                                                    <td className="px-4 py-3 font-bold text-primary">
+                                                        {item.hba1c || '-'}%
+                                                        <div className="ml-1 inline">{getTrend(item.hba1c, prev?.hba1c)}</div>
+                                                    </td>
+                                                    <td className="px-4 py-3">{item.ldl}/{item.hdl}</td>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <button onClick={() => { if (confirm('Delete?')) clientService.deleteBloodTest(item.id).then(() => fetchMedicalData(id!)) }} className="text-gray-400 hover:text-red-500 transition-colors">
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
                         )}
                     </div>
-                </div>
+                )}
 
-                {/* Charts Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Weight Progress Chart */}
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                        <h3 className="font-bold text-lg text-text-main mb-6">Weight Progress</h3>
-                        <div className="h-64 w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={[...(client.recent_measurements || [])].reverse()}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                                    <XAxis
-                                        dataKey="date"
-                                        tickFormatter={(date) => new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                                        stroke="#9CA3AF"
-                                        tick={{ fontSize: 12 }}
-                                        tickLine={false}
-                                        axisLine={false}
-                                    />
-                                    <YAxis
-                                        stroke="#9CA3AF"
-                                        tick={{ fontSize: 12 }}
-                                        tickLine={false}
-                                        axisLine={false}
-                                        domain={['auto', 'auto']}
-                                    />
-                                    <Tooltip
-                                        contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                        labelFormatter={(date) => new Date(date).toLocaleDateString()}
-                                    />
-                                    <Line
-                                        type="monotone"
-                                        dataKey="weight_kg"
-                                        stroke="#0D9488"
-                                        strokeWidth={3}
-                                        dot={{ fill: '#0D9488', strokeWidth: 2, r: 4, stroke: '#fff' }}
-                                        activeDot={{ r: 6, strokeWidth: 0 }}
-                                    />
-                                </LineChart>
-                            </ResponsiveContainer>
+                {activeTab === 'diary' && (
+                    <div className="space-y-6">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                                <Utensils size={20} className="text-primary" />
+                                Food Diary
+                            </h3>
+                            <button
+                                onClick={() => setShowAddDiary(true)}
+                                className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                            >
+                                <Plus size={16} />
+                                Add Entry
+                            </button>
+                        </div>
+                        {diaryEntries.length === 0 ? (
+                            <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm text-center">
+                                <p className="text-text-muted">No food diary entries recorded for today.</p>
+                            </div>
+                        ) : (
+                            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="bg-gray-50 text-gray-500 font-medium">
+                                        <tr>
+                                            <th className="px-4 py-3">Time</th>
+                                            <th className="px-4 py-3">Meal</th>
+                                            <th className="px-4 py-3">Food Item</th>
+                                            <th className="px-4 py-3">Portion</th>
+                                            <th className="px-4 py-3">Notes</th>
+                                            <th className="px-4 py-3"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {diaryEntries.map((entry: any) => (
+                                            <tr key={entry.id} className="hover:bg-gray-50">
+                                                <td className="px-4 py-3 text-text-muted">--</td>
+                                                <td className="px-4 py-3 capitalize">{entry.meal_type}</td>
+                                                <td className="px-4 py-3 font-medium text-text-main">{entry.food_item_id}</td>
+                                                <td className="px-4 py-3">{entry.quantity_grams}g</td>
+                                                <td className="px-4 py-3 text-text-muted">{entry.notes}</td>
+                                                <td className="px-4 py-3 text-right">
+                                                    <button
+                                                        onClick={() => handleDeleteDiary(entry.id)}
+                                                        className="text-gray-400 hover:text-red-500 transition-colors"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {activeTab === 'plan' && (
+                    <div className="space-y-6">
+                        {/* Current Active Protocols */}
+                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                            <h3 className="font-bold text-lg text-text-main mb-4 flex items-center gap-2">
+                                <Activity size={20} className="text-primary" />
+                                Active Protocols
+                            </h3>
+                            <div className="space-y-3">
+                                {protocols.filter((p: any) => p.status === 'active').length === 0 ? (
+                                    <p className="text-text-muted text-sm italic">No active protocols.</p>
+                                ) : (
+                                    protocols.filter((p: any) => p.status === 'active').map((p: any) => (
+                                        <div key={p.id} className="flex items-center justify-between bg-blue-50 border border-blue-100 rounded-lg p-3">
+                                            <div>
+                                                <p className="font-bold text-sm text-blue-900">{p.name}</p>
+                                                <p className="text-xs text-blue-700">{p.details || 'No details specified.'}</p>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[10px] uppercase font-bold bg-blue-200 text-blue-800 px-2 py-0.5 rounded">Active</span>
+                                                <button onClick={() => handleUpdateProtocolStatus(p.id, 'paused')} className="text-xs text-gray-500 hover:text-gray-700 underline">Pause</button>
+                                                <button onClick={() => handleUpdateProtocolStatus(p.id, 'completed')} className="text-xs text-gray-500 hover:text-gray-700 underline">End</button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                                <button
+                                    onClick={() => setShowAddProtocol(true)}
+                                    className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm font-bold text-text-muted hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <Plus size={16} />
+                                    Add Specific Protocol
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Plan Change Log - New Section */}
+                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 overflow-hidden">
+                            <h3 className="font-bold text-lg text-text-main mb-6 flex items-center gap-2">
+                                <HistoryIcon size={20} className="text-primary" />
+                                Plan Change Log
+                            </h3>
+                            <div className="relative border-l-2 border-primary/20 ml-3 pl-8 space-y-8">
+                                {prescriptions.slice().sort((a: any, b: any) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime()).map((plan: any, index: number, arr: any[]) => {
+                                    const nextPlan = arr[index + 1];
+                                    const kcalDiff = nextPlan ? plan.calories_target - nextPlan.calories_target : 0;
+                                    const proteinDiff = nextPlan ? plan.protein_grams - nextPlan.protein_grams : 0;
+
+                                    return (
+                                        <div key={plan.id} className="relative">
+                                            {/* Date indicator dot */}
+                                            <div className="absolute -left-[41px] top-1.5 w-6 h-6 rounded-full bg-white border-4 border-primary shadow-sm z-10" />
+
+                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                                <div>
+                                                    <div className="flex items-center gap-3">
+                                                        <p className="font-bold text-text-main">{new Date(plan.start_date).toLocaleDateString()}</p>
+                                                        <span className="text-[10px] px-2 py-0.5 rounded bg-gray-100 text-gray-600 font-bold uppercase">{plan.phase_name}</span>
+                                                    </div>
+                                                    <p className="text-xs text-text-muted mt-1 italic">Consultation adjustment</p>
+                                                </div>
+
+                                                <div className="flex items-center gap-6">
+                                                    <div className="text-center">
+                                                        <p className="text-sm font-bold text-gray-800">{plan.calories_target} kcal</p>
+                                                        {kcalDiff !== 0 && (
+                                                            <p className={`text-[10px] font-bold ${kcalDiff > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                                {kcalDiff > 0 ? '+' : ''}{kcalDiff} kcal
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <p className="text-sm font-bold text-gray-800 font-mono">{plan.protein_grams}P / {plan.carbs_grams}C / {plan.fat_grams}F</p>
+                                                        {proteinDiff !== 0 && (
+                                                            <p className={`text-[10px] font-bold ${proteinDiff > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                                {proteinDiff > 0 ? '+' : ''}{proteinDiff}g Protein
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Current Nutrition Plan Display - Refined UI */}
+                        <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm mt-8">
+                            <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                                <FileText size={20} className="text-primary" />
+                                Current Nutrition Prescriptions
+                            </h3>
+                            <button
+                                onClick={() => alert('Strategy Editing Coming Soon')}
+                                className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-4 py-2 rounded-lg text-sm font-bold transition-all border border-primary/20 shadow-sm"
+                            >
+                                <Plus size={16} />
+                                New Phase
+                            </button>
+                        </div>
+
+                        {prescriptions.filter((p: any) => p.is_active).map((plan: any) => (
+                            <div key={plan.id} className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-primary shadow-xl p-8 relative overflow-hidden">
+                                {/* Decor */}
+                                <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none">
+                                    <Activity size={200} />
+                                </div>
+
+                                <div className="flex justify-between items-start mb-8 relative z-10">
+                                    <div>
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <h4 className="font-black text-2xl text-text-main tracking-tight">{plan.phase_name || 'Nutrition Plan'}</h4>
+                                            <span className="bg-green-500 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">Current Active Plan</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-text-muted">
+                                            <Calendar size={14} />
+                                            <p className="text-xs font-medium">
+                                                Started {new Date(plan.start_date).toLocaleDateString()} • {plan.end_date ? `Ends ${new Date(plan.end_date).toLocaleDateString()}` : 'Ongoing Priority'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="inline-block bg-primary text-white px-4 py-2 rounded-xl shadow-lg shadow-primary/20">
+                                            <p className="text-3xl font-black leading-none">{plan.calories_target}</p>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Daily kcal</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-3 gap-6 mb-10 relative z-10">
+                                    <div className="bg-white/60 backdrop-blur-sm border border-blue-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest">Protein</p>
+                                            <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                                        </div>
+                                        <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.protein_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
+                                        <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.protein_grams * 4 / plan.calories_target) * 100)}% of total</p>
+                                    </div>
+                                    <div className="bg-white/60 backdrop-blur-sm border border-green-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <p className="text-[10px] text-green-600 font-black uppercase tracking-widest">Carbs</p>
+                                            <div className="w-2 h-2 rounded-full bg-green-400" />
+                                        </div>
+                                        <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.carbs_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
+                                        <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.carbs_grams * 4 / plan.calories_target) * 100)}% of total</p>
+                                    </div>
+                                    <div className="bg-white/60 backdrop-blur-sm border border-yellow-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <p className="text-[10px] text-yellow-600 font-black uppercase tracking-widest">Fats</p>
+                                            <div className="w-2 h-2 rounded-full bg-yellow-400" />
+                                        </div>
+                                        <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.fat_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
+                                        <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.fat_grams * 9 / plan.calories_target) * 100)}% of total</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4 bg-white/40 p-6 rounded-2xl border border-white relative z-10">
+                                    <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-2">Detailed Menu & Rules</h5>
+                                    <div className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap font-medium" dir="rtl">
+                                        {plan.training_day_rules}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+
+
+                        {/* Phase Manager (Goals) */}
+                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                            <h3 className="font-bold text-lg text-text-main mb-4 flex items-center gap-2">
+                                <Target size={20} className="text-primary" />
+                                Phase Manager
+                            </h3>
+                            <div className="space-y-4">
+                                {goals.map((goal: any) => (
+                                    <div key={goal.id} className="flex items-center justify-between border-b border-gray-100 last:border-0 pb-4 last:pb-0">
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className={`text-xs px-2 py-0.5 rounded-full font-bold uppercase ${goal.status === 'active' ? 'bg-green-100 text-green-700' :
+                                                    goal.status === 'completed' ? 'bg-gray-100 text-gray-500' :
+                                                        goal.status === 'aborted' ? 'bg-red-100 text-red-500' : 'bg-yellow-100 text-yellow-700'
+                                                    }`}>
+                                                    {goal.status}
+                                                </span>
+                                                <p className="font-bold text-sm text-gray-800">{goal.phase_name || goal.priority}</p>
+                                            </div>
+                                            <p className="text-xs text-gray-500">Target: {goal.target_weight_kg}kg ({goal.target_body_fat_percent}%)</p>
+                                            <p className="text-xs text-text-muted mt-0.5">{new Date(goal.start_date).toLocaleDateString()} - {goal.end_date ? new Date(goal.end_date).toLocaleDateString() : '...'}</p>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            {goal.status === 'active' && (
+                                                <>
+                                                    <button onClick={() => handleGoalStatusChange(goal.id, 'completed')} className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded border border-gray-300 transition-colors">Complete</button>
+                                                    <button onClick={() => handleGoalStatusChange(goal.id, 'aborted')} className="text-xs bg-white hover:bg-red-50 text-red-600 px-2 py-1 rounded border border-red-200 transition-colors">Abort</button>
+                                                </>
+                                            )}
+                                            {(goal.status === 'pending' || !goal.status) && (
+                                                <button onClick={() => handleGoalStatusChange(goal.id, 'active')} className="text-xs bg-primary hover:bg-primary-hover text-white px-3 py-1 rounded transition-colors">Start Phase</button>
+                                            )}
+                                            {goal.status === 'aborted' && (
+                                                <button onClick={() => handleGoalStatusChange(goal.id, 'active')} className="text-xs text-primary hover:underline">Restart</button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                                {goals.length === 0 && <p className="text-sm text-text-muted text-center py-4">No phases defined.</p>}
+                            </div>
                         </div>
                     </div>
+                )}
 
-                    {/* Body Fat Progress Chart */}
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                        <h3 className="font-bold text-lg text-text-main mb-6">Body Fat % Progress</h3>
-                        <div className="h-64 w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={[...(client.recent_measurements || [])].reverse()}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                                    <XAxis
-                                        dataKey="date"
-                                        tickFormatter={(date) => new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                                        stroke="#9CA3AF"
-                                        tick={{ fontSize: 12 }}
-                                        tickLine={false}
-                                        axisLine={false}
-                                    />
-                                    <YAxis
-                                        stroke="#9CA3AF"
-                                        tick={{ fontSize: 12 }}
-                                        tickLine={false}
-                                        axisLine={false}
-                                        domain={['auto', 'auto']}
-                                    />
-                                    <Tooltip
-                                        contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                        labelFormatter={(date) => new Date(date).toLocaleDateString()}
-                                    />
-                                    <Line
-                                        type="monotone"
-                                        dataKey="body_fat_percent"
-                                        stroke="#7C3AED"
-                                        strokeWidth={3}
-                                        dot={{ fill: '#7C3AED', strokeWidth: 2, r: 4, stroke: '#fff' }}
-                                        activeDot={{ r: 6, strokeWidth: 0 }}
-                                    />
-                                </LineChart>
-                            </ResponsiveContainer>
+                {/* Add Protocol Modal */}
+                {showAddProtocol && (
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="font-bold text-lg">Add New Protocol</h3>
+                                <button onClick={() => setShowAddProtocol(false)}><X size={20} /></button>
+                            </div>
+                            <form onSubmit={handleAddProtocol} className="space-y-4">
+                                <div><label className="block text-sm font-medium text-gray-700">Protocol Name</label><input type="text" required placeholder="e.g. IF 16:8, Refeed Day" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newProtocol.name} onChange={e => setNewProtocol({ ...newProtocol, name: e.target.value })} /></div>
+                                <div><label className="block text-sm font-medium text-gray-700">Type</label>
+                                    <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newProtocol.type} onChange={e => setNewProtocol({ ...newProtocol, type: e.target.value })}>
+                                        <option value="nutrition">Nutrition</option>
+                                        <option value="training">Training</option>
+                                        <option value="lifestyle">Lifestyle</option>
+                                        <option value="supplement">Supplement</option>
+                                    </select>
+                                </div>
+                                <div><label className="block text-sm font-medium text-gray-700">Details / Rules</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} placeholder="e.g. Fast from 8pm to 12pm daily." value={newProtocol.details} onChange={e => setNewProtocol({ ...newProtocol, details: e.target.value })}></textarea></div>
+
+                                <div className="flex justify-end gap-2 pt-4"><button type="button" onClick={() => setShowAddProtocol(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save Protocol</button></div>
+                            </form>
                         </div>
                     </div>
-                </div>
+                )}
 
                 {/* Add Measurement Modal */}
                 {showAddMeasurement && (
@@ -377,6 +1272,247 @@ export const ClientDetails = () => {
                                         Save Entry
                                     </button>
                                 </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
+
+                {/* Add Condition Modal */}
+                {showAddCondition && (
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="font-bold text-lg">Add Medical Condition</h3>
+                                <button onClick={() => setShowAddCondition(false)}><X size={20} /></button>
+                            </div>
+                            <form onSubmit={handleAddCondition} className="space-y-4">
+                                <div><label className="block text-sm font-medium text-gray-700">Condition</label><input type="text" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newCondition.condition_name} onChange={e => setNewCondition({ ...newCondition, condition_name: e.target.value })} /></div>
+                                <div><label className="block text-sm font-medium text-gray-700">Date Diagnosed</label><input type="date" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newCondition.diagnosed_date} onChange={e => setNewCondition({ ...newCondition, diagnosed_date: e.target.value })} /></div>
+                                <div><label className="block text-sm font-medium text-gray-700">Status</label><select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newCondition.status} onChange={e => setNewCondition({ ...newCondition, status: e.target.value })}><option value="active">Active</option><option value="managed">Managed</option><option value="resolved">Resolved</option></select></div>
+                                <div><label className="block text-sm font-medium text-gray-700">Notes</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} value={newCondition.notes} onChange={e => setNewCondition({ ...newCondition, notes: e.target.value })}></textarea></div>
+                                <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddCondition(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
+                            </form>
+                        </div>
+                    </div>
+                )}
+
+                {/* Add Medication Modal */}
+                {showAddMedication && (
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="font-bold text-lg">Add Medication</h3>
+                                <button onClick={() => setShowAddMedication(false)}><X size={20} /></button>
+                            </div>
+                            <form onSubmit={handleAddMedication} className="space-y-4">
+                                <div><label className="block text-sm font-medium text-gray-700">Medication Name</label><input type="text" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.name} onChange={e => setNewMedication({ ...newMedication, name: e.target.value })} /></div>
+                                <div><label className="block text-sm font-medium text-gray-700">Dosage</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.dosage} onChange={e => setNewMedication({ ...newMedication, dosage: e.target.value })} /></div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div><label className="block text-sm font-medium text-gray-700">Start Date</label><input type="date" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.start_date} onChange={e => setNewMedication({ ...newMedication, start_date: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">End Date (Optional)</label><input type="date" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.end_date} onChange={e => setNewMedication({ ...newMedication, end_date: e.target.value })} /></div>
+                                </div>
+                                <div><label className="block text-sm font-medium text-gray-700">Reason</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.reason} onChange={e => setNewMedication({ ...newMedication, reason: e.target.value })} /></div>
+                                <div><label className="block text-sm font-medium text-gray-700">Notes</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} value={newMedication.notes} onChange={e => setNewMedication({ ...newMedication, notes: e.target.value })}></textarea></div>
+                                <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddMedication(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
+                            </form>
+                        </div>
+                    </div>
+                )}
+
+                {/* Add Blood Test Modal */}
+                {showAddBloodTest && (
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="font-bold text-lg">Add Blood Test</h3>
+                                <button onClick={() => setShowAddBloodTest(false)}><X size={20} /></button>
+                            </div>
+                            <form onSubmit={handleAddBloodTest} className="space-y-4">
+                                <div><label className="block text-sm font-medium text-gray-700">Date</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.date} onChange={e => setNewBloodTest({ ...newBloodTest, date: e.target.value })} /></div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div><label className="block text-sm font-medium text-gray-700">Glucose</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.glucose} onChange={e => setNewBloodTest({ ...newBloodTest, glucose: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">HbA1c %</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.hba1c} onChange={e => setNewBloodTest({ ...newBloodTest, hba1c: e.target.value })} /></div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div><label className="block text-sm font-medium text-gray-700">LDL</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.ldl} onChange={e => setNewBloodTest({ ...newBloodTest, ldl: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">HDL</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.hdl} onChange={e => setNewBloodTest({ ...newBloodTest, hdl: e.target.value })} /></div>
+                                </div>
+                                <div><label className="block text-sm font-medium text-gray-700">Clinician Notes / Interpretation</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} value={newBloodTest.clinician_notes} onChange={e => setNewBloodTest({ ...newBloodTest, clinician_notes: e.target.value })}></textarea></div>
+                                <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddBloodTest(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
+                            </form>
+                        </div>
+                    </div>
+                )}
+
+                {/* Add Diary Modal */}
+                {showAddDiary && (
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="font-bold text-lg">Add Diary Entry</h3>
+                                <button onClick={() => setShowAddDiary(false)}><X size={20} /></button>
+                            </div>
+                            <form onSubmit={handleAddDiary} className="space-y-4">
+                                <div><label className="block text-sm font-medium text-gray-700">Food / Drink</label><input type="text" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newDiaryEntry.food_name} onChange={e => setNewDiaryEntry({ ...newDiaryEntry, food_name: e.target.value })} /></div>
+                                <div><label className="block text-sm font-medium text-gray-700">Quantity (grams)</label><input type="number" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newDiaryEntry.quantity_grams} onChange={e => setNewDiaryEntry({ ...newDiaryEntry, quantity_grams: e.target.value })} /></div>
+                                <div><label className="block text-sm font-medium text-gray-700">Notes</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} value={newDiaryEntry.notes} onChange={e => setNewDiaryEntry({ ...newDiaryEntry, notes: e.target.value })}></textarea></div>
+                                <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddDiary(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
+                            </form>
+                        </div>
+                    </div>
+                )}
+
+                {/* Consultations Tab Content */}
+                {activeTab === 'consultations' && (
+                    <div className="space-y-6">
+                        {/* Status Check-ins Grid */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {/* Behavior & Adherence */}
+                            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                                <h3 className="font-bold text-lg text-text-main flex items-center gap-2 mb-4">
+                                    <Brain size={20} className="text-secondary" />
+                                    Behavior & Adherence
+                                </h3>
+                                {psychCheckins.length === 0 ? (
+                                    <p className="text-text-muted text-sm">No behavior checks logged.</p>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {psychCheckins.slice(0, 3).map((check: any) => (
+                                            <div key={check.id} className="border-b border-gray-100 last:border-0 pb-3 last:pb-0">
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <span className="text-xs font-medium text-gray-500">{new Date(check.date).toLocaleDateString()}</span>
+                                                    <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${check.motivation_status === 'high' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                                        Mot: {check.motivation_status}
+                                                    </span>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-2 text-sm">
+                                                    <div>
+                                                        <span className="text-xs text-gray-400 block">Hunger (1-5)</span>
+                                                        <span className="font-bold">{check.psychological_hunger_scale}</span>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-xs text-text-muted block">Stress</span>
+                                                        <span>{check.stress_level}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Activity Tracking */}
+                            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                                <h3 className="font-bold text-lg text-text-main flex items-center gap-2 mb-4">
+                                    <Dumbbell size={20} className="text-blue-500" />
+                                    Activity & Training
+                                </h3>
+                                {activityLogs.length === 0 ? (
+                                    <p className="text-text-muted text-sm">No activity logs active.</p>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {activityLogs.slice(0, 1).map((log: any) => (
+                                            <div key={log.id} className="bg-blue-50/50 p-4 rounded-lg">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <div>
+                                                        <p className="font-bold text-gray-800">{log.activity_type}</p>
+                                                        <p className="text-xs text-gray-500">Started {new Date(log.start_date).toLocaleDateString()}</p>
+                                                    </div>
+                                                    {log.is_current && <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold">CURRENT</span>}
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-4 mt-2">
+                                                    <div className="text-center bg-white p-2 rounded border border-blue-100">
+                                                        <span className="block text-xl font-bold text-blue-600">{log.sessions_per_week}</span>
+                                                        <span className="text-[10px] text-gray-500 uppercase">Sessions/Wk</span>
+                                                    </div>
+                                                    <div className="text-center bg-white p-2 rounded border border-blue-100">
+                                                        <span className="block text-xl font-bold text-blue-600">{log.distance_km_week || '--'}</span>
+                                                        <span className="text-[10px] text-gray-500 uppercase">km/Week</span>
+                                                    </div>
+                                                </div>
+                                                {log.strength_training && (
+                                                    <div className="mt-3 pt-3 border-t border-blue-100 text-sm">
+                                                        <span className="font-bold text-gray-700 block mb-1">Strength Program</span>
+                                                        <span>{log.strength_split}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                                <BookOpen size={20} className="text-primary" />
+                                Session Decisions Log
+                            </h3>
+                            <button
+                                onClick={() => setShowAddSession(true)}
+                                className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                            >
+                                <Plus size={16} />
+                                Start Session
+                            </button>
+                        </div>
+                        {sessionNotes.map((note: any) => (
+                            <div key={note.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 relative">
+                                <div className="absolute top-6 right-6 text-sm text-text-muted">{new Date(note.date).toLocaleDateString()}</div>
+                                <h4 className="font-bold text-lg mb-4 text-text-main">Consultation Notes</h4>
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="text-xs font-bold text-gray-500 uppercase">Observations</p>
+                                        <p className="text-gray-800">{note.observations}</p>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-orange-50 p-3 rounded-lg border border-orange-100">
+                                            <p className="text-xs font-bold text-orange-600 uppercase mb-1">What Changed</p>
+                                            <p className="text-sm text-gray-800">{note.changes_made || 'No changes.'}</p>
+                                            {note.reason_for_change && (
+                                                <p className="text-xs text-text-muted mt-2 italic">"{note.reason_for_change}"</p>
+                                            )}
+                                        </div>
+                                        <div className="bg-green-50 p-3 rounded-lg border border-green-100">
+                                            <p className="text-xs font-bold text-green-600 uppercase mb-1">What Stayed Same</p>
+                                            <p className="text-sm text-gray-800">{note.constants || '--'}</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-bold text-gray-500 uppercase">Next Checkpoint</p>
+                                        <p className="text-sm text-primary font-medium">{note.next_checkpoint}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Add Session Modal */}
+                {showAddSession && (
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl p-6 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="font-bold text-lg">New Consultation Log</h3>
+                                <button onClick={() => setShowAddSession(false)}><X size={20} /></button>
+                            </div>
+                            <form onSubmit={handleAddSession} className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div><label className="block text-sm font-medium text-gray-700">Date</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newSession.date} onChange={e => setNewSession({ ...newSession, date: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Next Checkpoint</label><input type="text" placeholder="e.g. 2 weeks" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newSession.next_checkpoint} onChange={e => setNewSession({ ...newSession, next_checkpoint: e.target.value })} /></div>
+                                </div>
+                                <div><label className="block text-sm font-medium text-gray-700">Key Observations</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} placeholder="Client mood, compliance, physical changes..." value={newSession.observations} onChange={e => setNewSession({ ...newSession, observations: e.target.value })}></textarea></div>
+
+                                <div className="border-t pt-4">
+                                    <h4 className="font-bold text-sm mb-2">Decisions</h4>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div><label className="block text-sm font-medium text-gray-700">What Changed?</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} placeholder="Adjusted calories..." value={newSession.changes_made} onChange={e => setNewSession({ ...newSession, changes_made: e.target.value })}></textarea></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">Why?</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} placeholder="Weight stalled for 2 weeks..." value={newSession.reason_for_change} onChange={e => setNewSession({ ...newSession, reason_for_change: e.target.value })}></textarea></div>
+                                    </div>
+                                    <div className="mt-2"><label className="block text-sm font-medium text-gray-700">What Stayed the Same?</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" placeholder="Training split, supplements..." value={newSession.constants} onChange={e => setNewSession({ ...newSession, constants: e.target.value })} /></div>
+                                </div>
+
+                                <div className="flex justify-end gap-2 pt-4 border-t"><button type="button" onClick={() => setShowAddSession(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save Session Log</button></div>
                             </form>
                         </div>
                     </div>
