@@ -34,6 +34,26 @@ export const clientService = {
         return response.json();
     },
 
+    async update(clientId: string, clientData: any) {
+        const response = await fetch(`${API_BASE_URL}/client/${clientId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(clientData),
+        });
+        if (!response.ok) throw new Error('Failed to update client');
+        return response.json();
+    },
+
+    async delete(clientId: string) {
+        const response = await fetch(`${API_BASE_URL}/client/${clientId}`, {
+            method: 'DELETE',
+        });
+        if (!response.ok) throw new Error('Failed to delete client');
+        return true;
+    },
+
     async getStats() {
         const response = await fetch(`${API_BASE_URL}/client/stats`);
         if (!response.ok) throw new Error('Failed to fetch client stats');

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { clientService } from '../lib/api';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User, Plus, X, Trash2, Activity, Thermometer, Pill, FileText, HeartPulse, Target, Utensils, BookOpen, Brain, Dumbbell, TrendingDown, Clock, History as HistoryIcon } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User, Plus, X, Trash2, Pencil, Activity, Thermometer, Pill, FileText, HeartPulse, Target, Utensils, BookOpen, Brain, Dumbbell, TrendingDown, Clock, History as HistoryIcon } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { NewPhaseModal } from './NewPhase';
 
@@ -13,6 +13,8 @@ export const ClientDetails = () => {
     const [client, setClient] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview'); // overview, medical, diary, plan, consultations
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editClient, setEditClient] = useState<any>({});
 
     // Medical State
     const [medicalConditions, setMedicalConditions] = useState<any[]>([]);
@@ -201,6 +203,35 @@ export const ClientDetails = () => {
         } catch (error) {
             console.error('Failed to add measurement', error);
             alert('Error adding measurement');
+        }
+    };
+
+    const handleDeleteClient = async () => {
+        if (!id || !client) return;
+        if (!confirm(`Are you sure you want to permanently delete ${client.full_name}? This will also delete all their medical records, measurements, and nutrition plans.`)) {
+            return;
+        }
+
+        try {
+            await clientService.delete(id);
+            navigate('/clients');
+        } catch (error) {
+            console.error('Failed to delete client:', error);
+            alert('Error deleting client');
+        }
+    };
+
+    const handleUpdateClient = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!id) return;
+
+        try {
+            const updated = await clientService.update(id, editClient);
+            setClient(updated);
+            setShowEditModal(false);
+        } catch (error) {
+            console.error('Failed to update client:', error);
+            alert('Error updating client');
         }
     };
 
@@ -405,6 +436,35 @@ export const ClientDetails = () => {
                     </button>
                     {i18n.dir() === 'rtl' ? <ChevronLeft size={16} className="text-text-muted" /> : <ChevronRight size={16} className="text-text-muted" />}
                     <span className="text-text-main text-sm font-bold">{client.full_name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => {
+                            setEditClient({
+                                full_name: client.full_name,
+                                email: client.email,
+                                birth_date: client.birth_date ? new Date(client.birth_date).toISOString().split('T')[0] : '',
+                                gender: client.gender || '',
+                                sex: client.sex || '',
+                                height_cm: client.height_cm,
+                                target_weight_kg: client.target_weight_kg,
+                                activity_level: client.activity_level || '',
+                                status: client.status || 'active'
+                            });
+                            setShowEditModal(true);
+                        }}
+                        className="flex items-center gap-2 text-gray-400 hover:text-primary px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                    >
+                        <Pencil size={16} />
+                        Edit Profile
+                    </button>
+                    <button
+                        onClick={handleDeleteClient}
+                        className="flex items-center gap-2 text-gray-400 hover:text-red-500 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                    >
+                        <Trash2 size={16} />
+                        Delete Client
+                    </button>
                 </div>
             </header>
 
@@ -1666,6 +1726,123 @@ export const ClientDetails = () => {
                                     Done
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                )}
+                {/* Edit Profile Modal */}
+                {showEditModal && (
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl p-6 animate-in fade-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh]">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="font-bold text-lg flex items-center gap-2">
+                                    <Pencil size={20} className="text-primary" />
+                                    Edit Patient Profile
+                                </h3>
+                                <button onClick={() => setShowEditModal(false)}><X size={20} /></button>
+                            </div>
+                            <form onSubmit={handleUpdateClient} className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-bold text-text-main mb-1">Full Name</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                                            value={editClient.full_name}
+                                            onChange={e => setEditClient({ ...editClient, full_name: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-text-main mb-1">Email Address</label>
+                                        <input
+                                            type="email"
+                                            required
+                                            className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-text-muted"
+                                            value={editClient.email}
+                                            onChange={e => setEditClient({ ...editClient, email: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-text-main mb-1">Birth Date</label>
+                                        <input
+                                            type="date"
+                                            className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                                            value={editClient.birth_date}
+                                            onChange={e => setEditClient({ ...editClient, birth_date: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-text-main mb-1">Status</label>
+                                        <select
+                                            className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                                            value={editClient.status}
+                                            onChange={e => setEditClient({ ...editClient, status: e.target.value })}
+                                        >
+                                            <option value="active">Active</option>
+                                            <option value="paused">Paused</option>
+                                            <option value="completed">Completed</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-text-main mb-1">Sex (At Birth)</label>
+                                        <select
+                                            className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                                            value={editClient.sex}
+                                            onChange={e => setEditClient({ ...editClient, sex: e.target.value })}
+                                        >
+                                            <option value="">Select Sex</option>
+                                            <option value="male">Male</option>
+                                            <option value="female">Female</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-text-main mb-1">Gender Identity</label>
+                                        <input
+                                            type="text"
+                                            className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                                            value={editClient.gender}
+                                            onChange={e => setEditClient({ ...editClient, gender: e.target.value })}
+                                            placeholder="e.g. Male, Female, Non-binary"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-text-main mb-1">Height (cm)</label>
+                                        <input
+                                            type="number"
+                                            step="0.1"
+                                            className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                                            value={editClient.height_cm}
+                                            onChange={e => setEditClient({ ...editClient, height_cm: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-text-main mb-1">Target Weight (kg)</label>
+                                        <input
+                                            type="number"
+                                            step="0.1"
+                                            className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                                            value={editClient.target_weight_kg}
+                                            onChange={e => setEditClient({ ...editClient, target_weight_kg: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowEditModal(false)}
+                                        className="px-6 py-2 border border-gray-200 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="px-6 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary-hover transition-colors shadow-sm"
+                                    >
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 )}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { clientService, coachService } from '../lib/api';
-import { Users, Search, Plus, MoreHorizontal } from 'lucide-react';
+import { Users, Search, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -84,6 +84,20 @@ export const ClientsPage = () => {
             case 'paused': return 'bg-yellow-100 text-yellow-700';
             case 'completed': return 'bg-blue-100 text-blue-700';
             default: return 'bg-gray-100 text-gray-700';
+        }
+    };
+
+    const handleDeleteClient = async (clientId: string, clientName: string) => {
+        if (!confirm(`Are you sure you want to permanently delete ${clientName}? This will also delete all their medical records, measurements, and nutrition plans.`)) {
+            return;
+        }
+
+        try {
+            await clientService.delete(clientId);
+            await fetchData(); // Refresh list
+        } catch (error) {
+            console.error('Failed to delete client:', error);
+            alert('Error deleting client');
         }
     };
 
@@ -172,7 +186,7 @@ export const ClientsPage = () => {
                                         return (
                                             <tr
                                                 key={client.id}
-                                                className="hover:bg-gray-50 transition-colors cursor-pointer"
+                                                className="hover:bg-gray-50 transition-colors cursor-pointer group"
                                                 onClick={() => navigate(`/clients/${client.id}`)}
                                             >
                                                 <td className={`px-6 py-4 ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}>
@@ -193,8 +207,15 @@ export const ClientsPage = () => {
                                                     {new Date(client.created_at).toLocaleDateString()}
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
-                                                    <button className="p-2 text-gray-400 hover:text-primary transition-colors">
-                                                        <MoreHorizontal size={18} />
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDeleteClient(client.id, client.full_name);
+                                                        }}
+                                                        className="p-2 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                                                        title="Delete Client"
+                                                    >
+                                                        <Trash2 size={18} />
                                                     </button>
                                                 </td>
                                             </tr>
