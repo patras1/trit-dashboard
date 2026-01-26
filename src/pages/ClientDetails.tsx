@@ -1077,216 +1077,217 @@ export const ClientDetails = () => {
                 {activeTab === 'plan' && (
                     <div className="space-y-6">
                         {/* Current Active Protocols */}
-                        <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
-                            <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
-                                <Activity size={20} className="text-primary" />
-                                <h3 className="text-text-main text-base font-bold">Active Protocols</h3>
+                        {/* Top Section: Protocols & Phase Manager */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {/* Current Active Protocols */}
+                            <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                                <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
+                                    <Activity size={20} className="text-primary" />
+                                    <h3 className="text-text-main text-base font-bold">Active Protocols</h3>
+                                </div>
+                                <div className="p-6 space-y-3">
+                                    {protocols.filter((p: any) => p.status === 'active').length === 0 ? (
+                                        <p className="text-text-muted text-sm italic">No active protocols.</p>
+                                    ) : (
+                                        protocols.filter((p: any) => p.status === 'active').map((p: any) => (
+                                            <div key={p.id} className="flex items-center justify-between bg-blue-50 border border-blue-100 rounded-lg p-3">
+                                                <div>
+                                                    <p className="font-bold text-sm text-blue-900">{p.name}</p>
+                                                    <p className="text-xs text-blue-700">{p.details || 'No details specified.'}</p>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-[10px] uppercase font-bold bg-blue-200 text-blue-800 px-2 py-0.5 rounded">Active</span>
+                                                    <button onClick={() => handleUpdateProtocolStatus(p.id, 'paused')} className="text-xs text-gray-500 hover:text-gray-700 underline">Pause</button>
+                                                    <button onClick={() => handleUpdateProtocolStatus(p.id, 'completed')} className="text-xs text-gray-500 hover:text-gray-700 underline">End</button>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                    <button
+                                        onClick={() => setShowAddProtocol(true)}
+                                        className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm font-bold text-text-muted hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        <Plus size={16} />
+                                        Add Specific Protocol
+                                    </button>
+                                </div>
                             </div>
-                            <div className="p-6 space-y-3">
-                                {protocols.filter((p: any) => p.status === 'active').length === 0 ? (
-                                    <p className="text-text-muted text-sm italic">No active protocols.</p>
-                                ) : (
-                                    protocols.filter((p: any) => p.status === 'active').map((p: any) => (
-                                        <div key={p.id} className="flex items-center justify-between bg-blue-50 border border-blue-100 rounded-lg p-3">
+
+                            {/* Phase Manager (Goals) */}
+                            <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                                <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
+                                    <Target size={20} className="text-primary" />
+                                    <h3 className="text-text-main text-base font-bold">Phase Manager</h3>
+                                </div>
+                                <div className="p-6 space-y-4">
+                                    {goals.map((goal: any) => (
+                                        <div key={goal.id} className="flex items-center justify-between border-b border-gray-100 last:border-0 pb-4 last:pb-0">
                                             <div>
-                                                <p className="font-bold text-sm text-blue-900">{p.name}</p>
-                                                <p className="text-xs text-blue-700">{p.details || 'No details specified.'}</p>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className={`text-xs px-2 py-0.5 rounded-full font-bold uppercase ${goal.status === 'active' ? 'bg-green-100 text-green-700' :
+                                                        goal.status === 'completed' ? 'bg-gray-100 text-gray-500' :
+                                                            goal.status === 'aborted' ? 'bg-red-100 text-red-500' : 'bg-yellow-100 text-yellow-700'
+                                                        }`}>
+                                                        {goal.status}
+                                                    </span>
+                                                    <p className="font-bold text-sm text-gray-800">{goal.phase_name || goal.priority}</p>
+                                                </div>
+                                                <p className="text-xs text-gray-500">Target: {goal.target_weight_kg}kg ({goal.target_body_fat_percent}%)</p>
+                                                <p className="text-xs text-text-muted mt-0.5">{new Date(goal.start_date).toLocaleDateString()} - {goal.end_date ? new Date(goal.end_date).toLocaleDateString() : '...'}</p>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <span className="text-[10px] uppercase font-bold bg-blue-200 text-blue-800 px-2 py-0.5 rounded">Active</span>
-                                                <button onClick={() => handleUpdateProtocolStatus(p.id, 'paused')} className="text-xs text-gray-500 hover:text-gray-700 underline">Pause</button>
-                                                <button onClick={() => handleUpdateProtocolStatus(p.id, 'completed')} className="text-xs text-gray-500 hover:text-gray-700 underline">End</button>
+                                                {goal.status === 'active' && (
+                                                    <>
+                                                        <button onClick={() => handleGoalStatusChange(goal.id, 'completed')} className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded border border-gray-300 transition-colors">Complete</button>
+                                                        <button onClick={() => handleGoalStatusChange(goal.id, 'aborted')} className="text-xs bg-white hover:bg-red-50 text-red-600 px-2 py-1 rounded border border-red-200 transition-colors">Abort</button>
+                                                    </>
+                                                )}
+                                                {(goal.status === 'pending' || !goal.status) && (
+                                                    <button onClick={() => handleGoalStatusChange(goal.id, 'active')} className="text-xs bg-primary hover:bg-primary-hover text-white px-3 py-1 rounded transition-colors">Start Phase</button>
+                                                )}
+                                                {goal.status === 'aborted' && (
+                                                    <button onClick={() => handleGoalStatusChange(goal.id, 'active')} className="text-xs text-primary hover:underline">Restart</button>
+                                                )}
                                             </div>
                                         </div>
-                                    ))
-                                )}
-                                <button
-                                    onClick={() => setShowAddProtocol(true)}
-                                    className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm font-bold text-text-muted hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
-                                >
-                                    <Plus size={16} />
-                                    Add Specific Protocol
-                                </button>
+                                    ))}
+                                    {goals.length === 0 && <p className="text-sm text-text-muted text-center py-4">No phases defined.</p>}
+                                </div>
                             </div>
                         </div>
 
                         {/* Plan Change Log - New Section */}
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 overflow-hidden">
-                            <div className="flex justify-between items-center mb-6">
-                                <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
-                                    <HistoryIcon size={20} className="text-primary" />
-                                    Plan Change Log
-                                </h3>
-                                <button
-                                    onClick={() => setShowAddPhase(true)}
-                                    className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-4 py-2 rounded-lg text-sm font-bold transition-all border border-primary/20 shadow-sm"
-                                >
-                                    <Plus size={16} />
-                                    New Phase
-                                </button>
-                            </div>
-                            <div className="relative border-l-2 border-primary/20 ml-3 pl-8 space-y-8">
-                                {prescriptions.slice().sort((a: any, b: any) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime()).map((plan: any, index: number, arr: any[]) => {
-                                    const nextPlan = arr[index + 1];
-                                    const kcalDiff = nextPlan ? plan.calories_target - nextPlan.calories_target : 0;
-                                    const proteinDiff = nextPlan ? plan.protein_grams - nextPlan.protein_grams : 0;
-                                    const isSelected = selectedPrescriptionId === plan.id;
-
-                                    return (
-                                        <div
-                                            key={plan.id}
-                                            className={`relative cursor-pointer transition-all ${isSelected ? 'scale-[1.02]' : 'hover:scale-[1.01]'}`}
-                                            onClick={() => setSelectedPrescriptionId(plan.id)}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {/* Plan Change Log - New Section */}
+                            <div className="lg:col-span-1">
+                                <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 overflow-hidden h-full">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                                            <HistoryIcon size={20} className="text-primary" />
+                                            Plan Change Log
+                                        </h3>
+                                        <button
+                                            onClick={() => setShowAddPhase(true)}
+                                            className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-primary/20 shadow-sm"
                                         >
-                                            {/* Date indicator dot */}
-                                            <div className={`absolute -left-[41px] top-1.5 w-6 h-6 rounded-full bg-white border-4 ${isSelected ? 'border-primary shadow-md' : 'border-gray-200'} z-10 transition-colors`} />
+                                            <Plus size={14} />
+                                            New
+                                        </button>
+                                    </div>
+                                    <div className="relative border-l-2 border-primary/20 ml-3 pl-6 space-y-6">
+                                        {prescriptions.slice().sort((a: any, b: any) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime()).map((plan: any, index: number, arr: any[]) => {
+                                            const nextPlan = arr[index + 1];
+                                            const kcalDiff = nextPlan ? plan.calories_target - nextPlan.calories_target : 0;
+                                            const proteinDiff = nextPlan ? plan.protein_grams - nextPlan.protein_grams : 0;
+                                            const isSelected = selectedPrescriptionId === plan.id;
 
-                                            <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl border-2 transition-all ${isSelected ? 'bg-primary/5 border-primary shadow-sm' : 'bg-transparent border-transparent hover:bg-gray-50'}`}>
-                                                <div>
-                                                    <div className="flex items-center gap-3">
-                                                        <p className={`font-bold ${isSelected ? 'text-primary' : 'text-text-main'}`}>{new Date(plan.start_date).toLocaleDateString()}</p>
-                                                        <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${isSelected ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}>{plan.phase_name}</span>
+                                            return (
+                                                <div
+                                                    key={plan.id}
+                                                    className={`relative cursor-pointer transition-all ${isSelected ? 'scale-[1.02]' : 'hover:scale-[1.01]'}`}
+                                                    onClick={() => setSelectedPrescriptionId(plan.id)}
+                                                >
+                                                    {/* Date indicator dot */}
+                                                    <div className={`absolute -left-[35px] top-1.5 w-4 h-4 rounded-full bg-white border-4 ${isSelected ? 'border-primary shadow-md' : 'border-gray-200'} z-10 transition-colors`} />
+
+                                                    <div className={`flex flex-col gap-2 p-3 rounded-xl border-2 transition-all ${isSelected ? 'bg-primary/5 border-primary shadow-sm' : 'bg-transparent border-transparent hover:bg-gray-50'}`}>
+                                                        <div className="flex justify-between items-start">
+                                                            <div>
+                                                                <p className={`font-bold text-sm ${isSelected ? 'text-primary' : 'text-text-main'}`}>{new Date(plan.start_date).toLocaleDateString()}</p>
+                                                                <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase mt-1 inline-block ${isSelected ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}>{plan.phase_name}</span>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <p className="text-xs font-bold text-gray-800">{plan.calories_target} kcal</p>
+                                                                {kcalDiff !== 0 && (
+                                                                    <p className={`text-[10px] font-bold ${kcalDiff > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                                        {kcalDiff > 0 ? '+' : ''}{kcalDiff}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <p className="text-xs text-text-muted mt-1 italic">Consultation adjustment</p>
                                                 </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
 
-                                                <div className="flex items-center gap-6">
-                                                    <div className="text-center">
-                                                        <p className="text-sm font-bold text-gray-800">{plan.calories_target} kcal</p>
-                                                        {kcalDiff !== 0 && (
-                                                            <p className={`text-[10px] font-bold ${kcalDiff > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                                                {kcalDiff > 0 ? '+' : ''}{kcalDiff} kcal
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                    <div className="text-center">
-                                                        <p className="text-sm font-bold text-gray-800 font-mono">{plan.protein_grams}P / {plan.carbs_grams}C / {plan.fat_grams}F</p>
-                                                        {proteinDiff !== 0 && (
-                                                            <p className={`text-[10px] font-bold ${proteinDiff > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                                                {proteinDiff > 0 ? '+' : ''}{proteinDiff}g Protein
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                    <ChevronRight size={16} className={`transition-transform duration-300 ${isSelected ? 'text-primary rotate-90' : 'text-gray-300'}`} />
+                            {/* Selected Prescription Details */}
+                            <div className="lg:col-span-2">
+                                {prescriptions.filter((p: any) => p.id === selectedPrescriptionId).map((plan: any) => (
+                                    <div key={plan.id} className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-primary shadow-xl p-8 relative overflow-hidden animate-in slide-in-from-bottom-4 duration-500 h-full">
+                                        {/* Decor */}
+                                        <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none">
+                                            <Activity size={200} />
+                                        </div>
+
+                                        <div className="flex justify-between items-start mb-8 relative z-10">
+                                            <div>
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <h4 className="font-black text-2xl text-text-main tracking-tight">{plan.phase_name || 'Nutrition Plan'}</h4>
+                                                    {plan.is_active ? (
+                                                        <span className="bg-green-500 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">Current Active Plan</span>
+                                                    ) : (
+                                                        <span className="bg-gray-400 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">Historical Phase</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-2 text-text-muted">
+                                                    <Calendar size={14} />
+                                                    <p className="text-xs font-medium">
+                                                        Started {new Date(plan.start_date).toLocaleDateString()} • {plan.end_date ? `Ends ${new Date(plan.end_date).toLocaleDateString()}` : 'Ongoing Priority'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="inline-block bg-primary text-white px-4 py-2 rounded-xl shadow-lg shadow-primary/20">
+                                                    <p className="text-3xl font-black leading-none">{plan.calories_target}</p>
+                                                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Daily kcal</p>
                                                 </div>
                                             </div>
                                         </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
 
-
-                        {prescriptions.filter((p: any) => p.id === selectedPrescriptionId).map((plan: any) => (
-                            <div key={plan.id} className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-primary shadow-xl p-8 relative overflow-hidden animate-in slide-in-from-bottom-4 duration-500">
-                                {/* Decor */}
-                                <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none">
-                                    <Activity size={200} />
-                                </div>
-
-                                <div className="flex justify-between items-start mb-8 relative z-10">
-                                    <div>
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <h4 className="font-black text-2xl text-text-main tracking-tight">{plan.phase_name || 'Nutrition Plan'}</h4>
-                                            {plan.is_active ? (
-                                                <span className="bg-green-500 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">Current Active Plan</span>
-                                            ) : (
-                                                <span className="bg-gray-400 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">Historical Phase</span>
-                                            )}
-                                        </div>
-                                        <div className="flex items-center gap-2 text-text-muted">
-                                            <Calendar size={14} />
-                                            <p className="text-xs font-medium">
-                                                Started {new Date(plan.start_date).toLocaleDateString()} • {plan.end_date ? `Ends ${new Date(plan.end_date).toLocaleDateString()}` : 'Ongoing Priority'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <div className="inline-block bg-primary text-white px-4 py-2 rounded-xl shadow-lg shadow-primary/20">
-                                            <p className="text-3xl font-black leading-none">{plan.calories_target}</p>
-                                            <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Daily kcal</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-3 gap-6 mb-10 relative z-10">
-                                    <div className="bg-white/60 backdrop-blur-sm border border-blue-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest">Protein</p>
-                                            <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-                                        </div>
-                                        <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.protein_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
-                                        <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.protein_grams * 4 / plan.calories_target) * 100)}% of total</p>
-                                    </div>
-                                    <div className="bg-white/60 backdrop-blur-sm border border-green-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <p className="text-[10px] text-green-600 font-black uppercase tracking-widest">Carbs</p>
-                                            <div className="w-2 h-2 rounded-full bg-green-400" />
-                                        </div>
-                                        <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.carbs_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
-                                        <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.carbs_grams * 4 / plan.calories_target) * 100)}% of total</p>
-                                    </div>
-                                    <div className="bg-white/60 backdrop-blur-sm border border-yellow-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <p className="text-[10px] text-yellow-600 font-black uppercase tracking-widest">Fats</p>
-                                            <div className="w-2 h-2 rounded-full bg-yellow-400" />
-                                        </div>
-                                        <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.fat_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
-                                        <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.fat_grams * 9 / plan.calories_target) * 100)}% of total</p>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4 bg-white/40 p-6 rounded-2xl border border-white relative z-10">
-                                    <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-2">Detailed Menu & Rules</h5>
-                                    <div className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap font-medium" dir="rtl">
-                                        {plan.training_day_rules}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-
-
-                        {/* Phase Manager (Goals) */}
-                        <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
-                            <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
-                                <Target size={20} className="text-primary" />
-                                <h3 className="text-text-main text-base font-bold">Phase Manager</h3>
-                            </div>
-                            <div className="p-6 space-y-4">
-                                {goals.map((goal: any) => (
-                                    <div key={goal.id} className="flex items-center justify-between border-b border-gray-100 last:border-0 pb-4 last:pb-0">
-                                        <div>
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className={`text-xs px-2 py-0.5 rounded-full font-bold uppercase ${goal.status === 'active' ? 'bg-green-100 text-green-700' :
-                                                    goal.status === 'completed' ? 'bg-gray-100 text-gray-500' :
-                                                        goal.status === 'aborted' ? 'bg-red-100 text-red-500' : 'bg-yellow-100 text-yellow-700'
-                                                    }`}>
-                                                    {goal.status}
-                                                </span>
-                                                <p className="font-bold text-sm text-gray-800">{goal.phase_name || goal.priority}</p>
+                                        <div className="grid grid-cols-3 gap-6 mb-10 relative z-10">
+                                            <div className="bg-white/60 backdrop-blur-sm border border-blue-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest">Protein</p>
+                                                    <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                                                </div>
+                                                <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.protein_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
+                                                <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.protein_grams * 4 / plan.calories_target) * 100)}% of total</p>
                                             </div>
-                                            <p className="text-xs text-gray-500">Target: {goal.target_weight_kg}kg ({goal.target_body_fat_percent}%)</p>
-                                            <p className="text-xs text-text-muted mt-0.5">{new Date(goal.start_date).toLocaleDateString()} - {goal.end_date ? new Date(goal.end_date).toLocaleDateString() : '...'}</p>
+                                            <div className="bg-white/60 backdrop-blur-sm border border-green-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <p className="text-[10px] text-green-600 font-black uppercase tracking-widest">Carbs</p>
+                                                    <div className="w-2 h-2 rounded-full bg-green-400" />
+                                                </div>
+                                                <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.carbs_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
+                                                <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.carbs_grams * 4 / plan.calories_target) * 100)}% of total</p>
+                                            </div>
+                                            <div className="bg-white/60 backdrop-blur-sm border border-yellow-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <p className="text-[10px] text-yellow-600 font-black uppercase tracking-widest">Fats</p>
+                                                    <div className="w-2 h-2 rounded-full bg-yellow-400" />
+                                                </div>
+                                                <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.fat_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
+                                                <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.fat_grams * 9 / plan.calories_target) * 100)}% of total</p>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            {goal.status === 'active' && (
-                                                <>
-                                                    <button onClick={() => handleGoalStatusChange(goal.id, 'completed')} className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded border border-gray-300 transition-colors">Complete</button>
-                                                    <button onClick={() => handleGoalStatusChange(goal.id, 'aborted')} className="text-xs bg-white hover:bg-red-50 text-red-600 px-2 py-1 rounded border border-red-200 transition-colors">Abort</button>
-                                                </>
-                                            )}
-                                            {(goal.status === 'pending' || !goal.status) && (
-                                                <button onClick={() => handleGoalStatusChange(goal.id, 'active')} className="text-xs bg-primary hover:bg-primary-hover text-white px-3 py-1 rounded transition-colors">Start Phase</button>
-                                            )}
-                                            {goal.status === 'aborted' && (
-                                                <button onClick={() => handleGoalStatusChange(goal.id, 'active')} className="text-xs text-primary hover:underline">Restart</button>
-                                            )}
+
+                                        <div className="space-y-4 bg-white/40 p-6 rounded-2xl border border-white relative z-10">
+                                            <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-2">Detailed Menu & Rules</h5>
+                                            <div className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap font-medium" dir="rtl">
+                                                {plan.training_day_rules}
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
-                                {goals.length === 0 && <p className="text-sm text-text-muted text-center py-4">No phases defined.</p>}
                             </div>
                         </div>
+
+
+                        {/* Phase Manager (Goals) */}
+
                     </div>
                 )}
 
