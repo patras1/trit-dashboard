@@ -1,9 +1,9 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
 import { ArrowLeft, ArrowRight, Clock, Tag, Database, ShoppingBag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { foodService } from '../lib/api';
 
 interface Product {
     barcode: string;
@@ -38,18 +38,14 @@ export const ProductDetails = () => {
 
     const fetchProduct = async (code: string) => {
         setLoading(true);
-        const { data, error } = await supabase
-            .from('foods')
-            .select('*')
-            .eq('barcode', code)
-            .single();
-
-        if (error) {
-            console.error('Error fetching product:', error);
-        } else {
+        try {
+            const data = await foodService.get(code);
             setProduct(data);
+        } catch (error) {
+            console.error('Error fetching product:', error);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     if (loading) {

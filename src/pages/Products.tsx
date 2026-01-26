@@ -2,10 +2,10 @@
 
 
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
 import { Search, ChevronLeft, ChevronRight, X, BookOpen } from 'lucide-react';
 import { MultiSelect } from '../components/ui/MultiSelect';
 import { useTranslation } from 'react-i18next';
+import { foodService } from '../lib/api';
 
 interface Product {
     barcode: string;
@@ -52,60 +52,27 @@ export const ProductsPage = () => {
     const fetchData = async () => {
         setLoading(true);
 
-        // Fetch categories if not already loaded (only once)
-        if (categories.length === 0) {
-            const { data: catData } = await supabase
-                .from('foods')
-                .select('category');
-
-            if (catData) {
-                const categoryCounts: Record<string, number> = {};
-                catData.forEach(p => {
-                    const cat = p.category || 'ללא קטגוריה';
-                    categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
-                });
-
-                const sortedCategories = Object.entries(categoryCounts)
-                    .map(([name, count]) => ({ name, count }))
-                    .sort((a, b) => b.count - a.count);
-
-                setCategories(sortedCategories);
+        try {
+            // Fetch categories if not already loaded
+            if (categories.length === 0) {
+                const catData = await foodService.getCategories();
+                setCategories(catData);
             }
-        }
 
-        let query = supabase
-            .from('foods')
-            .select('*', { count: 'exact' });
+            const { data, total } = await foodService.list({
+                page,
+                pageSize: PAGE_SIZE,
+                search: debouncedSearch,
+                categories: categoryFilters
+            });
 
-        if (debouncedSearch) {
-            query = query.or(`name_he.ilike.%${debouncedSearch}%,name_en.ilike.%${debouncedSearch}%,barcode.eq.${debouncedSearch}`);
-        }
-
-        if (categoryFilters.length > 0) {
-            const regularCategories = categoryFilters.filter(c => c !== 'ללא קטגוריה');
-            const hasUncategorized = categoryFilters.includes('ללא קטגוריה');
-
-            if (hasUncategorized && regularCategories.length > 0) {
-                const inList = `(${regularCategories.map(c => `"${c}"`).join(',')})`;
-                query = query.or(`category.is.null,category.in.${inList}`);
-            } else if (hasUncategorized) {
-                query = query.is('category', null);
-            } else {
-                query = query.in('category', regularCategories);
-            }
-        }
-
-        const { data, count, error } = await query
-            .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            console.error('Error fetching products:', error);
-        } else {
             setProducts(data || []);
-            setTotal(count || 0);
+            setTotal(total);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
 

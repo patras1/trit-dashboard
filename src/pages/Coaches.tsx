@@ -22,6 +22,7 @@ interface Coach {
     consistencyEmphasis: number;
     tone: string;
     language: string;
+    programs_enabled?: boolean;
 }
 
 export const CoachesPage = () => {
@@ -76,7 +77,7 @@ export const CoachesPage = () => {
     const tabs = [
         { id: 'identity', label: t('coaches.tabs.identity') },
         { id: 'behavior', label: t('coaches.tabs.behavior') },
-        { id: 'programs', label: t('coaches.tabs.programs') },
+        ...(selectedCoach?.programs_enabled !== false ? [{ id: 'programs', label: t('coaches.tabs.programs') }] : []),
         { id: 'voice', label: t('coaches.tabs.voice') },
         { id: 'quests', label: t('coaches.tabs.quests') },
         { id: 'simulate', label: t('coaches.tabs.simulate') },

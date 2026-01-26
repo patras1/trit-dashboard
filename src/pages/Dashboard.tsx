@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
 import { Package, TrendingUp, Database, LayoutDashboard } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { foodService } from '../lib/api';
 
 export const Dashboard = () => {
     const { t, i18n } = useTranslation();
@@ -19,35 +19,19 @@ export const Dashboard = () => {
     const fetchStats = async () => {
         setLoading(true);
 
-        // Fetch total count
-        const { count, error: countError } = await supabase
-            .from('foods')
-            .select('*', { count: 'exact', head: true });
+        try {
+            // Fetch total count
+            const { total } = await foodService.getStats();
+            setTotalProducts(total);
 
-        if (!countError && count !== null) {
-            setTotalProducts(count);
-        }
-
-        // Fetch categories
-        const { data: products, error: productsError } = await supabase
-            .from('foods')
-            .select('category');
-
-        if (!productsError && products) {
-            const categoryCounts: Record<string, number> = {};
-            products.forEach(p => {
-                const cat = p.category || (i18n.language === 'he' ? 'ללא קטגוריה' : 'Uncategorized');
-                categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
-            });
-
-            const sortedCategories = Object.entries(categoryCounts)
-                .map(([name, count]) => ({ name, count }))
-                .sort((a, b) => b.count - a.count);
-
+            // Fetch categories
+            const sortedCategories = await foodService.getCategories();
             setCategories(sortedCategories);
+        } catch (error) {
+            console.error('Error fetching dashboard stats:', error);
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
 
     return (
