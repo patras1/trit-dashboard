@@ -514,3 +514,42 @@ export const foodService = {
         return { total: count || 0 };
     }
 };
+
+export const coachProgramService = {
+    async list(coachId: string) {
+        const { data, error } = await supabase
+            .from('coach_programs')
+            .select('*')
+            .eq('coach_id', coachId)
+            .order('created_at', { ascending: true });
+        if (error) throw error;
+        return data || [];
+    },
+
+    async create(coachId: string, program: any) {
+        const { data, error } = await supabase
+            .from('coach_programs')
+            .insert([{
+                coach_id: coachId,
+                title: program.title,
+                description: program.desc,
+                duration: program.days,
+                videos: program.videos,
+                gradient: program.gradient,
+                phases: program.phases,
+                active_phase: program.activePhase || 0
+            }])
+            .select()
+            .single();
+        if (error) throw error;
+        return data;
+    },
+
+    async delete(programId: string) {
+        const { error } = await supabase
+            .from('coach_programs')
+            .delete()
+            .eq('id', programId);
+        if (error) throw error;
+    }
+};

@@ -46,8 +46,8 @@ export const Layout = () => {
                     <nav className="flex flex-col gap-1">
                         <SidebarLink to="/" icon={LayoutDashboard}>{t('nav.dashboard')}</SidebarLink>
                         <SidebarLink to="/products" icon={BookOpen}>{t('nav.products')}</SidebarLink>
-                        <SidebarLink to="/coaches" icon={User}>{t('nav.coaches')}</SidebarLink>
                         <SidebarLink to="/clients" icon={Users}>{t('nav.clients')}</SidebarLink>
+                        <SidebarLink to="/coaches" icon={User}>{t('nav.coaches')}</SidebarLink>
                         <SidebarLink to="/settings" icon={Settings}>{t('nav.settings')}</SidebarLink>
                     </nav>
                 </div>
@@ -97,8 +97,8 @@ export const Layout = () => {
                 <nav className="flex-1 p-4 space-y-1">
                     <SidebarLink to="/" icon={LayoutDashboard} onClick={closeMobileMenu}>{t('nav.dashboard')}</SidebarLink>
                     <SidebarLink to="/products" icon={BookOpen} onClick={closeMobileMenu}>{t('nav.products')}</SidebarLink>
-                    <SidebarLink to="/coaches" icon={User} onClick={closeMobileMenu}>{t('nav.coaches')}</SidebarLink>
                     <SidebarLink to="/clients" icon={Users} onClick={closeMobileMenu}>{t('nav.clients')}</SidebarLink>
+                    <SidebarLink to="/coaches" icon={User} onClick={closeMobileMenu}>{t('nav.coaches')}</SidebarLink>
                     <SidebarLink to="/settings" icon={Settings} onClick={closeMobileMenu}>{t('nav.settings')}</SidebarLink>
                 </nav>
 

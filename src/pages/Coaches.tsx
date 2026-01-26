@@ -174,7 +174,7 @@ export const CoachesPage = () => {
 
                         {/* TAB CONTENT: PROGRAMS */}
                         {activeTab === 'programs' && (
-                            <ProgramsTab />
+                            <ProgramsTab coachId={selectedCoach.id} />
                         )}
 
                         {/* TAB CONTENT: VOICE */}

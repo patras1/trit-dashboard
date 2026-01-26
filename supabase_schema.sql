@@ -233,7 +233,42 @@ VALUES
 ('balanced', 'Balance Coach', 'All-around • Balanced', 0.5, 0.5, 0.5, 0.5, 0.5, 0.7, 'calm', 'balanced_v1', 'en', true)
 ON CONFLICT (id) DO NOTHING;
 
--- 8. Foods Table (Master Product List)
+-- Seed Programs for default coaches
+INSERT INTO coach_programs (coach_id, title, description, duration, videos, gradient, phases, active_phase)
+VALUES 
+('trit-default', 'Rapid Reset Protocol', 'AI-Optimized Metabolic Restart', '30 DAYS', '12 VIDEOS', 'from-[#4b7c77] to-[#a8c1bf]', '["Detox", "Refeed", "Sustain"]'::jsonb, 0),
+('trit-default', 'Endurance Fueling', 'High-performance carb cycling', '12 WEEKS', '8 VIDEOS', 'from-[#2d4f4b] to-[#4b7c77]', '["Base", "Build", "Peak", "Taper"]'::jsonb, 1),
+('trit-default', 'Gut Health Intensive', 'Microbiome restoration plan', '21 DAYS', '5 VIDEOS', 'from-[#d4a373] to-[#4b7c77]', '["Eliminate", "Reintroduce"]'::jsonb, 1),
+('hebrew-default', 'פרוטוקול איפוס מהיר', 'אתחול מטבולי מבוסס AI', '30 ימים', '12 סרטונים', 'from-[#4b7c77] to-[#a8c1bf]', '["ניקוי", "הזנה מחדש", "שימור"]'::jsonb, 0),
+('hebrew-default', 'תדלוק סיבולת', 'סייקלינג פחמימות לביצועים גבוהים', '12 שבועות', '8 סרטונים', 'from-[#2d4f4b] to-[#4b7c77]', '["בסיס", "בנייה", "שיא", "טייפר"]'::jsonb, 1)
+ON CONFLICT DO NOTHING;
+
+-- 8. Coach Programs
+CREATE TABLE IF NOT EXISTS coach_programs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    coach_id TEXT REFERENCES coaches(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    description TEXT,
+    duration TEXT,
+    videos TEXT,
+    gradient TEXT,
+    phases JSONB DEFAULT '[]'::jsonb,
+    active_phase INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_coach_programs_updated_at BEFORE UPDATE ON coach_programs FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+-- 9. Foods Table (Master Product List)
 CREATE TABLE IF NOT EXISTS foods (
     barcode TEXT PRIMARY KEY,
     name_he TEXT,
@@ -247,19 +282,11 @@ CREATE TABLE IF NOT EXISTS foods (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 9. Utility Functions & Triggers
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$ language 'plpgsql';
-
+-- 10. Utility Functions & Triggers
 CREATE TRIGGER update_coaches_updated_at BEFORE UPDATE ON coaches FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 CREATE TRIGGER update_clients_updated_at BEFORE UPDATE ON clients FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 
--- 10. RPC Functions (Server-side Logic)
+-- 11. RPC Functions (Server-side Logic)
 CREATE OR REPLACE FUNCTION get_client_dashboard_stats()
 RETURNS JSON AS $$
 DECLARE
