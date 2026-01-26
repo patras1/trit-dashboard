@@ -1178,7 +1178,6 @@ export const ClientDetails = () => {
                                         {prescriptions.slice().sort((a: any, b: any) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime()).map((plan: any, index: number, arr: any[]) => {
                                             const nextPlan = arr[index + 1];
                                             const kcalDiff = nextPlan ? plan.calories_target - nextPlan.calories_target : 0;
-                                            const proteinDiff = nextPlan ? plan.protein_grams - nextPlan.protein_grams : 0;
                                             const isSelected = selectedPrescriptionId === plan.id;
 
                                             return (

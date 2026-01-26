@@ -1,4 +1,4 @@
-import { Star, Flame, Trophy, Award, Target, Plus, Settings, MoreVertical, Droplets, Utensils, Zap, Info, Users, Smartphone, BookOpen } from 'lucide-react';
+import { Star, Flame, Trophy, Award, Target, Plus, Settings, MoreVertical, Droplets, Utensils, Info, Users, Smartphone, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export const QuestsGamificationTab = () => {
