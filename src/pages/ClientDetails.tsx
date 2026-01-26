@@ -471,7 +471,7 @@ export const ClientDetails = () => {
             <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
                 {/* Top Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+                    <div className="bg-white p-4 rounded-xl border border-[#dfe2e2] flex items-center gap-4">
                         <div className="p-3 rounded-full bg-blue-50 text-blue-600">
                             <User size={24} />
                         </div>
@@ -481,7 +481,7 @@ export const ClientDetails = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+                    <div className="bg-white p-4 rounded-xl border border-[#dfe2e2] flex items-center gap-4">
                         <div className="p-3 rounded-full bg-red-50 text-red-600">
                             <Weight size={24} />
                         </div>
@@ -495,7 +495,7 @@ export const ClientDetails = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+                    <div className="bg-white p-4 rounded-xl border border-[#dfe2e2] flex items-center gap-4">
                         <div className="p-3 rounded-full bg-green-50 text-green-600">
                             <Ruler size={24} />
                         </div>
@@ -505,7 +505,7 @@ export const ClientDetails = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+                    <div className="bg-white p-4 rounded-xl border border-[#dfe2e2] flex items-center gap-4">
                         <div className="p-3 rounded-full bg-purple-50 text-purple-600">
                             <Calendar size={24} />
                         </div>
@@ -520,7 +520,7 @@ export const ClientDetails = () => {
 
                 {/* Middle Stats - Primary KPI Row */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2] flex items-center justify-between">
                         <div>
                             <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Weight Delta</p>
                             <p className="text-2xl font-black text-text-main flex items-baseline gap-1">
@@ -534,7 +534,7 @@ export const ClientDetails = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2] flex items-center justify-between">
                         <div>
                             <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Active Phase</p>
                             <p className="text-lg font-black text-text-main truncate max-w-[120px]">
@@ -546,7 +546,7 @@ export const ClientDetails = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2] flex items-center justify-between">
                         <div>
                             <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Last Contact</p>
                             <p className="text-lg font-black text-text-main">
@@ -558,7 +558,7 @@ export const ClientDetails = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between overflow-hidden">
+                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2] flex items-center justify-between overflow-hidden">
                         <div className="z-10">
                             <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Adherence Signal</p>
                             <div className="flex items-center gap-1.5">
@@ -599,7 +599,7 @@ export const ClientDetails = () => {
                 {activeTab === 'overview' && (<>
                     {/* Insights / Derived Metrics Row */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                        <div className="bg-white p-4 rounded-xl border border-[#dfe2e2]">
                             <p className="text-xs text-text-muted font-bold uppercase">Total Loss</p>
                             <p className="text-2xl font-bold text-primary">{client?.starting_weight_kg && client?.recent_measurements?.[0]?.weight_kg ? (client.starting_weight_kg - client.recent_measurements[0].weight_kg).toFixed(1) : '0'} kg</p>
                             <p className="text-xs text-green-600 font-medium">
@@ -609,7 +609,7 @@ export const ClientDetails = () => {
                                 }
                             </p>
                         </div>
-                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                        <div className="bg-white p-4 rounded-xl border border-[#dfe2e2]">
                             <p className="text-xs text-text-muted font-bold uppercase">Active Phase</p>
                             <p className="text-lg font-bold text-gray-800">{goals.find(g => g.status === 'active')?.phase_name || 'General'}</p>
                             <div className="flex items-center gap-2">
@@ -617,7 +617,7 @@ export const ClientDetails = () => {
                                 <p className="text-xs text-text-muted">{goals.find(g => g.status === 'active')?.priority || 'Maintenance'}</p>
                             </div>
                         </div>
-                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                        <div className="bg-white p-4 rounded-xl border border-[#dfe2e2]">
                             <p className="text-xs text-text-muted font-bold uppercase">Last Contact</p>
                             <p className={`text-2xl font-bold ${!sessionNotes.length || (new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24) > 14
                                 ? 'text-red-500'
@@ -631,7 +631,7 @@ export const ClientDetails = () => {
                                 {sessionNotes.length > 0 && Math.floor((new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24)) > 14 ? 'Check-in Overdue' : 'On Track'}
                             </p>
                         </div>
-                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                        <div className="bg-white p-4 rounded-xl border border-[#dfe2e2]">
                             <p className="text-xs text-text-muted font-bold uppercase">Adherence Signal</p>
                             <p className={`text-lg font-bold ${!psychCheckins.length ? 'text-gray-400' : psychCheckins[0]?.motivation_status === 'high' ? 'text-green-600' : 'text-orange-500'}`}>
                                 {psychCheckins.length ? (
@@ -649,64 +649,66 @@ export const ClientDetails = () => {
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Left Column: Metabolic & Strategy Profile */}
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-6">
-                            <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                        <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                            <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
                                 <Activity size={20} className="text-primary" />
-                                Metabolic Profile
-                            </h3>
+                                <h3 className="text-text-main text-base font-bold">Metabolic Profile</h3>
+                            </div>
+                            <div className="p-6 space-y-6">
 
-                            <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-gray-50 p-3 rounded-lg">
-                                        <label className="text-xs text-text-muted block mb-1">Target Calories</label>
-                                        <p className="text-lg font-bold text-primary">{prescriptions.find(p => p.is_active)?.calories_target || 'N/A'}</p>
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-gray-50 p-3 rounded-lg">
+                                            <label className="text-xs text-text-muted block mb-1">Target Calories</label>
+                                            <p className="text-lg font-bold text-primary">{prescriptions.find(p => p.is_active)?.calories_target || 'N/A'}</p>
+                                        </div>
+                                        <div className="bg-gray-50 p-3 rounded-lg">
+                                            <label className="text-xs text-text-muted block mb-1">Target Change/Wk</label>
+                                            <p className="text-lg font-bold text-gray-800">{goals.find(g => g.status === 'active')?.expected_weekly_change_kg || 0.5} kg</p>
+                                        </div>
                                     </div>
-                                    <div className="bg-gray-50 p-3 rounded-lg">
-                                        <label className="text-xs text-text-muted block mb-1">Target Change/Wk</label>
-                                        <p className="text-lg font-bold text-gray-800">{goals.find(g => g.status === 'active')?.expected_weekly_change_kg || 0.5} kg</p>
-                                    </div>
-                                </div>
 
-                                <div className="border-t border-gray-100 pt-4">
-                                    <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Current Protocol</label>
-                                    <div className="space-y-2 text-sm">
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-600">Protein</span>
-                                            <span className="font-medium">{prescriptions.find(p => p.is_active)?.protein_grams || '-'}g</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-600">Steps/Cardio</span>
-                                            <span className="font-medium">{activityLogs.find(a => a.is_current)?.distance_km_week ? `${activityLogs.find(a => a.is_current).distance_km_week}km/wk` : client.activity_level}</span>
-                                        </div>
-                                        {prescriptions.find(p => p.is_active)?.is_intermittent_fasting && (
+                                    <div className="border-t border-gray-100 pt-4">
+                                        <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Current Protocol</label>
+                                        <div className="space-y-2 text-sm">
                                             <div className="flex justify-between">
-                                                <span className="text-gray-600">Fasting</span>
-                                                <span className="font-medium text-purple-600">{prescriptions.find(p => p.is_active).fasting_protocol}</span>
+                                                <span className="text-gray-600">Protein</span>
+                                                <span className="font-medium">{prescriptions.find(p => p.is_active)?.protein_grams || '-'}g</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-600">Steps/Cardio</span>
+                                                <span className="font-medium">{activityLogs.find(a => a.is_current)?.distance_km_week ? `${activityLogs.find(a => a.is_current).distance_km_week}km/wk` : client.activity_level}</span>
+                                            </div>
+                                            {prescriptions.find(p => p.is_active)?.is_intermittent_fasting && (
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Fasting</span>
+                                                    <span className="font-medium text-purple-600">{prescriptions.find(p => p.is_active).fasting_protocol}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="border-t border-gray-100 pt-4">
+                                        <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Red Flags (Latest)</label>
+                                        {!psychCheckins.length ? (
+                                            <p className="text-sm text-text-muted italic">No recent check-ins.</p>
+                                        ) : (
+                                            <div className="flex flex-wrap gap-2">
+                                                {psychCheckins[0]?.evening_hunger && <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-md font-bold">Evening Hunger</span>}
+                                                {psychCheckins[0]?.stress_level === 'high' && <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-md font-bold">High Stress</span>}
+                                                {psychCheckins[0]?.adherence_difficulty && <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-md font-bold">Diff: {psychCheckins[0].adherence_difficulty}</span>}
+                                                {!psychCheckins[0]?.evening_hunger && psychCheckins[0]?.stress_level !== 'high' && <span className="text-sm text-green-600 font-medium">No alerts flagged.</span>}
                                             </div>
                                         )}
                                     </div>
-                                </div>
-
-                                <div className="border-t border-gray-100 pt-4">
-                                    <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Red Flags (Latest)</label>
-                                    {!psychCheckins.length ? (
-                                        <p className="text-sm text-text-muted italic">No recent check-ins.</p>
-                                    ) : (
-                                        <div className="flex flex-wrap gap-2">
-                                            {psychCheckins[0]?.evening_hunger && <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-md font-bold">Evening Hunger</span>}
-                                            {psychCheckins[0]?.stress_level === 'high' && <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-md font-bold">High Stress</span>}
-                                            {psychCheckins[0]?.adherence_difficulty && <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-md font-bold">Diff: {psychCheckins[0].adherence_difficulty}</span>}
-                                            {!psychCheckins[0]?.evening_hunger && psychCheckins[0]?.stress_level !== 'high' && <span className="text-sm text-green-600 font-medium">No alerts flagged.</span>}
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         </div>
 
                         {/* Right Column: Progress / Measurements History */}
-                        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="font-bold text-lg text-text-main">Recent Progress</h3>
+                        <div className="lg:col-span-2 bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                            <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center justify-between">
+                                <h3 className="text-text-main text-base font-bold">Recent Progress</h3>
                                 <button
                                     onClick={() => setShowAddMeasurement(true)}
                                     className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
@@ -758,80 +760,88 @@ export const ClientDetails = () => {
                     {/* Charts Section */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Weight Progress Chart */}
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                            <h3 className="font-bold text-lg text-text-main mb-6">Weight Progress</h3>
-                            <div className="h-64 w-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <LineChart data={[...(client.recent_measurements || [])].reverse()}>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                                        <XAxis
-                                            dataKey="date"
-                                            tickFormatter={(date) => new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                                            stroke="#9CA3AF"
-                                            tick={{ fontSize: 12 }}
-                                            tickLine={false}
-                                            axisLine={false}
-                                        />
-                                        <YAxis
-                                            stroke="#9CA3AF"
-                                            tick={{ fontSize: 12 }}
-                                            tickLine={false}
-                                            axisLine={false}
-                                            domain={['auto', 'auto']}
-                                        />
-                                        <Tooltip
-                                            contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                            labelFormatter={(date) => new Date(date).toLocaleDateString()}
-                                        />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="weight_kg"
-                                            stroke="#0D9488"
-                                            strokeWidth={3}
-                                            dot={{ fill: '#0D9488', strokeWidth: 2, r: 4, stroke: '#fff' }}
-                                            activeDot={{ r: 6, strokeWidth: 0 }}
-                                        />
-                                    </LineChart>
-                                </ResponsiveContainer>
+                        <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                            <div className="px-6 py-4 border-b border-[#dfe2e2]">
+                                <h3 className="text-text-main text-base font-bold">Weight Progress</h3>
+                            </div>
+                            <div className="p-6">
+                                <div className="h-64 w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <LineChart data={[...(client.recent_measurements || [])].reverse()}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                                            <XAxis
+                                                dataKey="date"
+                                                tickFormatter={(date) => new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                                stroke="#9CA3AF"
+                                                tick={{ fontSize: 12 }}
+                                                tickLine={false}
+                                                axisLine={false}
+                                            />
+                                            <YAxis
+                                                stroke="#9CA3AF"
+                                                tick={{ fontSize: 12 }}
+                                                tickLine={false}
+                                                axisLine={false}
+                                                domain={['auto', 'auto']}
+                                            />
+                                            <Tooltip
+                                                contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                                labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                                            />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="weight_kg"
+                                                stroke="#0D9488"
+                                                strokeWidth={3}
+                                                dot={{ fill: '#0D9488', strokeWidth: 2, r: 4, stroke: '#fff' }}
+                                                activeDot={{ r: 6, strokeWidth: 0 }}
+                                            />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                </div>
                             </div>
                         </div>
 
                         {/* Body Fat Progress Chart */}
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                            <h3 className="font-bold text-lg text-text-main mb-6">Body Fat % Progress</h3>
-                            <div className="h-64 w-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <LineChart data={[...(client.recent_measurements || [])].reverse()}>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                                        <XAxis
-                                            dataKey="date"
-                                            tickFormatter={(date) => new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                                            stroke="#9CA3AF"
-                                            tick={{ fontSize: 12 }}
-                                            tickLine={false}
-                                            axisLine={false}
-                                        />
-                                        <YAxis
-                                            stroke="#9CA3AF"
-                                            tick={{ fontSize: 12 }}
-                                            tickLine={false}
-                                            axisLine={false}
-                                            domain={['auto', 'auto']}
-                                        />
-                                        <Tooltip
-                                            contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                            labelFormatter={(date) => new Date(date).toLocaleDateString()}
-                                        />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="body_fat_percent"
-                                            stroke="#7C3AED"
-                                            strokeWidth={3}
-                                            dot={{ fill: '#7C3AED', strokeWidth: 2, r: 4, stroke: '#fff' }}
-                                            activeDot={{ r: 6, strokeWidth: 0 }}
-                                        />
-                                    </LineChart>
-                                </ResponsiveContainer>
+                        <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                            <div className="px-6 py-4 border-b border-[#dfe2e2]">
+                                <h3 className="text-text-main text-base font-bold">Body Fat % Progress</h3>
+                            </div>
+                            <div className="p-6">
+                                <div className="h-64 w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <LineChart data={[...(client.recent_measurements || [])].reverse()}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                                            <XAxis
+                                                dataKey="date"
+                                                tickFormatter={(date) => new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                                stroke="#9CA3AF"
+                                                tick={{ fontSize: 12 }}
+                                                tickLine={false}
+                                                axisLine={false}
+                                            />
+                                            <YAxis
+                                                stroke="#9CA3AF"
+                                                tick={{ fontSize: 12 }}
+                                                tickLine={false}
+                                                axisLine={false}
+                                                domain={['auto', 'auto']}
+                                            />
+                                            <Tooltip
+                                                contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                                labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                                            />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="body_fat_percent"
+                                                stroke="#7C3AED"
+                                                strokeWidth={3}
+                                                dot={{ fill: '#7C3AED', strokeWidth: 2, r: 4, stroke: '#fff' }}
+                                                activeDot={{ r: 6, strokeWidth: 0 }}
+                                            />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -840,9 +850,9 @@ export const ClientDetails = () => {
                 {activeTab === 'medical' && (
                     <div className="space-y-6">
                         {/* Medical Conditions */}
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                            <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50/30">
-                                <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                        <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                            <div className="flex justify-between items-center px-6 py-4 border-b border-[#dfe2e2]">
+                                <h3 className="text-text-main text-base font-bold flex items-center gap-2">
                                     <Activity size={20} className="text-primary" />
                                     Medical Conditions
                                 </h3>
@@ -887,9 +897,9 @@ export const ClientDetails = () => {
                         </div>
 
                         {/* Medications */}
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                            <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50/30">
-                                <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                        <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                            <div className="flex justify-between items-center px-6 py-4 border-b border-[#dfe2e2]">
+                                <h3 className="text-text-main text-base font-bold flex items-center gap-2">
                                     <Pill size={20} className="text-primary" />
                                     Medications
                                 </h3>
@@ -934,9 +944,9 @@ export const ClientDetails = () => {
                         </div>
 
                         {/* Blood Tests */}
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                            <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50/30">
-                                <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                        <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                            <div className="flex justify-between items-center px-6 py-4 border-b border-[#dfe2e2]">
+                                <h3 className="text-text-main text-base font-bold flex items-center gap-2">
                                     <Thermometer size={20} className="text-primary" />
                                     Blood Tests
                                 </h3>
@@ -1027,7 +1037,7 @@ export const ClientDetails = () => {
                                 <p className="text-text-muted">No food diary entries recorded for today.</p>
                             </div>
                         ) : (
-                            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                            <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
                                 <table className="w-full text-sm text-left">
                                     <thead className="bg-gray-50 text-gray-500 font-medium">
                                         <tr>
@@ -1067,12 +1077,12 @@ export const ClientDetails = () => {
                 {activeTab === 'plan' && (
                     <div className="space-y-6">
                         {/* Current Active Protocols */}
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                            <h3 className="font-bold text-lg text-text-main mb-4 flex items-center gap-2">
+                        <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                            <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
                                 <Activity size={20} className="text-primary" />
-                                Active Protocols
-                            </h3>
-                            <div className="space-y-3">
+                                <h3 className="text-text-main text-base font-bold">Active Protocols</h3>
+                            </div>
+                            <div className="p-6 space-y-3">
                                 {protocols.filter((p: any) => p.status === 'active').length === 0 ? (
                                     <p className="text-text-muted text-sm italic">No active protocols.</p>
                                 ) : (
@@ -1237,12 +1247,12 @@ export const ClientDetails = () => {
 
 
                         {/* Phase Manager (Goals) */}
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                            <h3 className="font-bold text-lg text-text-main mb-4 flex items-center gap-2">
+                        <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                            <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
                                 <Target size={20} className="text-primary" />
-                                Phase Manager
-                            </h3>
-                            <div className="space-y-4">
+                                <h3 className="text-text-main text-base font-bold">Phase Manager</h3>
+                            </div>
+                            <div className="p-6 space-y-4">
                                 {goals.map((goal: any) => (
                                     <div key={goal.id} className="flex items-center justify-between border-b border-gray-100 last:border-0 pb-4 last:pb-0">
                                         <div>
@@ -1281,572 +1291,600 @@ export const ClientDetails = () => {
                 )}
 
                 {/* Add Protocol Modal */}
-                {showAddProtocol && (
-                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="font-bold text-lg">Add New Protocol</h3>
-                                <button onClick={() => setShowAddProtocol(false)}><X size={20} /></button>
-                            </div>
-                            <form onSubmit={handleAddProtocol} className="space-y-4">
-                                <div><label className="block text-sm font-medium text-gray-700">Protocol Name</label><input type="text" required placeholder="e.g. IF 16:8, Refeed Day" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newProtocol.name} onChange={e => setNewProtocol({ ...newProtocol, name: e.target.value })} /></div>
-                                <div><label className="block text-sm font-medium text-gray-700">Type</label>
-                                    <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newProtocol.type} onChange={e => setNewProtocol({ ...newProtocol, type: e.target.value })}>
-                                        <option value="nutrition">Nutrition</option>
-                                        <option value="training">Training</option>
-                                        <option value="lifestyle">Lifestyle</option>
-                                        <option value="supplement">Supplement</option>
-                                    </select>
+                {
+                    showAddProtocol && (
+                        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="font-bold text-lg">Add New Protocol</h3>
+                                    <button onClick={() => setShowAddProtocol(false)}><X size={20} /></button>
                                 </div>
-                                <div><label className="block text-sm font-medium text-gray-700">Details / Rules</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} placeholder="e.g. Fast from 8pm to 12pm daily." value={newProtocol.details} onChange={e => setNewProtocol({ ...newProtocol, details: e.target.value })}></textarea></div>
+                                <form onSubmit={handleAddProtocol} className="space-y-4">
+                                    <div><label className="block text-sm font-medium text-gray-700">Protocol Name</label><input type="text" required placeholder="e.g. IF 16:8, Refeed Day" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newProtocol.name} onChange={e => setNewProtocol({ ...newProtocol, name: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Type</label>
+                                        <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newProtocol.type} onChange={e => setNewProtocol({ ...newProtocol, type: e.target.value })}>
+                                            <option value="nutrition">Nutrition</option>
+                                            <option value="training">Training</option>
+                                            <option value="lifestyle">Lifestyle</option>
+                                            <option value="supplement">Supplement</option>
+                                        </select>
+                                    </div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Details / Rules</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} placeholder="e.g. Fast from 8pm to 12pm daily." value={newProtocol.details} onChange={e => setNewProtocol({ ...newProtocol, details: e.target.value })}></textarea></div>
 
-                                <div className="flex justify-end gap-2 pt-4"><button type="button" onClick={() => setShowAddProtocol(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save Protocol</button></div>
-                            </form>
+                                    <div className="flex justify-end gap-2 pt-4"><button type="button" onClick={() => setShowAddProtocol(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save Protocol</button></div>
+                                </form>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )
+                }
 
                 {/* Add Measurement Modal */}
-                {showAddMeasurement && (
-                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                            <div className="flex items-center justify-between p-4 border-b border-gray-100">
-                                <h3 className="font-bold text-text-main">Add Progress Entry</h3>
-                                <button onClick={() => setShowAddMeasurement(false)} className="text-text-muted hover:text-text-main">
-                                    <X size={20} />
-                                </button>
-                            </div>
-
-                            <form onSubmit={handleAddMeasurement} className="p-4 space-y-4">
-                                <div className="space-y-1">
-                                    <label className="text-xs font-medium text-text-muted">Date</label>
-                                    <input
-                                        type="date"
-                                        required
-                                        value={newMeasurement.date}
-                                        onChange={e => setNewMeasurement({ ...newMeasurement, date: e.target.value })}
-                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-1 focus:ring-primary outline-none text-sm"
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-medium text-text-muted">Weight (kg)</label>
-                                        <input
-                                            type="number"
-                                            step="0.1"
-                                            required
-                                            value={newMeasurement.weight_kg}
-                                            onChange={e => setNewMeasurement({ ...newMeasurement, weight_kg: e.target.value })}
-                                            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-1 focus:ring-primary outline-none text-sm"
-                                        />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-medium text-text-muted">Body Fat %</label>
-                                        <input
-                                            type="number"
-                                            step="0.1"
-                                            value={newMeasurement.body_fat_percent}
-                                            onChange={e => setNewMeasurement({ ...newMeasurement, body_fat_percent: e.target.value })}
-                                            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-1 focus:ring-primary outline-none text-sm"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-1">
-                                    <label className="text-xs font-medium text-text-muted">Notes</label>
-                                    <textarea
-                                        rows={3}
-                                        value={newMeasurement.notes}
-                                        onChange={e => setNewMeasurement({ ...newMeasurement, notes: e.target.value })}
-                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-1 focus:ring-primary outline-none text-sm resize-none"
-                                        placeholder="Optional progress notes..."
-                                    />
-                                </div>
-
-                                <div className="pt-2 flex justify-end gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowAddMeasurement(false)}
-                                        className="px-4 py-2 text-sm font-medium text-text-muted hover:bg-gray-100 rounded-lg transition-colors"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="px-4 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-lg transition-colors"
-                                    >
-                                        Save Entry
+                {
+                    showAddMeasurement && (
+                        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                                <div className="flex items-center justify-between p-4 border-b border-gray-100">
+                                    <h3 className="font-bold text-text-main">Add Progress Entry</h3>
+                                    <button onClick={() => setShowAddMeasurement(false)} className="text-text-muted hover:text-text-main">
+                                        <X size={20} />
                                     </button>
                                 </div>
-                            </form>
-                        </div>
-                    </div>
-                )}
 
-                {/* Add Condition Modal */}
-                {showAddCondition && (
-                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="font-bold text-lg">Add Medical Condition</h3>
-                                <button onClick={() => setShowAddCondition(false)}><X size={20} /></button>
-                            </div>
-                            <form onSubmit={handleAddCondition} className="space-y-4">
-                                <div><label className="block text-sm font-medium text-gray-700">Condition</label><input type="text" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newCondition.condition_name} onChange={e => setNewCondition({ ...newCondition, condition_name: e.target.value })} /></div>
-                                <div><label className="block text-sm font-medium text-gray-700">Date Diagnosed</label><input type="date" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newCondition.diagnosed_date} onChange={e => setNewCondition({ ...newCondition, diagnosed_date: e.target.value })} /></div>
-                                <div><label className="block text-sm font-medium text-gray-700">Status</label><select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newCondition.status} onChange={e => setNewCondition({ ...newCondition, status: e.target.value })}><option value="active">Active</option><option value="managed">Managed</option><option value="resolved">Resolved</option></select></div>
-                                <div><label className="block text-sm font-medium text-gray-700">Notes</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} value={newCondition.notes} onChange={e => setNewCondition({ ...newCondition, notes: e.target.value })}></textarea></div>
-                                <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddCondition(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
-                            </form>
-                        </div>
-                    </div>
-                )}
-
-                {/* Add Medication Modal */}
-                {showAddMedication && (
-                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="font-bold text-lg">Add Medication</h3>
-                                <button onClick={() => setShowAddMedication(false)}><X size={20} /></button>
-                            </div>
-                            <form onSubmit={handleAddMedication} className="space-y-4">
-                                <div><label className="block text-sm font-medium text-gray-700">Medication Name</label><input type="text" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.name} onChange={e => setNewMedication({ ...newMedication, name: e.target.value })} /></div>
-                                <div><label className="block text-sm font-medium text-gray-700">Dosage</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.dosage} onChange={e => setNewMedication({ ...newMedication, dosage: e.target.value })} /></div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><label className="block text-sm font-medium text-gray-700">Start Date</label><input type="date" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.start_date} onChange={e => setNewMedication({ ...newMedication, start_date: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">End Date (Optional)</label><input type="date" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.end_date} onChange={e => setNewMedication({ ...newMedication, end_date: e.target.value })} /></div>
-                                </div>
-                                <div><label className="block text-sm font-medium text-gray-700">Reason</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.reason} onChange={e => setNewMedication({ ...newMedication, reason: e.target.value })} /></div>
-                                <div><label className="block text-sm font-medium text-gray-700">Notes</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} value={newMedication.notes} onChange={e => setNewMedication({ ...newMedication, notes: e.target.value })}></textarea></div>
-                                <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddMedication(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
-                            </form>
-                        </div>
-                    </div>
-                )}
-
-                {/* Add Blood Test Modal */}
-                {showAddBloodTest && (
-                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="font-bold text-lg">Add Blood Test</h3>
-                                <button onClick={() => setShowAddBloodTest(false)}><X size={20} /></button>
-                            </div>
-                            <form onSubmit={handleAddBloodTest} className="space-y-4">
-                                <div><label className="block text-sm font-medium text-gray-700">Date</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.date} onChange={e => setNewBloodTest({ ...newBloodTest, date: e.target.value })} /></div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><label className="block text-sm font-medium text-gray-700">Hemoglobin</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.hemoglobin} onChange={e => setNewBloodTest({ ...newBloodTest, hemoglobin: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Ferritin</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.ferritin} onChange={e => setNewBloodTest({ ...newBloodTest, ferritin: e.target.value })} /></div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><label className="block text-sm font-medium text-gray-700">Vitamin B12</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.vitamin_b12} onChange={e => setNewBloodTest({ ...newBloodTest, vitamin_b12: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Vitamin D</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.vitamin_d} onChange={e => setNewBloodTest({ ...newBloodTest, vitamin_d: e.target.value })} /></div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><label className="block text-sm font-medium text-gray-700">Folate</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.folate} onChange={e => setNewBloodTest({ ...newBloodTest, folate: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Glucose</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.glucose} onChange={e => setNewBloodTest({ ...newBloodTest, glucose: e.target.value })} /></div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><label className="block text-sm font-medium text-gray-700">LDL</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.ldl} onChange={e => setNewBloodTest({ ...newBloodTest, ldl: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">HDL</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.hdl} onChange={e => setNewBloodTest({ ...newBloodTest, hdl: e.target.value })} /></div>
-                                </div>
-                                <div><label className="block text-sm font-medium text-gray-700">Clinician Notes / Interpretation</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} value={newBloodTest.clinician_notes} onChange={e => setNewBloodTest({ ...newBloodTest, clinician_notes: e.target.value })}></textarea></div>
-                                <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddBloodTest(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
-                            </form>
-                        </div>
-                    </div>
-                )}
-
-                {/* Add Diary Modal */}
-                {showAddDiary && (
-                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="font-bold text-lg">Add Diary Entry</h3>
-                                <button onClick={() => setShowAddDiary(false)}><X size={20} /></button>
-                            </div>
-                            <form onSubmit={handleAddDiary} className="space-y-4">
-                                <div><label className="block text-sm font-medium text-gray-700">Food / Drink</label><input type="text" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newDiaryEntry.food_name} onChange={e => setNewDiaryEntry({ ...newDiaryEntry, food_name: e.target.value })} /></div>
-                                <div><label className="block text-sm font-medium text-gray-700">Quantity (grams)</label><input type="number" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newDiaryEntry.quantity_grams} onChange={e => setNewDiaryEntry({ ...newDiaryEntry, quantity_grams: e.target.value })} /></div>
-                                <div><label className="block text-sm font-medium text-gray-700">Notes</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} value={newDiaryEntry.notes} onChange={e => setNewDiaryEntry({ ...newDiaryEntry, notes: e.target.value })}></textarea></div>
-                                <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddDiary(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
-                            </form>
-                        </div>
-                    </div>
-                )}
-
-                {/* Consultations Tab Content */}
-                {activeTab === 'consultations' && (
-                    <div className="space-y-6">
-                        {/* Status Check-ins Grid */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            {/* Behavior & Adherence */}
-                            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                                <h3 className="font-bold text-lg text-text-main flex items-center gap-2 mb-4">
-                                    <Brain size={20} className="text-secondary" />
-                                    Behavior & Adherence
-                                </h3>
-                                {psychCheckins.length === 0 ? (
-                                    <p className="text-text-muted text-sm">No behavior checks logged.</p>
-                                ) : (
-                                    <div className="space-y-4">
-                                        {psychCheckins.slice(0, 3).map((check: any) => (
-                                            <div key={check.id} className="border-b border-gray-100 last:border-0 pb-3 last:pb-0">
-                                                <div className="flex justify-between items-center mb-2">
-                                                    <span className="text-xs font-medium text-gray-500">{new Date(check.date).toLocaleDateString()}</span>
-                                                    <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${check.motivation_status === 'high' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                                                        Mot: {check.motivation_status}
-                                                    </span>
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-2 text-sm">
-                                                    <div>
-                                                        <span className="text-xs text-gray-400 block">Hunger (1-5)</span>
-                                                        <span className="font-bold">{check.psychological_hunger_scale}</span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-xs text-text-muted block">Stress</span>
-                                                        <span>{check.stress_level}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Activity Tracking */}
-                            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                                <h3 className="font-bold text-lg text-text-main flex items-center gap-2 mb-4">
-                                    <Dumbbell size={20} className="text-blue-500" />
-                                    Activity & Training
-                                </h3>
-                                {activityLogs.length === 0 ? (
-                                    <p className="text-text-muted text-sm">No activity logs active.</p>
-                                ) : (
-                                    <div className="space-y-4">
-                                        {activityLogs.slice(0, 1).map((log: any) => (
-                                            <div key={log.id} className="bg-blue-50/50 p-4 rounded-lg">
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <div>
-                                                        <p className="font-bold text-gray-800">{log.activity_type}</p>
-                                                        <p className="text-xs text-gray-500">Started {new Date(log.start_date).toLocaleDateString()}</p>
-                                                    </div>
-                                                    {log.is_current && <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold">CURRENT</span>}
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-4 mt-2">
-                                                    <div className="text-center bg-white p-2 rounded border border-blue-100">
-                                                        <span className="block text-xl font-bold text-blue-600">{log.sessions_per_week}</span>
-                                                        <span className="text-[10px] text-gray-500 uppercase">Sessions/Wk</span>
-                                                    </div>
-                                                    <div className="text-center bg-white p-2 rounded border border-blue-100">
-                                                        <span className="block text-xl font-bold text-blue-600">{log.distance_km_week || '--'}</span>
-                                                        <span className="text-[10px] text-gray-500 uppercase">km/Week</span>
-                                                    </div>
-                                                </div>
-                                                {log.strength_training && (
-                                                    <div className="mt-3 pt-3 border-t border-blue-100 text-sm">
-                                                        <span className="font-bold text-gray-700 block mb-1">Strength Program</span>
-                                                        <span>{log.strength_split}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                            <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
-                                <BookOpen size={20} className="text-primary" />
-                                Session Decisions Log
-                            </h3>
-                            <button
-                                onClick={() => setShowAddSession(true)}
-                                className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
-                            >
-                                <Plus size={16} />
-                                Start Session
-                            </button>
-                        </div>
-                        {sessionNotes.map((note: any) => (
-                            <div key={note.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 relative">
-                                <div className="absolute top-6 right-6 text-sm text-text-muted">{new Date(note.date).toLocaleDateString()}</div>
-                                <h4 className="font-bold text-lg mb-4 text-text-main">Consultation Notes</h4>
-                                <div className="space-y-4">
-                                    <div>
-                                        <p className="text-xs font-bold text-gray-500 uppercase">Observations</p>
-                                        <p className="text-gray-800">{note.observations}</p>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="bg-orange-50 p-3 rounded-lg border border-orange-100">
-                                            <p className="text-xs font-bold text-orange-600 uppercase mb-1">What Changed</p>
-                                            <p className="text-sm text-gray-800">{note.changes_made || 'No changes.'}</p>
-                                            {note.reason_for_change && (
-                                                <p className="text-xs text-text-muted mt-2 italic">"{note.reason_for_change}"</p>
-                                            )}
-                                        </div>
-                                        <div className="bg-green-50 p-3 rounded-lg border border-green-100">
-                                            <p className="text-xs font-bold text-green-600 uppercase mb-1">What Stayed Same</p>
-                                            <p className="text-sm text-gray-800">{note.constants || '--'}</p>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs font-bold text-gray-500 uppercase">Next Checkpoint</p>
-                                        <p className="text-sm text-primary font-medium">{note.next_checkpoint}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-
-                {/* Add Session Modal */}
-                {showAddSession && (
-                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl p-6 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="font-bold text-lg">New Consultation Log</h3>
-                                <button onClick={() => setShowAddSession(false)}><X size={20} /></button>
-                            </div>
-                            <form onSubmit={handleAddSession} className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><label className="block text-sm font-medium text-gray-700">Date</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newSession.date} onChange={e => setNewSession({ ...newSession, date: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Next Checkpoint</label><input type="text" placeholder="e.g. 2 weeks" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newSession.next_checkpoint} onChange={e => setNewSession({ ...newSession, next_checkpoint: e.target.value })} /></div>
-                                </div>
-                                <div><label className="block text-sm font-medium text-gray-700">Key Observations</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} placeholder="Client mood, compliance, physical changes..." value={newSession.observations} onChange={e => setNewSession({ ...newSession, observations: e.target.value })}></textarea></div>
-
-                                <div className="border-t pt-4">
-                                    <h4 className="font-bold text-sm mb-2">Decisions</h4>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div><label className="block text-sm font-medium text-gray-700">What Changed?</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} placeholder="Adjusted calories..." value={newSession.changes_made} onChange={e => setNewSession({ ...newSession, changes_made: e.target.value })}></textarea></div>
-                                        <div><label className="block text-sm font-medium text-gray-700">Why?</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} placeholder="Weight stalled for 2 weeks..." value={newSession.reason_for_change} onChange={e => setNewSession({ ...newSession, reason_for_change: e.target.value })}></textarea></div>
-                                    </div>
-                                    <div className="mt-2"><label className="block text-sm font-medium text-gray-700">What Stayed the Same?</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" placeholder="Training split, supplements..." value={newSession.constants} onChange={e => setNewSession({ ...newSession, constants: e.target.value })} /></div>
-                                </div>
-
-                                <div className="flex justify-end gap-2 pt-4 border-t"><button type="button" onClick={() => setShowAddSession(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save Session Log</button></div>
-                            </form>
-                        </div>
-                    </div>
-                )}
-                {/* Add Phase Modal */}
-                {showAddPhase && id && (
-                    <NewPhaseModal
-                        clientId={id}
-                        clientName={client?.full_name || 'Client'}
-                        onClose={() => setShowAddPhase(false)}
-                        onSuccess={() => {
-                            setShowAddPhase(false);
-                            fetchStrategyData(id);
-                        }}
-                    />
-                )}
-                {/* Blood Test Details Modal */}
-                {selectedBloodTest && (
-                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-                        <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
-                            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-red-50 text-red-600 rounded-xl">
-                                        <Thermometer size={24} />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-xl font-black text-text-main">Blood Analysis Results</h2>
-                                        <p className="text-text-muted text-sm">{new Date(selectedBloodTest.date).toLocaleDateString(undefined, { dateStyle: 'long' })}</p>
-                                    </div>
-                                </div>
-                                <button onClick={() => setSelectedBloodTest(null)} className="p-2 text-gray-400 hover:text-text-main hover:bg-gray-100 rounded-xl transition-all">
-                                    <X size={24} />
-                                </button>
-                            </div>
-
-                            <div className="p-6 space-y-8">
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Hemoglobin (Hb)</p>
-                                        <p className="text-2xl font-black text-blue-800">{selectedBloodTest.hemoglobin || 'N/A'}</p>
-                                        <p className="text-[10px] font-bold text-text-muted mt-1">g/dL</p>
-                                    </div>
-                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">B12</p>
-                                        <p className="text-2xl font-black text-purple-600">{selectedBloodTest.vitamin_b12 || 'N/A'}</p>
-                                        <p className="text-[10px] font-bold text-text-muted mt-1">pg/mL</p>
-                                    </div>
-                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Vitamin D</p>
-                                        <p className="text-2xl font-black text-orange-400">{selectedBloodTest.vitamin_d || 'N/A'}</p>
-                                        <p className="text-[10px] font-bold text-text-muted mt-1">ng/mL</p>
-                                    </div>
-                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Folate</p>
-                                        <p className="text-2xl font-black text-green-700">{selectedBloodTest.folate || 'N/A'}</p>
-                                        <p className="text-[10px] font-bold text-text-muted mt-1">ng/mL</p>
-                                    </div>
-                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Ferritin</p>
-                                        <p className="text-2xl font-black text-orange-600">{selectedBloodTest.ferritin || 'N/A'}</p>
-                                        <p className="text-[10px] font-bold text-text-muted mt-1">ng/mL</p>
-                                    </div>
-                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Glucose</p>
-                                        <p className="text-2xl font-black text-text-main">{selectedBloodTest.glucose || 'N/A'}</p>
-                                    </div>
-                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">HbA1c</p>
-                                        <p className="text-2xl font-black text-primary">{selectedBloodTest.hba1c ? `${selectedBloodTest.hba1c}%` : 'N/A'}</p>
-                                    </div>
-                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">LDL (Bad)</p>
-                                        <p className="text-2xl font-black text-red-600">{selectedBloodTest.ldl || 'N/A'}</p>
-                                    </div>
-                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">HDL (Good)</p>
-                                        <p className="text-2xl font-black text-green-600">{selectedBloodTest.hdl || 'N/A'}</p>
-                                    </div>
-                                </div>
-
-                                {selectedBloodTest.clinician_notes && (
-                                    <div className="bg-blue-50 p-5 rounded-2xl border border-blue-100">
-                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">Clinician Interpretation</h4>
-                                        <p className="text-sm font-medium text-blue-900 leading-relaxed italic">
-                                            "{selectedBloodTest.clinician_notes}"
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-end">
-                                <button
-                                    onClick={() => setSelectedBloodTest(null)}
-                                    className="px-8 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-all shadow-lg"
-                                >
-                                    Done
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-                {/* Edit Profile Modal */}
-                {showEditModal && (
-                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl p-6 animate-in fade-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh]">
-                            <div className="flex justify-between items-center mb-6">
-                                <h3 className="font-bold text-lg flex items-center gap-2">
-                                    <Pencil size={20} className="text-primary" />
-                                    Edit Patient Profile
-                                </h3>
-                                <button onClick={() => setShowEditModal(false)}><X size={20} /></button>
-                            </div>
-                            <form onSubmit={handleUpdateClient} className="space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-bold text-text-main mb-1">Full Name</label>
-                                        <input
-                                            type="text"
-                                            required
-                                            className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
-                                            value={editClient.full_name}
-                                            onChange={e => setEditClient({ ...editClient, full_name: e.target.value })}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-bold text-text-main mb-1">Email Address</label>
-                                        <input
-                                            type="email"
-                                            required
-                                            className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-text-muted"
-                                            value={editClient.email}
-                                            onChange={e => setEditClient({ ...editClient, email: e.target.value })}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-bold text-text-main mb-1">Birth Date</label>
+                                <form onSubmit={handleAddMeasurement} className="p-4 space-y-4">
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-medium text-text-muted">Date</label>
                                         <input
                                             type="date"
-                                            className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
-                                            value={editClient.birth_date}
-                                            onChange={e => setEditClient({ ...editClient, birth_date: e.target.value })}
+                                            required
+                                            value={newMeasurement.date}
+                                            onChange={e => setNewMeasurement({ ...newMeasurement, date: e.target.value })}
+                                            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-1 focus:ring-primary outline-none text-sm"
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-bold text-text-main mb-1">Status</label>
-                                        <select
-                                            className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
-                                            value={editClient.status}
-                                            onChange={e => setEditClient({ ...editClient, status: e.target.value })}
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-medium text-text-muted">Weight (kg)</label>
+                                            <input
+                                                type="number"
+                                                step="0.1"
+                                                required
+                                                value={newMeasurement.weight_kg}
+                                                onChange={e => setNewMeasurement({ ...newMeasurement, weight_kg: e.target.value })}
+                                                className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-1 focus:ring-primary outline-none text-sm"
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-medium text-text-muted">Body Fat %</label>
+                                            <input
+                                                type="number"
+                                                step="0.1"
+                                                value={newMeasurement.body_fat_percent}
+                                                onChange={e => setNewMeasurement({ ...newMeasurement, body_fat_percent: e.target.value })}
+                                                className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-1 focus:ring-primary outline-none text-sm"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-medium text-text-muted">Notes</label>
+                                        <textarea
+                                            rows={3}
+                                            value={newMeasurement.notes}
+                                            onChange={e => setNewMeasurement({ ...newMeasurement, notes: e.target.value })}
+                                            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-1 focus:ring-primary outline-none text-sm resize-none"
+                                            placeholder="Optional progress notes..."
+                                        />
+                                    </div>
+
+                                    <div className="pt-2 flex justify-end gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowAddMeasurement(false)}
+                                            className="px-4 py-2 text-sm font-medium text-text-muted hover:bg-gray-100 rounded-lg transition-colors"
                                         >
-                                            <option value="active">Active</option>
-                                            <option value="paused">Paused</option>
-                                            <option value="completed">Completed</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-bold text-text-main mb-1">Sex (At Birth)</label>
-                                        <select
-                                            className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
-                                            value={editClient.sex}
-                                            onChange={e => setEditClient({ ...editClient, sex: e.target.value })}
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="px-4 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-lg transition-colors"
                                         >
-                                            <option value="">Select Sex</option>
-                                            <option value="male">Male</option>
-                                            <option value="female">Female</option>
-                                        </select>
+                                            Save Entry
+                                        </button>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-bold text-text-main mb-1">Gender Identity</label>
-                                        <input
-                                            type="text"
-                                            className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
-                                            value={editClient.gender}
-                                            onChange={e => setEditClient({ ...editClient, gender: e.target.value })}
-                                            placeholder="e.g. Male, Female, Non-binary"
-                                        />
+                                </form>
+                            </div>
+                        </div>
+                    )
+                }
+
+                {/* Add Condition Modal */}
+                {
+                    showAddCondition && (
+                        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="font-bold text-lg">Add Medical Condition</h3>
+                                    <button onClick={() => setShowAddCondition(false)}><X size={20} /></button>
+                                </div>
+                                <form onSubmit={handleAddCondition} className="space-y-4">
+                                    <div><label className="block text-sm font-medium text-gray-700">Condition</label><input type="text" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newCondition.condition_name} onChange={e => setNewCondition({ ...newCondition, condition_name: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Date Diagnosed</label><input type="date" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newCondition.diagnosed_date} onChange={e => setNewCondition({ ...newCondition, diagnosed_date: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Status</label><select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newCondition.status} onChange={e => setNewCondition({ ...newCondition, status: e.target.value })}><option value="active">Active</option><option value="managed">Managed</option><option value="resolved">Resolved</option></select></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Notes</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} value={newCondition.notes} onChange={e => setNewCondition({ ...newCondition, notes: e.target.value })}></textarea></div>
+                                    <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddCondition(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
+                                </form>
+                            </div>
+                        </div>
+                    )
+                }
+
+                {/* Add Medication Modal */}
+                {
+                    showAddMedication && (
+                        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="font-bold text-lg">Add Medication</h3>
+                                    <button onClick={() => setShowAddMedication(false)}><X size={20} /></button>
+                                </div>
+                                <form onSubmit={handleAddMedication} className="space-y-4">
+                                    <div><label className="block text-sm font-medium text-gray-700">Medication Name</label><input type="text" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.name} onChange={e => setNewMedication({ ...newMedication, name: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Dosage</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.dosage} onChange={e => setNewMedication({ ...newMedication, dosage: e.target.value })} /></div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div><label className="block text-sm font-medium text-gray-700">Start Date</label><input type="date" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.start_date} onChange={e => setNewMedication({ ...newMedication, start_date: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">End Date (Optional)</label><input type="date" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.end_date} onChange={e => setNewMedication({ ...newMedication, end_date: e.target.value })} /></div>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-bold text-text-main mb-1">Height (cm)</label>
-                                        <input
-                                            type="number"
-                                            step="0.1"
-                                            className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
-                                            value={editClient.height_cm}
-                                            onChange={e => setEditClient({ ...editClient, height_cm: e.target.value })}
-                                        />
+                                    <div><label className="block text-sm font-medium text-gray-700">Reason</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.reason} onChange={e => setNewMedication({ ...newMedication, reason: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Notes</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} value={newMedication.notes} onChange={e => setNewMedication({ ...newMedication, notes: e.target.value })}></textarea></div>
+                                    <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddMedication(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
+                                </form>
+                            </div>
+                        </div>
+                    )
+                }
+
+                {/* Add Blood Test Modal */}
+                {
+                    showAddBloodTest && (
+                        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="font-bold text-lg">Add Blood Test</h3>
+                                    <button onClick={() => setShowAddBloodTest(false)}><X size={20} /></button>
+                                </div>
+                                <form onSubmit={handleAddBloodTest} className="space-y-4">
+                                    <div><label className="block text-sm font-medium text-gray-700">Date</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.date} onChange={e => setNewBloodTest({ ...newBloodTest, date: e.target.value })} /></div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div><label className="block text-sm font-medium text-gray-700">Hemoglobin</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.hemoglobin} onChange={e => setNewBloodTest({ ...newBloodTest, hemoglobin: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">Ferritin</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.ferritin} onChange={e => setNewBloodTest({ ...newBloodTest, ferritin: e.target.value })} /></div>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-bold text-text-main mb-1">Target Weight (kg)</label>
-                                        <input
-                                            type="number"
-                                            step="0.1"
-                                            className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
-                                            value={editClient.target_weight_kg}
-                                            onChange={e => setEditClient({ ...editClient, target_weight_kg: e.target.value })}
-                                        />
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div><label className="block text-sm font-medium text-gray-700">Vitamin B12</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.vitamin_b12} onChange={e => setNewBloodTest({ ...newBloodTest, vitamin_b12: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">Vitamin D</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.vitamin_d} onChange={e => setNewBloodTest({ ...newBloodTest, vitamin_d: e.target.value })} /></div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div><label className="block text-sm font-medium text-gray-700">Folate</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.folate} onChange={e => setNewBloodTest({ ...newBloodTest, folate: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">Glucose</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.glucose} onChange={e => setNewBloodTest({ ...newBloodTest, glucose: e.target.value })} /></div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div><label className="block text-sm font-medium text-gray-700">LDL</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.ldl} onChange={e => setNewBloodTest({ ...newBloodTest, ldl: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">HDL</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.hdl} onChange={e => setNewBloodTest({ ...newBloodTest, hdl: e.target.value })} /></div>
+                                    </div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Clinician Notes / Interpretation</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} value={newBloodTest.clinician_notes} onChange={e => setNewBloodTest({ ...newBloodTest, clinician_notes: e.target.value })}></textarea></div>
+                                    <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddBloodTest(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
+                                </form>
+                            </div>
+                        </div>
+                    )
+                }
+
+                {/* Add Diary Modal */}
+                {
+                    showAddDiary && (
+                        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="font-bold text-lg">Add Diary Entry</h3>
+                                    <button onClick={() => setShowAddDiary(false)}><X size={20} /></button>
+                                </div>
+                                <form onSubmit={handleAddDiary} className="space-y-4">
+                                    <div><label className="block text-sm font-medium text-gray-700">Food / Drink</label><input type="text" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newDiaryEntry.food_name} onChange={e => setNewDiaryEntry({ ...newDiaryEntry, food_name: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Quantity (grams)</label><input type="number" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newDiaryEntry.quantity_grams} onChange={e => setNewDiaryEntry({ ...newDiaryEntry, quantity_grams: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Notes</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} value={newDiaryEntry.notes} onChange={e => setNewDiaryEntry({ ...newDiaryEntry, notes: e.target.value })}></textarea></div>
+                                    <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddDiary(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
+                                </form>
+                            </div>
+                        </div>
+                    )
+                }
+
+                {/* Consultations Tab Content */}
+                {
+                    activeTab === 'consultations' && (
+                        <div className="space-y-6">
+                            {/* Status Check-ins Grid */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                {/* Behavior & Adherence */}
+                                <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                                    <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
+                                        <Brain size={20} className="text-secondary" />
+                                        <h3 className="text-text-main text-base font-bold">Behavior & Adherence</h3>
+                                    </div>
+                                    <div className="p-6">
+                                        {psychCheckins.length === 0 ? (
+                                            <p className="text-text-muted text-sm">No behavior checks logged.</p>
+                                        ) : (
+                                            <div className="space-y-4">
+                                                {psychCheckins.slice(0, 3).map((check: any) => (
+                                                    <div key={check.id} className="border-b border-gray-100 last:border-0 pb-3 last:pb-0">
+                                                        <div className="flex justify-between items-center mb-2">
+                                                            <span className="text-xs font-medium text-gray-500">{new Date(check.date).toLocaleDateString()}</span>
+                                                            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${check.motivation_status === 'high' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                                                Mot: {check.motivation_status}
+                                                            </span>
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-2 text-sm">
+                                                            <div>
+                                                                <span className="text-xs text-gray-400 block">Hunger (1-5)</span>
+                                                                <span className="font-bold">{check.psychological_hunger_scale}</span>
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-xs text-text-muted block">Stress</span>
+                                                                <span>{check.stress_level}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
-                                <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowEditModal(false)}
-                                        className="px-6 py-2 border border-gray-200 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="px-6 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary-hover transition-colors shadow-sm"
-                                    >
-                                        Save Changes
+                                {/* Activity Tracking */}
+                                <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                                    <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
+                                        <Dumbbell size={20} className="text-blue-500" />
+                                        <h3 className="text-text-main text-base font-bold">Activity & Training</h3>
+                                    </div>
+                                    <div className="p-6">
+                                        {activityLogs.length === 0 ? (
+                                            <p className="text-text-muted text-sm">No activity logs active.</p>
+                                        ) : (
+                                            <div className="space-y-4">
+                                                {activityLogs.slice(0, 1).map((log: any) => (
+                                                    <div key={log.id} className="bg-blue-50/50 p-4 rounded-lg">
+                                                        <div className="flex justify-between items-start mb-2">
+                                                            <div>
+                                                                <p className="font-bold text-gray-800">{log.activity_type}</p>
+                                                                <p className="text-xs text-gray-500">Started {new Date(log.start_date).toLocaleDateString()}</p>
+                                                            </div>
+                                                            {log.is_current && <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold">CURRENT</span>}
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-4 mt-2">
+                                                            <div className="text-center bg-white p-2 rounded border border-blue-100">
+                                                                <span className="block text-xl font-bold text-blue-600">{log.sessions_per_week}</span>
+                                                                <span className="text-[10px] text-gray-500 uppercase">Sessions/Wk</span>
+                                                            </div>
+                                                            <div className="text-center bg-white p-2 rounded border border-blue-100">
+                                                                <span className="block text-xl font-bold text-blue-600">{log.distance_km_week || '--'}</span>
+                                                                <span className="text-[10px] text-gray-500 uppercase">km/Week</span>
+                                                            </div>
+                                                        </div>
+                                                        {log.strength_training && (
+                                                            <div className="mt-3 pt-3 border-t border-blue-100 text-sm">
+                                                                <span className="font-bold text-gray-700 block mb-1">Strength Program</span>
+                                                                <span>{log.strength_split}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-[#dfe2e2]">
+                                <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                                    <BookOpen size={20} className="text-primary" />
+                                    Session Decisions Log
+                                </h3>
+                                <button
+                                    onClick={() => setShowAddSession(true)}
+                                    className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                                >
+                                    <Plus size={16} />
+                                    Start Session
+                                </button>
+                            </div>
+                            {sessionNotes.map((note: any) => (
+                                <div key={note.id} className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                                    <div className="px-6 py-4 border-b border-[#dfe2e2] flex justify-between items-center">
+                                        <h4 className="font-bold text-lg text-text-main">Consultation Notes</h4>
+                                        <div className="text-sm text-text-muted">{new Date(note.date).toLocaleDateString()}</div>
+                                    </div>
+                                    <div className="p-6 space-y-4">
+                                        <div>
+                                            <p className="text-xs font-bold text-gray-500 uppercase">Observations</p>
+                                            <p className="text-gray-800">{note.observations}</p>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="bg-orange-50 p-3 rounded-lg border border-orange-100">
+                                                <p className="text-xs font-bold text-orange-600 uppercase mb-1">What Changed</p>
+                                                <p className="text-sm text-gray-800">{note.changes_made || 'No changes.'}</p>
+                                                {note.reason_for_change && (
+                                                    <p className="text-xs text-text-muted mt-2 italic">"{note.reason_for_change}"</p>
+                                                )}
+                                            </div>
+                                            <div className="bg-green-50 p-3 rounded-lg border border-green-100">
+                                                <p className="text-xs font-bold text-green-600 uppercase mb-1">What Stayed Same</p>
+                                                <p className="text-sm text-gray-800">{note.constants || '--'}</p>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-bold text-gray-500 uppercase">Next Checkpoint</p>
+                                            <p className="text-sm text-primary font-medium">{note.next_checkpoint}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )
+                }
+
+                {/* Add Session Modal */}
+                {
+                    showAddSession && (
+                        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl p-6 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="font-bold text-lg">New Consultation Log</h3>
+                                    <button onClick={() => setShowAddSession(false)}><X size={20} /></button>
+                                </div>
+                                <form onSubmit={handleAddSession} className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div><label className="block text-sm font-medium text-gray-700">Date</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newSession.date} onChange={e => setNewSession({ ...newSession, date: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">Next Checkpoint</label><input type="text" placeholder="e.g. 2 weeks" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newSession.next_checkpoint} onChange={e => setNewSession({ ...newSession, next_checkpoint: e.target.value })} /></div>
+                                    </div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Key Observations</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} placeholder="Client mood, compliance, physical changes..." value={newSession.observations} onChange={e => setNewSession({ ...newSession, observations: e.target.value })}></textarea></div>
+
+                                    <div className="border-t pt-4">
+                                        <h4 className="font-bold text-sm mb-2">Decisions</h4>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div><label className="block text-sm font-medium text-gray-700">What Changed?</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} placeholder="Adjusted calories..." value={newSession.changes_made} onChange={e => setNewSession({ ...newSession, changes_made: e.target.value })}></textarea></div>
+                                            <div><label className="block text-sm font-medium text-gray-700">Why?</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} placeholder="Weight stalled for 2 weeks..." value={newSession.reason_for_change} onChange={e => setNewSession({ ...newSession, reason_for_change: e.target.value })}></textarea></div>
+                                        </div>
+                                        <div className="mt-2"><label className="block text-sm font-medium text-gray-700">What Stayed the Same?</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" placeholder="Training split, supplements..." value={newSession.constants} onChange={e => setNewSession({ ...newSession, constants: e.target.value })} /></div>
+                                    </div>
+
+                                    <div className="flex justify-end gap-2 pt-4 border-t"><button type="button" onClick={() => setShowAddSession(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save Session Log</button></div>
+                                </form>
+                            </div>
+                        </div>
+                    )
+                }
+                {/* Add Phase Modal */}
+                {
+                    showAddPhase && id && (
+                        <NewPhaseModal
+                            clientId={id}
+                            clientName={client?.full_name || 'Client'}
+                            onClose={() => setShowAddPhase(false)}
+                            onSuccess={() => {
+                                setShowAddPhase(false);
+                                fetchStrategyData(id);
+                            }}
+                        />
+                    )
+                }
+                {/* Blood Test Details Modal */}
+                {
+                    selectedBloodTest && (
+                        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+                                <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-red-50 text-red-600 rounded-xl">
+                                            <Thermometer size={24} />
+                                        </div>
+                                        <div>
+                                            <h2 className="text-xl font-black text-text-main">Blood Analysis Results</h2>
+                                            <p className="text-text-muted text-sm">{new Date(selectedBloodTest.date).toLocaleDateString(undefined, { dateStyle: 'long' })}</p>
+                                        </div>
+                                    </div>
+                                    <button onClick={() => setSelectedBloodTest(null)} className="p-2 text-gray-400 hover:text-text-main hover:bg-gray-100 rounded-xl transition-all">
+                                        <X size={24} />
                                     </button>
                                 </div>
-                            </form>
+
+                                <div className="p-6 space-y-8">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Hemoglobin (Hb)</p>
+                                            <p className="text-2xl font-black text-blue-800">{selectedBloodTest.hemoglobin || 'N/A'}</p>
+                                            <p className="text-[10px] font-bold text-text-muted mt-1">g/dL</p>
+                                        </div>
+                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">B12</p>
+                                            <p className="text-2xl font-black text-purple-600">{selectedBloodTest.vitamin_b12 || 'N/A'}</p>
+                                            <p className="text-[10px] font-bold text-text-muted mt-1">pg/mL</p>
+                                        </div>
+                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Vitamin D</p>
+                                            <p className="text-2xl font-black text-orange-400">{selectedBloodTest.vitamin_d || 'N/A'}</p>
+                                            <p className="text-[10px] font-bold text-text-muted mt-1">ng/mL</p>
+                                        </div>
+                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Folate</p>
+                                            <p className="text-2xl font-black text-green-700">{selectedBloodTest.folate || 'N/A'}</p>
+                                            <p className="text-[10px] font-bold text-text-muted mt-1">ng/mL</p>
+                                        </div>
+                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Ferritin</p>
+                                            <p className="text-2xl font-black text-orange-600">{selectedBloodTest.ferritin || 'N/A'}</p>
+                                            <p className="text-[10px] font-bold text-text-muted mt-1">ng/mL</p>
+                                        </div>
+                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Glucose</p>
+                                            <p className="text-2xl font-black text-text-main">{selectedBloodTest.glucose || 'N/A'}</p>
+                                        </div>
+                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">HbA1c</p>
+                                            <p className="text-2xl font-black text-primary">{selectedBloodTest.hba1c ? `${selectedBloodTest.hba1c}%` : 'N/A'}</p>
+                                        </div>
+                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">LDL (Bad)</p>
+                                            <p className="text-2xl font-black text-red-600">{selectedBloodTest.ldl || 'N/A'}</p>
+                                        </div>
+                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">HDL (Good)</p>
+                                            <p className="text-2xl font-black text-green-600">{selectedBloodTest.hdl || 'N/A'}</p>
+                                        </div>
+                                    </div>
+
+                                    {selectedBloodTest.clinician_notes && (
+                                        <div className="bg-blue-50 p-5 rounded-2xl border border-blue-100">
+                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">Clinician Interpretation</h4>
+                                            <p className="text-sm font-medium text-blue-900 leading-relaxed italic">
+                                                "{selectedBloodTest.clinician_notes}"
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-end">
+                                    <button
+                                        onClick={() => setSelectedBloodTest(null)}
+                                        className="px-8 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-all shadow-lg"
+                                    >
+                                        Done
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                )}
-            </main>
-        </div>
+                    )
+                }
+                {/* Edit Profile Modal */}
+                {
+                    showEditModal && (
+                        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl p-6 animate-in fade-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh]">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="font-bold text-lg flex items-center gap-2">
+                                        <Pencil size={20} className="text-primary" />
+                                        Edit Patient Profile
+                                    </h3>
+                                    <button onClick={() => setShowEditModal(false)}><X size={20} /></button>
+                                </div>
+                                <form onSubmit={handleUpdateClient} className="space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-bold text-text-main mb-1">Full Name</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                                                value={editClient.full_name}
+                                                onChange={e => setEditClient({ ...editClient, full_name: e.target.value })}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold text-text-main mb-1">Email Address</label>
+                                            <input
+                                                type="email"
+                                                required
+                                                className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-text-muted"
+                                                value={editClient.email}
+                                                onChange={e => setEditClient({ ...editClient, email: e.target.value })}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold text-text-main mb-1">Birth Date</label>
+                                            <input
+                                                type="date"
+                                                className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                                                value={editClient.birth_date}
+                                                onChange={e => setEditClient({ ...editClient, birth_date: e.target.value })}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold text-text-main mb-1">Status</label>
+                                            <select
+                                                className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                                                value={editClient.status}
+                                                onChange={e => setEditClient({ ...editClient, status: e.target.value })}
+                                            >
+                                                <option value="active">Active</option>
+                                                <option value="paused">Paused</option>
+                                                <option value="completed">Completed</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold text-text-main mb-1">Sex (At Birth)</label>
+                                            <select
+                                                className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                                                value={editClient.sex}
+                                                onChange={e => setEditClient({ ...editClient, sex: e.target.value })}
+                                            >
+                                                <option value="">Select Sex</option>
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold text-text-main mb-1">Gender Identity</label>
+                                            <input
+                                                type="text"
+                                                className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                                                value={editClient.gender}
+                                                onChange={e => setEditClient({ ...editClient, gender: e.target.value })}
+                                                placeholder="e.g. Male, Female, Non-binary"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold text-text-main mb-1">Height (cm)</label>
+                                            <input
+                                                type="number"
+                                                step="0.1"
+                                                className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                                                value={editClient.height_cm}
+                                                onChange={e => setEditClient({ ...editClient, height_cm: e.target.value })}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold text-text-main mb-1">Target Weight (kg)</label>
+                                            <input
+                                                type="number"
+                                                step="0.1"
+                                                className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                                                value={editClient.target_weight_kg}
+                                                onChange={e => setEditClient({ ...editClient, target_weight_kg: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowEditModal(false)}
+                                            className="px-6 py-2 border border-gray-200 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="px-6 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary-hover transition-colors shadow-sm"
+                                        >
+                                            Save Changes
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )
+                }
+            </main >
+        </div >
     );
 };

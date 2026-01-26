@@ -336,7 +336,7 @@ export const clientService = {
     async addProtocol(clientId: string, data: any) {
         const { data: result, error } = await supabase
             .from('client_protocols')
-            .insert([{ ...data, client_id: clientId }])
+            .insert([{ ...data, client_id: clientId, id: crypto.randomUUID() }])
             .select()
             .single();
         if (error) throw error;
