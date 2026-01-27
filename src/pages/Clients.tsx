@@ -3,7 +3,8 @@ import { clientService, coachService } from '../lib/api';
 import { Users, Search, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 interface Client {
     id: string;
     full_name: string;
@@ -22,6 +23,7 @@ interface Coach {
 export const ClientsPage = () => {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [clients, setClients] = useState<Client[]>([]);
     const [filteredClients, setFilteredClients] = useState<Client[]>([]);
     const [coaches, setCoaches] = useState<Coach[]>([]);
@@ -31,8 +33,10 @@ export const ClientsPage = () => {
     const [statusFilter, setStatusFilter] = useState<string>('all');
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        if (user) {
+            fetchData();
+        }
+    }, [user]);
 
     useEffect(() => {
         filterClients();
@@ -41,7 +45,7 @@ export const ClientsPage = () => {
     const fetchData = async () => {
         try {
             const [clientsData, coachesData] = await Promise.all([
-                clientService.list(),
+                clientService.list(user?.id),
                 coachService.list()
             ]);
             setClients(clientsData);
@@ -101,6 +105,57 @@ export const ClientsPage = () => {
         }
     };
 
+    const handleAssignToMe = async () => {
+        if (!user) return;
+        setLoading(true);
+        try {
+            // 1. Ensure I exist as a coach
+            try {
+                await coachService.get(user.id);
+            } catch (e) {
+                // If not found, create
+                await coachService.create({
+                    id: user.id,
+                    name: user.email?.split('@')[0] || 'My Coach Profile',
+                    descriptor: 'Head Coach'
+                });
+            }
+
+            // 2. Fetch ALL clients to find targets (since state 'clients' is filtered)
+            // We bypass the filtered service call and fetch everything
+            const allClients = await clientService.list();
+
+            // 3. Find target clients (Dan Patra, Nimrod)
+            const targets = allClients.filter((c: any) =>
+                c.email === 'dan.patra@gmail.com' ||
+                c.email === 'jj.athlete@example.com'
+            );
+
+            if (targets.length === 0) {
+                alert('No target clients found (checked emails: dan.patra@gmail.com, jj.athlete@example.com)');
+                setLoading(false);
+                return;
+            }
+
+            // 4. Update them
+            let updatedCount = 0;
+            for (const client of targets) {
+                if (client.assigned_coach_id !== user.id) {
+                    await clientService.update(client.id, { assigned_coach_id: user.id });
+                    updatedCount++;
+                }
+            }
+
+            await fetchData();
+            alert(`Successfully assigned ${updatedCount} clients to you.`);
+        } catch (error) {
+            console.error('Failed to assign clients', error);
+            alert('Error assigning clients');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     if (loading) return <div className="p-8 text-center text-primary">{t('common.loading')}</div>;
 
     return (
@@ -138,6 +193,7 @@ export const ClientsPage = () => {
                             value={selectedCoachId}
                             onChange={(e) => setSelectedCoachId(e.target.value)}
                             className="px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                            disabled={!!user?.id}
                         >
                             <option value="">{t('clients.all_coaches')}</option>
                             {coaches.map(coach => (
@@ -162,6 +218,11 @@ export const ClientsPage = () => {
                         >
                             <Plus size={18} />
                             <span className="hidden md:inline">{t('clients.add_client')}</span>
+                        </button>
+
+                        {/* Hidden shortcut for quick fix */}
+                        <button onClick={handleAssignToMe} className="opacity-0 hover:opacity-100 px-2 text-xs text-gray-400">
+                            Fix Assignments
                         </button>
                     </div>
                 </div>

@@ -4,9 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { ChevronRight, ChevronLeft, Save } from 'lucide-react';
 import { clientService, coachService } from '../lib/api';
 
+import { useAuth } from '../contexts/AuthContext';
+
 export const AddClient = () => {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [loading, setLoading] = useState(false);
     const [coaches, setCoaches] = useState<any[]>([]);
 
@@ -26,13 +29,23 @@ export const AddClient = () => {
 
     useEffect(() => {
         loadCoaches();
-    }, []);
+    }, [user]);
 
     const loadCoaches = async () => {
         try {
             const data = await coachService.list();
             setCoaches(data);
-            if (data.length > 0) {
+
+            // Default to logged-in user if they correspond to a coach
+            if (user) {
+                const myCoachProfile = data.find(c => c.id === user.id);
+                if (myCoachProfile) {
+                    setFormData(prev => ({ ...prev, assigned_coach_id: user.id }));
+                    return;
+                }
+            }
+
+            if (data.length > 0 && !formData.assigned_coach_id) {
                 setFormData(prev => ({ ...prev, assigned_coach_id: data[0].id }));
             }
         } catch (error) {

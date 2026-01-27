@@ -51,6 +51,16 @@ export const coachService = {
             .single();
         if (error) throw error;
         return mapCoach(data);
+    },
+
+    async create(coach: any) {
+        const { data, error } = await supabase
+            .from('coaches')
+            .insert(coach)
+            .select()
+            .single();
+        if (error) throw error;
+        return mapCoach(data);
     }
 };
 
