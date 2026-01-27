@@ -62,7 +62,15 @@ export const AddClient = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            await clientService.create(formData);
+            // Sanitize numeric and date fields
+            const submissionData = {
+                ...formData,
+                birth_date: formData.birth_date === '' ? null : formData.birth_date,
+                height_cm: formData.height_cm === '' ? null : parseFloat(formData.height_cm),
+                starting_weight_kg: formData.starting_weight_kg === '' ? null : parseFloat(formData.starting_weight_kg),
+                target_weight_kg: formData.target_weight_kg === '' ? null : parseFloat(formData.target_weight_kg),
+            };
+            await clientService.create(submissionData);
             navigate('/clients');
         } catch (error) {
             console.error('Failed to create client', error);

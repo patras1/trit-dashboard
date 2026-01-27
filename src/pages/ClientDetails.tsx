@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { clientService } from '../lib/api';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User, Plus, X, Trash2, Pencil, Activity, Thermometer, Pill, FileText, HeartPulse, Target, BookOpen, Brain, Dumbbell, TrendingDown, TrendingUp, History as HistoryIcon, Info } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User, Plus, X, Trash2, Pencil, Activity, Thermometer, Pill, FileText, HeartPulse, Target, BookOpen, Brain, Dumbbell, TrendingDown, History as HistoryIcon, Info } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { NewPhaseModal } from './NewPhase';
 
@@ -257,7 +257,14 @@ export const ClientDetails = () => {
         if (!id) return;
 
         try {
-            const updated = await clientService.update(id, editClient);
+            // Sanitize birth_date: empty string must be null for Postgres date types
+            const sanitizedData = {
+                ...editClient,
+                birth_date: editClient.birth_date === '' ? null : editClient.birth_date,
+                height_cm: editClient.height_cm === '' ? null : parseFloat(editClient.height_cm),
+                target_weight_kg: editClient.target_weight_kg === '' ? null : parseFloat(editClient.target_weight_kg),
+            };
+            const updated = await clientService.update(id, sanitizedData);
             setClient(updated);
             setShowEditModal(false);
         } catch (error) {
@@ -545,108 +552,141 @@ export const ClientDetails = () => {
 
             <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
                 {/* Top Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-white p-4 rounded-xl border border-[#dfe2e2] flex items-center gap-4">
-                        <div className="p-3 rounded-full bg-blue-50 text-blue-600">
-                            <User size={24} />
-                        </div>
-                        <div>
-                            <p className="text-xs text-text-muted font-medium">Status</p>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative z-20">
+                    <div className="bg-white p-4 rounded-xl border border-[#dfe2e2] flex items-center gap-4 relative overflow-hidden group">
+                        <div className="z-10 relative">
+                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider mb-2">Status</p>
                             <p className="text-lg font-bold text-text-main capitalize">{client.status}</p>
+                        </div>
+                        {/* Clipped background icon */}
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                            <div className="absolute -right-2 top-1/2 -translate-y-1/2 opacity-[0.05] rotate-12">
+                                <User size={56} />
+                            </div>
                         </div>
                     </div>
 
-                    <div className="bg-white p-4 rounded-xl border border-[#dfe2e2] flex items-center gap-4">
-                        <div className="p-3 rounded-full bg-red-50 text-red-600">
-                            <Weight size={24} />
-                        </div>
-                        <div>
-                            <p className="text-xs text-text-muted font-medium">Current Weight</p>
+                    <div className="bg-white p-4 rounded-xl border border-[#dfe2e2] flex items-center gap-4 relative overflow-hidden group">
+                        <div className="z-10 relative">
+                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider mb-2">Current Weight</p>
                             <p className="text-lg font-bold text-text-main">
                                 {client.recent_measurements && client.recent_measurements.length > 0
                                     ? client.recent_measurements[0].weight_kg
                                     : client.starting_weight_kg} kg
                             </p>
                         </div>
+                        {/* Clipped background icon */}
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                            <div className="absolute -right-2 top-1/2 -translate-y-1/2 opacity-[0.05] rotate-12">
+                                <Weight size={56} />
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="bg-white p-4 rounded-xl border border-[#dfe2e2] flex items-center gap-4">
-                        <div className="p-3 rounded-full bg-green-50 text-green-600">
-                            <Ruler size={24} />
-                        </div>
-                        <div>
-                            <p className="text-xs text-text-muted font-medium">Height</p>
+                    <div className="bg-white p-4 rounded-xl border border-[#dfe2e2] flex items-center gap-4 relative overflow-hidden group">
+                        <div className="z-10 relative">
+                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider mb-2">Height</p>
                             <p className="text-lg font-bold text-text-main">{client.height_cm} cm</p>
                         </div>
+                        {/* Clipped background icon */}
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                            <div className="absolute -right-2 top-1/2 -translate-y-1/2 opacity-[0.05] rotate-12">
+                                <Ruler size={56} />
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="bg-white p-4 rounded-xl border border-[#dfe2e2] flex items-center gap-4">
-                        <div className="p-3 rounded-full bg-purple-50 text-purple-600">
-                            <Calendar size={24} />
-                        </div>
-                        <div>
-                            <p className="text-xs text-text-muted font-medium">Joined</p>
+                    <div className="bg-white p-4 rounded-xl border border-[#dfe2e2] flex items-center gap-4 relative overflow-hidden group">
+                        <div className="z-10 relative">
+                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider mb-2">Joined</p>
                             <p className="text-lg font-bold text-text-main">
                                 {new Date(client.created_at).toLocaleDateString()}
                             </p>
+                        </div>
+                        {/* Clipped background icon */}
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                            <div className="absolute -right-2 top-1/2 -translate-y-1/2 opacity-[0.05] rotate-12">
+                                <Calendar size={56} />
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Middle Stats - Primary KPI Row */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative z-20">
                     {/* Total Loss/Gain Card */}
-                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2]">
-                        <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">
-                            {client?.recent_measurements?.[0]?.weight_kg >= client.starting_weight_kg ? 'Total Gain' : 'Total Loss'}
-                        </p>
-                        <div className="flex items-center justify-between">
-                            <p className="text-2xl font-black text-text-main flex items-baseline gap-1">
-                                {client?.starting_weight_kg && client?.recent_measurements?.[0]?.weight_kg
-                                    ? Math.abs(client.starting_weight_kg - client.recent_measurements[0].weight_kg).toFixed(1)
-                                    : '0'}
-                                <span className="text-xs font-bold text-text-muted">kg</span>
+                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2] relative overflow-hidden group">
+                        <div className="z-10 relative">
+                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">
+                                {client?.recent_measurements?.[0]?.weight_kg >= client.starting_weight_kg ? 'Total Gain' : 'Total Loss'}
                             </p>
-                            <div className={`p-2 rounded-xl scale-110 ${client.starting_weight_kg - (client.recent_measurements?.[0]?.weight_kg || client.starting_weight_kg) > 0 ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'}`}>
-                                {client.starting_weight_kg - (client.recent_measurements?.[0]?.weight_kg || client.starting_weight_kg) > 0 ? <TrendingDown size={20} /> : <TrendingUp size={20} />}
+                            <div className="flex items-center justify-between">
+                                <p className="text-2xl font-black text-text-main flex items-baseline gap-1">
+                                    {client?.starting_weight_kg && client?.recent_measurements?.[0]?.weight_kg
+                                        ? Math.abs(client.starting_weight_kg - client.recent_measurements[0].weight_kg).toFixed(1)
+                                        : '0'}
+                                    <span className="text-xs font-bold text-text-muted">kg</span>
+                                </p>
+                            </div>
+                            <p className="text-xs text-green-600 font-medium mt-1">
+                                {client?.starting_weight_kg && client?.recent_measurements?.[0]?.weight_kg
+                                    ? Math.abs((client.starting_weight_kg - client.recent_measurements[0].weight_kg) / (Math.max(1, (new Date().getTime() - new Date(client.created_at).getTime()) / (1000 * 60 * 60 * 24 * 7)))).toFixed(1) + ' kg/wk avg'
+                                    : '0 kg/wk avg'
+                                }
+                            </p>
+                        </div>
+                        {/* Clipped background icon */}
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                            <div className="absolute -right-2 top-1/2 -translate-y-1/2 opacity-10 rotate-12">
+                                <TrendingDown size={60} />
                             </div>
                         </div>
-                        <p className="text-xs text-green-600 font-medium mt-1">
-                            {client?.starting_weight_kg && client?.recent_measurements?.[0]?.weight_kg
-                                ? Math.abs((client.starting_weight_kg - client.recent_measurements[0].weight_kg) / (Math.max(1, (new Date().getTime() - new Date(client.created_at).getTime()) / (1000 * 60 * 60 * 24 * 7)))).toFixed(1) + ' kg/wk avg'
-                                : '0 kg/wk avg'
-                            }
-                        </p>
                     </div>
 
                     {/* Active Phase Card */}
-                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2]">
-                        <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Active Phase</p>
-                        <p className="text-xl font-black text-text-main truncate mb-1">
-                            {goals.find((g: any) => g.status === 'active')?.phase_name || 'General'}
-                        </p>
-                        <div className="flex items-center gap-2">
-                            <span className={`w-2 h-2 rounded-full ${goals.find((g: any) => g.status === 'active') ? 'bg-primary shadow-[0_0_8px_rgba(34,197,94,0.4)]' : 'bg-gray-300'}`}></span>
-                            <p className="text-xs text-text-muted font-bold truncate">
-                                {goals.find((g: any) => g.status === 'active')?.priority || 'Maintenance'}
+                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2] relative overflow-hidden group">
+                        <div className="z-10 relative">
+                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Active Phase</p>
+                            <p className="text-xl font-black text-text-main truncate mb-1">
+                                {goals.find((g: any) => g.status === 'active')?.phase_name || 'General'}
                             </p>
+                            <div className="flex items-center gap-2">
+                                <span className={`w-2 h-2 rounded-full ${goals.find((g: any) => g.status === 'active') ? 'bg-primary shadow-[0_0_8px_rgba(34,197,94,0.4)]' : 'bg-gray-300'}`}></span>
+                                <p className="text-xs text-text-muted font-bold truncate">
+                                    {goals.find((g: any) => g.status === 'active')?.priority || 'Maintenance'}
+                                </p>
+                            </div>
+                        </div>
+                        {/* Clipped background icon */}
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                            <div className="absolute -right-2 top-1/2 -translate-y-1/2 opacity-10 rotate-12">
+                                <Target size={60} />
+                            </div>
                         </div>
                     </div>
 
                     {/* Last Contact Card */}
-                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2]">
-                        <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Last Contact</p>
-                        <p className={`text-2xl font-black ${!sessionNotes.length || (new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24) > 14
-                            ? 'text-red-500'
-                            : 'text-text-main'
-                            }`}>
-                            {sessionNotes.length
-                                ? Math.floor((new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24)) + 'd ago'
-                                : 'Never'}
-                        </p>
-                        <p className="text-xs text-text-muted font-bold mt-1">
-                            {sessionNotes.length > 0 && Math.floor((new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24)) > 14 ? 'Check-in Overdue' : 'On Track'}
-                        </p>
+                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2] relative overflow-hidden group">
+                        <div className="z-10 relative">
+                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Last Contact</p>
+                            <p className={`text-2xl font-black ${!sessionNotes.length || (new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24) > 14
+                                ? 'text-red-500'
+                                : 'text-text-main'
+                                }`}>
+                                {sessionNotes.length
+                                    ? Math.floor((new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24)) + 'd ago'
+                                    : 'Never'}
+                            </p>
+                            <p className="text-xs text-text-muted font-bold mt-1">
+                                {sessionNotes.length > 0 && Math.floor((new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24)) > 14 ? 'Check-in Overdue' : 'On Track'}
+                            </p>
+                        </div>
+                        {/* Clipped background icon */}
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                            <div className="absolute -right-2 top-1/2 -translate-y-1/2 opacity-10 rotate-12">
+                                <Calendar size={60} />
+                            </div>
+                        </div>
                     </div>
 
                     {/* Adherence Signal Card (Dynamic) */}
@@ -740,8 +780,8 @@ export const ClientDetails = () => {
                 {activeTab === 'overview' && (<>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Left Column: Metabolic & Strategy Profile */}
-                        <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
-                            <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center justify-between">
+                        <div className="bg-white rounded-xl border border-[#dfe2e2] relative group">
+                            <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center justify-between relative z-10">
                                 <div className="flex items-center gap-2">
                                     <Activity size={20} className="text-primary" />
                                     <h3 className="text-text-main text-base font-bold">Metabolic Profile</h3>
@@ -754,15 +794,15 @@ export const ClientDetails = () => {
                                     <Pencil size={16} />
                                 </button>
                             </div>
-                            <div className="p-6 space-y-6">
+                            <div className="p-6 space-y-6 relative z-10">
 
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div className="bg-gray-50 p-3 rounded-lg">
+                                        <div className="bg-gray-50/80 backdrop-blur-sm p-3 rounded-lg">
                                             <label className="text-xs text-text-muted block mb-1">Target Calories</label>
                                             <p className="text-lg font-bold text-primary">{prescriptions.find(p => p.is_active)?.calories_target || 'N/A'}</p>
                                         </div>
-                                        <div className="bg-gray-50 p-3 rounded-lg">
+                                        <div className="bg-gray-50/80 backdrop-blur-sm p-3 rounded-lg">
                                             <label className="text-xs text-text-muted block mb-1">Target Change/Wk</label>
                                             <p className="text-lg font-bold text-gray-800">{goals.find(g => g.status === 'active')?.expected_weekly_change_kg || 0.5} kg</p>
                                         </div>
@@ -823,8 +863,8 @@ export const ClientDetails = () => {
                         </div>
 
                         {/* Right Column: Progress / Measurements History */}
-                        <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
-                            <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center justify-between">
+                        <div className="bg-white rounded-xl border border-[#dfe2e2] relative overflow-hidden group">
+                            <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center justify-between relative z-10">
                                 <h3 className="text-text-main text-base font-bold">Recent Progress</h3>
                                 <button
                                     onClick={() => setShowAddMeasurement(true)}
@@ -835,42 +875,46 @@ export const ClientDetails = () => {
                                 </button>
                             </div>
 
-                            {client.recent_measurements && client.recent_measurements.length > 0 ? (
-                                <div className="max-h-[300px] overflow-y-auto pr-2">
-                                    <table className="w-full text-sm text-left border-separate border-spacing-0">
-                                        <thead className="bg-gray-50 text-gray-500 font-medium sticky top-0 z-10 shadow-sm">
-                                            <tr>
-                                                <th className="px-4 py-3">Date</th>
-                                                <th className="px-4 py-3">Weight (kg)</th>
-                                                <th className="px-4 py-3">Body Fat %</th>
-                                                <th className="px-4 py-3">Notes</th>
-                                                <th className="px-4 py-3 w-10"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-100">
-                                            {client.recent_measurements.map((m: any) => (
-                                                <tr key={m.id} className="group">
-                                                    <td className="px-4 py-3">{new Date(m.date).toLocaleDateString()}</td>
-                                                    <td className="px-4 py-3 font-medium text-text-main">{m.weight_kg}</td>
-                                                    <td className="px-4 py-3">{m.body_fat_percent || '-'}%</td>
-                                                    <td className="px-4 py-3 text-text-muted truncate max-w-xs">{m.notes}</td>
-                                                    <td className="px-4 py-3 text-right">
-                                                        <button
-                                                            onClick={() => handleDeleteMeasurement(m.id)}
-                                                            className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1"
-                                                            title="Delete entry"
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                    </td>
+                            <div className="relative z-10">
+                                {client.recent_measurements && client.recent_measurements.length > 0 ? (
+                                    <div className="max-h-[300px] overflow-y-auto pr-2">
+                                        <table className="w-full text-sm text-left border-separate border-spacing-0">
+                                            <thead className="bg-gray-50/50 backdrop-blur-sm text-gray-500 font-medium sticky top-0 z-10 shadow-sm">
+                                                <tr>
+                                                    <th className="px-4 py-3 border-b border-gray-100">Date</th>
+                                                    <th className="px-4 py-3 border-b border-gray-100">Weight (kg)</th>
+                                                    <th className="px-4 py-3 border-b border-gray-100">Body Fat %</th>
+                                                    <th className="px-4 py-3 border-b border-gray-100">Notes</th>
+                                                    <th className="px-4 py-3 border-b border-gray-100 w-10"></th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            ) : (
-                                <p className="text-text-muted">No measurements recorded yet.</p>
-                            )}
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-100">
+                                                {client.recent_measurements.map((m: any) => (
+                                                    <tr key={m.id} className="group hover:bg-white/50 transition-colors">
+                                                        <td className="px-4 py-3">{new Date(m.date).toLocaleDateString()}</td>
+                                                        <td className="px-4 py-3 font-medium text-text-main">{m.weight_kg}</td>
+                                                        <td className="px-4 py-3">{m.body_fat_percent || '-'}%</td>
+                                                        <td className="px-4 py-3 text-text-muted truncate max-w-xs">{m.notes}</td>
+                                                        <td className="px-4 py-3 text-right">
+                                                            <button
+                                                                onClick={() => handleDeleteMeasurement(m.id)}
+                                                                className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1"
+                                                                title="Delete entry"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : (
+                                    <div className="p-6">
+                                        <p className="text-text-muted">No measurements recorded yet.</p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 
@@ -945,7 +989,7 @@ export const ClientDetails = () => {
                                                 domain={['auto', 'auto']}
                                             />
                                             <Tooltip
-                                                contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                                contentStyle={{ backgroundColor: '#fff', borderRadius: '8_px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                                 labelFormatter={(date) => new Date(date).toLocaleDateString()}
                                             />
                                             <Line
@@ -962,395 +1006,400 @@ export const ClientDetails = () => {
                             </div>
                         </div>
                     </div>
-                </>)}
-
-                {activeTab === 'medical' && (
-                    <div className="space-y-6">
-                        {/* Medical Conditions */}
-                        <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
-                            <div className="flex justify-between items-center px-6 py-4 border-b border-[#dfe2e2]">
-                                <h3 className="text-text-main text-base font-bold flex items-center gap-2">
-                                    <Activity size={20} className="text-primary" />
-                                    Medical Conditions
-                                </h3>
-                                <button
-                                    onClick={() => setShowAddCondition(true)}
-                                    className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
-                                >
-                                    <Plus size={16} />
-                                    Add Condition
-                                </button>
-                            </div>
-                            {medicalConditions.length === 0 ? (
-                                <div className="text-center p-8 text-text-muted">No medical conditions recorded.</div>
-                            ) : (
-                                <table className="w-full text-sm text-left">
-                                    <thead className="bg-gray-50 text-gray-500 font-medium">
-                                        <tr>
-                                            <th className="px-4 py-3">Diagnosed</th>
-                                            <th className="px-4 py-3">Condition</th>
-                                            <th className="px-4 py-3">Status</th>
-                                            <th className="px-4 py-3">Notes</th>
-                                            <th className="px-4 py-3"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-100">
-                                        {medicalConditions.map((item: any) => (
-                                            <tr key={item.id} className="hover:bg-gray-50">
-                                                <td className="px-4 py-3">{new Date(item.diagnosed_date).toLocaleDateString()}</td>
-                                                <td className="px-4 py-3 font-medium text-text-main">{item.condition_name}</td>
-                                                <td className="px-4 py-3 capitalize">{item.status}</td>
-                                                <td className="px-4 py-3 text-text-muted">{item.notes}</td>
-                                                <td className="px-4 py-3 text-right">
-                                                    <button onClick={() => { if (confirm('Delete?')) clientService.deleteMedicalCondition(item.id).then(() => fetchMedicalData(id!)) }} className="text-gray-400 hover:text-red-500 transition-colors">
-                                                        <Trash2 size={14} />
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            )}
-                        </div>
-
-                        {/* Medications */}
-                        <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
-                            <div className="flex justify-between items-center px-6 py-4 border-b border-[#dfe2e2]">
-                                <h3 className="text-text-main text-base font-bold flex items-center gap-2">
-                                    <Pill size={20} className="text-primary" />
-                                    Medications
-                                </h3>
-                                <button
-                                    onClick={() => setShowAddMedication(true)}
-                                    className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
-                                >
-                                    <Plus size={16} />
-                                    Add Medication
-                                </button>
-                            </div>
-                            {medications.length === 0 ? (
-                                <div className="text-center p-8 text-text-muted">No medications recorded.</div>
-                            ) : (
-                                <table className="w-full text-sm text-left">
-                                    <thead className="bg-gray-50 text-gray-500 font-medium">
-                                        <tr>
-                                            <th className="px-4 py-3">Start Date</th>
-                                            <th className="px-4 py-3">Medication</th>
-                                            <th className="px-4 py-3">Dosage</th>
-                                            <th className="px-4 py-3">Reason</th>
-                                            <th className="px-4 py-3"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-100">
-                                        {medications.map((item: any) => (
-                                            <tr key={item.id} className="hover:bg-gray-50">
-                                                <td className="px-4 py-3">{new Date(item.start_date).toLocaleDateString()}</td>
-                                                <td className="px-4 py-3 font-medium text-text-main">{item.name}</td>
-                                                <td className="px-4 py-3">{item.dosage}</td>
-                                                <td className="px-4 py-3 text-text-muted">{item.reason}</td>
-                                                <td className="px-4 py-3 text-right">
-                                                    <button onClick={() => { if (confirm('Delete?')) clientService.deleteMedication(item.id).then(() => fetchMedicalData(id!)) }} className="text-gray-400 hover:text-red-500 transition-colors">
-                                                        <Trash2 size={14} />
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            )}
-                        </div>
-
-                        {/* Blood Tests */}
-                        <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
-                            <div className="flex justify-between items-center px-6 py-4 border-b border-[#dfe2e2]">
-                                <h3 className="text-text-main text-base font-bold flex items-center gap-2">
-                                    <Thermometer size={20} className="text-primary" />
-                                    Blood Tests
-                                </h3>
-                                <button
-                                    onClick={() => setShowAddBloodTest(true)}
-                                    className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
-                                >
-                                    <Plus size={16} />
-                                    Add Blood Test
-                                </button>
-                            </div>
-                            {bloodTests.length === 0 ? (
-                                <div className="text-center p-8 text-text-muted">No blood tests recorded.</div>
-                            ) : (
-                                <table className="w-full text-sm text-left">
-                                    <thead className="bg-gray-50 text-gray-500 font-medium">
-                                        <tr>
-                                            <th className="px-4 py-3">Date</th>
-                                            <th className="px-4 py-3">Glucose</th>
-                                            <th className="px-4 py-3">HbA1c</th>
-                                            <th className="px-4 py-3">Lipids (LDL/HDL)</th>
-                                            <th className="px-4 py-3"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-100">
-                                        {bloodTests.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((item: any, index: number, arr: any[]) => {
-                                            const prev = arr[index + 1];
-                                            const getTrend = (curr: any, prev: any) => {
-                                                if (!curr || !prev) return null;
-                                                const diff = parseFloat(curr) - parseFloat(prev);
-                                                if (Math.abs(diff) < 0.1) return <span className="text-gray-400">→</span>;
-                                                return diff > 0
-                                                    ? <span className="text-red-500 text-xs">↑ {diff.toFixed(1)}</span>
-                                                    : <span className="text-green-500 text-xs">↓ {Math.abs(diff).toFixed(1)}</span>;
-                                            };
-
-                                            return (
-                                                <tr
-                                                    key={item.id}
-                                                    className="hover:bg-blue-50 cursor-pointer transition-colors"
-                                                    onClick={() => setSelectedBloodTest(item)}
-                                                >
-                                                    <td className="px-4 py-3 font-medium text-text-main">{new Date(item.date).toLocaleDateString()}</td>
-                                                    <td className="px-4 py-3">
-                                                        {item.glucose || '-'}
-                                                        <div className="ml-1 inline">{getTrend(item.glucose, prev?.glucose)}</div>
-                                                    </td>
-                                                    <td className="px-4 py-3 font-bold text-primary">
-                                                        {item.hba1c || '-'}%
-                                                        <div className="ml-1 inline">{getTrend(item.hba1c, prev?.hba1c)}</div>
-                                                    </td>
-                                                    <td className="px-4 py-3">{item.ldl || '-'}/{item.hdl || '-'}</td>
-                                                    <td className="px-4 py-3 text-right">
-                                                        <div className="flex items-center justify-end gap-2">
-                                                            <ChevronRight size={16} className="text-gray-300" />
-                                                            <button onClick={(e) => { e.stopPropagation(); if (confirm('Delete?')) clientService.deleteBloodTest(item.id).then(() => fetchMedicalData(id!)) }} className="p-1 text-gray-400 hover:text-red-500 transition-colors">
-                                                                <Trash2 size={14} />
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            )}
-                        </div>
-                    </div>
+                </>
                 )}
 
-
-
-                {activeTab === 'plan' && (
-                    <div className="space-y-6">
-                        {/* Current Active Protocols */}
-                        {/* Top Section: Protocols & Phase Manager */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            {/* Current Active Protocols */}
+                {
+                    activeTab === 'medical' && (
+                        <div className="space-y-6">
+                            {/* Medical Conditions */}
                             <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
-                                <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
-                                    <Activity size={20} className="text-primary" />
-                                    <h3 className="text-text-main text-base font-bold">Active Protocols</h3>
-                                </div>
-                                <div className="p-6 space-y-3">
-                                    {protocols.filter((p: any) => p.status === 'active').length === 0 ? (
-                                        <p className="text-text-muted text-sm italic">No active protocols.</p>
-                                    ) : (
-                                        protocols.filter((p: any) => p.status === 'active').map((p: any) => (
-                                            <div key={p.id} className="flex items-center justify-between bg-blue-50 border border-blue-100 rounded-lg p-3">
-                                                <div>
-                                                    <p className="font-bold text-sm text-blue-900">{p.name}</p>
-                                                    <p className="text-xs text-blue-700">{p.details || 'No details specified.'}</p>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-[10px] uppercase font-bold bg-blue-200 text-blue-800 px-2 py-0.5 rounded">Active</span>
-                                                    <button onClick={() => handleUpdateProtocolStatus(p.id, 'paused')} className="text-xs text-gray-500 hover:text-gray-700 underline">Pause</button>
-                                                    <button onClick={() => handleUpdateProtocolStatus(p.id, 'completed')} className="text-xs text-gray-500 hover:text-gray-700 underline">End</button>
-                                                </div>
-                                            </div>
-                                        ))
-                                    )}
+                                <div className="flex justify-between items-center px-6 py-4 border-b border-[#dfe2e2]">
+                                    <h3 className="text-text-main text-base font-bold flex items-center gap-2">
+                                        <Activity size={20} className="text-primary" />
+                                        Medical Conditions
+                                    </h3>
                                     <button
-                                        onClick={() => setShowAddProtocol(true)}
-                                        className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm font-bold text-text-muted hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
+                                        onClick={() => setShowAddCondition(true)}
+                                        className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
                                     >
                                         <Plus size={16} />
-                                        Add Specific Protocol
+                                        Add Condition
                                     </button>
                                 </div>
+                                {medicalConditions.length === 0 ? (
+                                    <div className="text-center p-8 text-text-muted">No medical conditions recorded.</div>
+                                ) : (
+                                    <table className="w-full text-sm text-left">
+                                        <thead className="bg-gray-50 text-gray-500 font-medium">
+                                            <tr>
+                                                <th className="px-4 py-3">Diagnosed</th>
+                                                <th className="px-4 py-3">Condition</th>
+                                                <th className="px-4 py-3">Status</th>
+                                                <th className="px-4 py-3">Notes</th>
+                                                <th className="px-4 py-3"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100">
+                                            {medicalConditions.map((item: any) => (
+                                                <tr key={item.id} className="hover:bg-gray-50">
+                                                    <td className="px-4 py-3">{new Date(item.diagnosed_date).toLocaleDateString()}</td>
+                                                    <td className="px-4 py-3 font-medium text-text-main">{item.condition_name}</td>
+                                                    <td className="px-4 py-3 capitalize">{item.status}</td>
+                                                    <td className="px-4 py-3 text-text-muted">{item.notes}</td>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <button onClick={() => { if (confirm('Delete?')) clientService.deleteMedicalCondition(item.id).then(() => fetchMedicalData(id!)) }} className="text-gray-400 hover:text-red-500 transition-colors">
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                )}
                             </div>
 
-                            {/* Phase Manager (Goals) */}
+                            {/* Medications */}
                             <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
-                                <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
-                                    <Target size={20} className="text-primary" />
-                                    <h3 className="text-text-main text-base font-bold">Phase Manager</h3>
+                                <div className="flex justify-between items-center px-6 py-4 border-b border-[#dfe2e2]">
+                                    <h3 className="text-text-main text-base font-bold flex items-center gap-2">
+                                        <Pill size={20} className="text-primary" />
+                                        Medications
+                                    </h3>
+                                    <button
+                                        onClick={() => setShowAddMedication(true)}
+                                        className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                                    >
+                                        <Plus size={16} />
+                                        Add Medication
+                                    </button>
                                 </div>
-                                <div className="p-6 space-y-4">
-                                    {goals.map((goal: any) => (
-                                        <div key={goal.id} className="flex items-center justify-between border-b border-gray-100 last:border-0 pb-4 last:pb-0">
-                                            <div>
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <span className={`text-xs px-2 py-0.5 rounded-full font-bold uppercase ${goal.status === 'active' ? 'bg-green-100 text-green-700' :
-                                                        goal.status === 'completed' ? 'bg-gray-100 text-gray-500' :
-                                                            goal.status === 'aborted' ? 'bg-red-100 text-red-500' : 'bg-yellow-100 text-yellow-700'
-                                                        }`}>
-                                                        {goal.status}
-                                                    </span>
-                                                    <p className="font-bold text-sm text-gray-800">{goal.phase_name || goal.priority}</p>
-                                                </div>
-                                                <p className="text-xs text-gray-500">Target: {goal.target_weight_kg}kg ({goal.target_body_fat_percent}%)</p>
-                                                <p className="text-xs text-text-muted mt-0.5">{new Date(goal.start_date).toLocaleDateString()} - {goal.end_date ? new Date(goal.end_date).toLocaleDateString() : '...'}</p>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                {goal.status === 'active' && (
-                                                    <>
-                                                        <button onClick={() => handleGoalStatusChange(goal.id, 'completed')} className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded border border-gray-300 transition-colors">Complete</button>
-                                                        <button onClick={() => handleGoalStatusChange(goal.id, 'aborted')} className="text-xs bg-white hover:bg-red-50 text-red-600 px-2 py-1 rounded border border-red-200 transition-colors">Abort</button>
-                                                    </>
-                                                )}
-                                                {(goal.status === 'pending' || !goal.status) && (
-                                                    <button onClick={() => handleGoalStatusChange(goal.id, 'active')} className="text-xs bg-primary hover:bg-primary-hover text-white px-3 py-1 rounded transition-colors">Start Phase</button>
-                                                )}
-                                                {goal.status === 'aborted' && (
-                                                    <button onClick={() => handleGoalStatusChange(goal.id, 'active')} className="text-xs text-primary hover:underline">Restart</button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                    {goals.length === 0 && <p className="text-sm text-text-muted text-center py-4">No phases defined.</p>}
+                                {medications.length === 0 ? (
+                                    <div className="text-center p-8 text-text-muted">No medications recorded.</div>
+                                ) : (
+                                    <table className="w-full text-sm text-left">
+                                        <thead className="bg-gray-50 text-gray-500 font-medium">
+                                            <tr>
+                                                <th className="px-4 py-3">Start Date</th>
+                                                <th className="px-4 py-3">Medication</th>
+                                                <th className="px-4 py-3">Dosage</th>
+                                                <th className="px-4 py-3">Reason</th>
+                                                <th className="px-4 py-3"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100">
+                                            {medications.map((item: any) => (
+                                                <tr key={item.id} className="hover:bg-gray-50">
+                                                    <td className="px-4 py-3">{new Date(item.start_date).toLocaleDateString()}</td>
+                                                    <td className="px-4 py-3 font-medium text-text-main">{item.name}</td>
+                                                    <td className="px-4 py-3">{item.dosage}</td>
+                                                    <td className="px-4 py-3 text-text-muted">{item.reason}</td>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <button onClick={() => { if (confirm('Delete?')) clientService.deleteMedication(item.id).then(() => fetchMedicalData(id!)) }} className="text-gray-400 hover:text-red-500 transition-colors">
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                )}
+                            </div>
+
+                            {/* Blood Tests */}
+                            <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                                <div className="flex justify-between items-center px-6 py-4 border-b border-[#dfe2e2]">
+                                    <h3 className="text-text-main text-base font-bold flex items-center gap-2">
+                                        <Thermometer size={20} className="text-primary" />
+                                        Blood Tests
+                                    </h3>
+                                    <button
+                                        onClick={() => setShowAddBloodTest(true)}
+                                        className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                                    >
+                                        <Plus size={16} />
+                                        Add Blood Test
+                                    </button>
                                 </div>
+                                {bloodTests.length === 0 ? (
+                                    <div className="text-center p-8 text-text-muted">No blood tests recorded.</div>
+                                ) : (
+                                    <table className="w-full text-sm text-left">
+                                        <thead className="bg-gray-50 text-gray-500 font-medium">
+                                            <tr>
+                                                <th className="px-4 py-3">Date</th>
+                                                <th className="px-4 py-3">Glucose</th>
+                                                <th className="px-4 py-3">HbA1c</th>
+                                                <th className="px-4 py-3">Lipids (LDL/HDL)</th>
+                                                <th className="px-4 py-3"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100">
+                                            {bloodTests.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((item: any, index: number, arr: any[]) => {
+                                                const prev = arr[index + 1];
+                                                const getTrend = (curr: any, prev: any) => {
+                                                    if (!curr || !prev) return null;
+                                                    const diff = parseFloat(curr) - parseFloat(prev);
+                                                    if (Math.abs(diff) < 0.1) return <span className="text-gray-400">→</span>;
+                                                    return diff > 0
+                                                        ? <span className="text-red-500 text-xs">↑ {diff.toFixed(1)}</span>
+                                                        : <span className="text-green-500 text-xs">↓ {Math.abs(diff).toFixed(1)}</span>;
+                                                };
+
+                                                return (
+                                                    <tr
+                                                        key={item.id}
+                                                        className="hover:bg-blue-50 cursor-pointer transition-colors"
+                                                        onClick={() => setSelectedBloodTest(item)}
+                                                    >
+                                                        <td className="px-4 py-3 font-medium text-text-main">{new Date(item.date).toLocaleDateString()}</td>
+                                                        <td className="px-4 py-3">
+                                                            {item.glucose || '-'}
+                                                            <div className="ml-1 inline">{getTrend(item.glucose, prev?.glucose)}</div>
+                                                        </td>
+                                                        <td className="px-4 py-3 font-bold text-primary">
+                                                            {item.hba1c || '-'}%
+                                                            <div className="ml-1 inline">{getTrend(item.hba1c, prev?.hba1c)}</div>
+                                                        </td>
+                                                        <td className="px-4 py-3">{item.ldl || '-'}/{item.hdl || '-'}</td>
+                                                        <td className="px-4 py-3 text-right">
+                                                            <div className="flex items-center justify-end gap-2">
+                                                                <ChevronRight size={16} className="text-gray-300" />
+                                                                <button onClick={(e) => { e.stopPropagation(); if (confirm('Delete?')) clientService.deleteBloodTest(item.id).then(() => fetchMedicalData(id!)) }} className="p-1 text-gray-400 hover:text-red-500 transition-colors">
+                                                                    <Trash2 size={14} />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                )}
                             </div>
                         </div>
+                    )
+                }
 
-                        {/* Plan Change Log - New Section */}
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            {/* Plan Change Log - New Section */}
-                            <div className="lg:col-span-1">
-                                <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 overflow-hidden h-full">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
-                                            <HistoryIcon size={20} className="text-primary" />
-                                            Plan Change Log
-                                        </h3>
+
+
+                {
+                    activeTab === 'plan' && (
+                        <div className="space-y-6">
+                            {/* Current Active Protocols */}
+                            {/* Top Section: Protocols & Phase Manager */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                {/* Current Active Protocols */}
+                                <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                                    <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
+                                        <Activity size={20} className="text-primary" />
+                                        <h3 className="text-text-main text-base font-bold">Active Protocols</h3>
+                                    </div>
+                                    <div className="p-6 space-y-3">
+                                        {protocols.filter((p: any) => p.status === 'active').length === 0 ? (
+                                            <p className="text-text-muted text-sm italic">No active protocols.</p>
+                                        ) : (
+                                            protocols.filter((p: any) => p.status === 'active').map((p: any) => (
+                                                <div key={p.id} className="flex items-center justify-between bg-blue-50 border border-blue-100 rounded-lg p-3">
+                                                    <div>
+                                                        <p className="font-bold text-sm text-blue-900">{p.name}</p>
+                                                        <p className="text-xs text-blue-700">{p.details || 'No details specified.'}</p>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[10px] uppercase font-bold bg-blue-200 text-blue-800 px-2 py-0.5 rounded">Active</span>
+                                                        <button onClick={() => handleUpdateProtocolStatus(p.id, 'paused')} className="text-xs text-gray-500 hover:text-gray-700 underline">Pause</button>
+                                                        <button onClick={() => handleUpdateProtocolStatus(p.id, 'completed')} className="text-xs text-gray-500 hover:text-gray-700 underline">End</button>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
                                         <button
-                                            onClick={() => setShowAddPhase(true)}
-                                            className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-primary/20 shadow-sm"
+                                            onClick={() => setShowAddProtocol(true)}
+                                            className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm font-bold text-text-muted hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
                                         >
-                                            <Plus size={14} />
-                                            New
+                                            <Plus size={16} />
+                                            Add Specific Protocol
                                         </button>
                                     </div>
-                                    <div className="relative border-l-2 border-primary/20 ml-3 pl-6 space-y-6">
-                                        {prescriptions.slice().sort((a: any, b: any) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime()).map((plan: any, index: number, arr: any[]) => {
-                                            const nextPlan = arr[index + 1];
-                                            const kcalDiff = nextPlan ? plan.calories_target - nextPlan.calories_target : 0;
-                                            const isSelected = selectedPrescriptionId === plan.id;
+                                </div>
 
-                                            return (
-                                                <div
-                                                    key={plan.id}
-                                                    className={`relative cursor-pointer transition-all ${isSelected ? 'scale-[1.02]' : 'hover:scale-[1.01]'}`}
-                                                    onClick={() => setSelectedPrescriptionId(plan.id)}
-                                                >
-                                                    {/* Date indicator dot */}
-                                                    <div className={`absolute -left-[35px] top-1.5 w-4 h-4 rounded-full bg-white border-4 ${isSelected ? 'border-primary shadow-md' : 'border-gray-200'} z-10 transition-colors`} />
+                                {/* Phase Manager (Goals) */}
+                                <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                                    <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
+                                        <Target size={20} className="text-primary" />
+                                        <h3 className="text-text-main text-base font-bold">Phase Manager</h3>
+                                    </div>
+                                    <div className="p-6 space-y-4">
+                                        {goals.map((goal: any) => (
+                                            <div key={goal.id} className="flex items-center justify-between border-b border-gray-100 last:border-0 pb-4 last:pb-0">
+                                                <div>
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className={`text-xs px-2 py-0.5 rounded-full font-bold uppercase ${goal.status === 'active' ? 'bg-green-100 text-green-700' :
+                                                            goal.status === 'completed' ? 'bg-gray-100 text-gray-500' :
+                                                                goal.status === 'aborted' ? 'bg-red-100 text-red-500' : 'bg-yellow-100 text-yellow-700'
+                                                            }`}>
+                                                            {goal.status}
+                                                        </span>
+                                                        <p className="font-bold text-sm text-gray-800">{goal.phase_name || goal.priority}</p>
+                                                    </div>
+                                                    <p className="text-xs text-gray-500">Target: {goal.target_weight_kg}kg ({goal.target_body_fat_percent}%)</p>
+                                                    <p className="text-xs text-text-muted mt-0.5">{new Date(goal.start_date).toLocaleDateString()} - {goal.end_date ? new Date(goal.end_date).toLocaleDateString() : '...'}</p>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    {goal.status === 'active' && (
+                                                        <>
+                                                            <button onClick={() => handleGoalStatusChange(goal.id, 'completed')} className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded border border-gray-300 transition-colors">Complete</button>
+                                                            <button onClick={() => handleGoalStatusChange(goal.id, 'aborted')} className="text-xs bg-white hover:bg-red-50 text-red-600 px-2 py-1 rounded border border-red-200 transition-colors">Abort</button>
+                                                        </>
+                                                    )}
+                                                    {(goal.status === 'pending' || !goal.status) && (
+                                                        <button onClick={() => handleGoalStatusChange(goal.id, 'active')} className="text-xs bg-primary hover:bg-primary-hover text-white px-3 py-1 rounded transition-colors">Start Phase</button>
+                                                    )}
+                                                    {goal.status === 'aborted' && (
+                                                        <button onClick={() => handleGoalStatusChange(goal.id, 'active')} className="text-xs text-primary hover:underline">Restart</button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {goals.length === 0 && <p className="text-sm text-text-muted text-center py-4">No phases defined.</p>}
+                                    </div>
+                                </div>
+                            </div>
 
-                                                    <div className={`flex flex-col gap-2 p-3 rounded-xl border-2 transition-all ${isSelected ? 'bg-primary/5 border-primary shadow-sm' : 'bg-transparent border-transparent hover:bg-gray-50'}`}>
-                                                        <div className="flex justify-between items-start">
-                                                            <div>
-                                                                <p className={`font-bold text-sm ${isSelected ? 'text-primary' : 'text-text-main'}`}>{new Date(plan.start_date).toLocaleDateString()}</p>
-                                                                <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase mt-1 inline-block ${isSelected ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}>{plan.phase_name}</span>
-                                                            </div>
-                                                            <div className="text-right">
-                                                                <p className="text-xs font-bold text-gray-800">{plan.calories_target} kcal</p>
-                                                                {kcalDiff !== 0 && (
-                                                                    <p className={`text-[10px] font-bold ${kcalDiff > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                                                        {kcalDiff > 0 ? '+' : ''}{kcalDiff}
-                                                                    </p>
-                                                                )}
+                            {/* Plan Change Log - New Section */}
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                {/* Plan Change Log - New Section */}
+                                <div className="lg:col-span-1">
+                                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 overflow-hidden h-full">
+                                        <div className="flex justify-between items-center mb-6">
+                                            <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
+                                                <HistoryIcon size={20} className="text-primary" />
+                                                Plan Change Log
+                                            </h3>
+                                            <button
+                                                onClick={() => setShowAddPhase(true)}
+                                                className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-primary/20 shadow-sm"
+                                            >
+                                                <Plus size={14} />
+                                                New
+                                            </button>
+                                        </div>
+                                        <div className="relative border-l-2 border-primary/20 ml-3 pl-6 space-y-6">
+                                            {prescriptions.slice().sort((a: any, b: any) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime()).map((plan: any, index: number, arr: any[]) => {
+                                                const nextPlan = arr[index + 1];
+                                                const kcalDiff = nextPlan ? plan.calories_target - nextPlan.calories_target : 0;
+                                                const isSelected = selectedPrescriptionId === plan.id;
+
+                                                return (
+                                                    <div
+                                                        key={plan.id}
+                                                        className={`relative cursor-pointer transition-all ${isSelected ? 'scale-[1.02]' : 'hover:scale-[1.01]'}`}
+                                                        onClick={() => setSelectedPrescriptionId(plan.id)}
+                                                    >
+                                                        {/* Date indicator dot */}
+                                                        <div className={`absolute -left-[35px] top-1.5 w-4 h-4 rounded-full bg-white border-4 ${isSelected ? 'border-primary shadow-md' : 'border-gray-200'} z-10 transition-colors`} />
+
+                                                        <div className={`flex flex-col gap-2 p-3 rounded-xl border-2 transition-all ${isSelected ? 'bg-primary/5 border-primary shadow-sm' : 'bg-transparent border-transparent hover:bg-gray-50'}`}>
+                                                            <div className="flex justify-between items-start">
+                                                                <div>
+                                                                    <p className={`font-bold text-sm ${isSelected ? 'text-primary' : 'text-text-main'}`}>{new Date(plan.start_date).toLocaleDateString()}</p>
+                                                                    <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase mt-1 inline-block ${isSelected ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}>{plan.phase_name}</span>
+                                                                </div>
+                                                                <div className="text-right">
+                                                                    <p className="text-xs font-bold text-gray-800">{plan.calories_target} kcal</p>
+                                                                    {kcalDiff !== 0 && (
+                                                                        <p className={`text-[10px] font-bold ${kcalDiff > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                                            {kcalDiff > 0 ? '+' : ''}{kcalDiff}
+                                                                        </p>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            );
-                                        })}
+                                                );
+                                            })}
+                                        </div>
                                     </div>
+                                </div>
+
+                                {/* Selected Prescription Details */}
+                                <div className="lg:col-span-2">
+                                    {prescriptions.filter((p: any) => p.id === selectedPrescriptionId).map((plan: any) => (
+                                        <div key={plan.id} className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-primary shadow-xl p-8 relative overflow-hidden animate-in slide-in-from-bottom-4 duration-500 h-full">
+                                            {/* Decor */}
+                                            <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none">
+                                                <Activity size={200} />
+                                            </div>
+
+                                            <div className="flex justify-between items-start mb-8 relative z-10">
+                                                <div>
+                                                    <div className="flex items-center gap-3 mb-2">
+                                                        <h4 className="font-black text-2xl text-text-main tracking-tight">{plan.phase_name || 'Nutrition Plan'}</h4>
+                                                        {plan.is_active ? (
+                                                            <span className="bg-green-500 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">Current Active Plan</span>
+                                                        ) : (
+                                                            <span className="bg-gray-400 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">Historical Phase</span>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-text-muted">
+                                                        <Calendar size={14} />
+                                                        <p className="text-xs font-medium">
+                                                            Started {new Date(plan.start_date).toLocaleDateString()} • {plan.end_date ? `Ends ${new Date(plan.end_date).toLocaleDateString()}` : 'Ongoing Priority'}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="inline-block bg-primary text-white px-4 py-2 rounded-xl shadow-lg shadow-primary/20">
+                                                        <p className="text-3xl font-black leading-none">{plan.calories_target}</p>
+                                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Daily kcal</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-3 gap-6 mb-10 relative z-10">
+                                                <div className="bg-white/60 backdrop-blur-sm border border-blue-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest">Protein</p>
+                                                        <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                                                    </div>
+                                                    <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.protein_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
+                                                    <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.protein_grams * 4 / plan.calories_target) * 100)}% of total</p>
+                                                </div>
+                                                <div className="bg-white/60 backdrop-blur-sm border border-green-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <p className="text-[10px] text-green-600 font-black uppercase tracking-widest">Carbs</p>
+                                                        <div className="w-2 h-2 rounded-full bg-green-400" />
+                                                    </div>
+                                                    <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.carbs_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
+                                                    <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.carbs_grams * 4 / plan.calories_target) * 100)}% of total</p>
+                                                </div>
+                                                <div className="bg-white/60 backdrop-blur-sm border border-yellow-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <p className="text-[10px] text-yellow-600 font-black uppercase tracking-widest">Fats</p>
+                                                        <div className="w-2 h-2 rounded-full bg-yellow-400" />
+                                                    </div>
+                                                    <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.fat_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
+                                                    <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.fat_grams * 9 / plan.calories_target) * 100)}% of total</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-4 bg-white/40 p-6 rounded-2xl border border-white relative z-10">
+                                                <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-2">Detailed Menu & Rules</h5>
+                                                <div className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap font-medium" dir="rtl">
+                                                    {plan.training_day_rules}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
 
-                            {/* Selected Prescription Details */}
-                            <div className="lg:col-span-2">
-                                {prescriptions.filter((p: any) => p.id === selectedPrescriptionId).map((plan: any) => (
-                                    <div key={plan.id} className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-primary shadow-xl p-8 relative overflow-hidden animate-in slide-in-from-bottom-4 duration-500 h-full">
-                                        {/* Decor */}
-                                        <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none">
-                                            <Activity size={200} />
-                                        </div>
 
-                                        <div className="flex justify-between items-start mb-8 relative z-10">
-                                            <div>
-                                                <div className="flex items-center gap-3 mb-2">
-                                                    <h4 className="font-black text-2xl text-text-main tracking-tight">{plan.phase_name || 'Nutrition Plan'}</h4>
-                                                    {plan.is_active ? (
-                                                        <span className="bg-green-500 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">Current Active Plan</span>
-                                                    ) : (
-                                                        <span className="bg-gray-400 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">Historical Phase</span>
-                                                    )}
-                                                </div>
-                                                <div className="flex items-center gap-2 text-text-muted">
-                                                    <Calendar size={14} />
-                                                    <p className="text-xs font-medium">
-                                                        Started {new Date(plan.start_date).toLocaleDateString()} • {plan.end_date ? `Ends ${new Date(plan.end_date).toLocaleDateString()}` : 'Ongoing Priority'}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="text-right">
-                                                <div className="inline-block bg-primary text-white px-4 py-2 rounded-xl shadow-lg shadow-primary/20">
-                                                    <p className="text-3xl font-black leading-none">{plan.calories_target}</p>
-                                                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Daily kcal</p>
-                                                </div>
-                                            </div>
-                                        </div>
+                            {/* Phase Manager (Goals) */}
 
-                                        <div className="grid grid-cols-3 gap-6 mb-10 relative z-10">
-                                            <div className="bg-white/60 backdrop-blur-sm border border-blue-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest">Protein</p>
-                                                    <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-                                                </div>
-                                                <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.protein_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
-                                                <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.protein_grams * 4 / plan.calories_target) * 100)}% of total</p>
-                                            </div>
-                                            <div className="bg-white/60 backdrop-blur-sm border border-green-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <p className="text-[10px] text-green-600 font-black uppercase tracking-widest">Carbs</p>
-                                                    <div className="w-2 h-2 rounded-full bg-green-400" />
-                                                </div>
-                                                <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.carbs_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
-                                                <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.carbs_grams * 4 / plan.calories_target) * 100)}% of total</p>
-                                            </div>
-                                            <div className="bg-white/60 backdrop-blur-sm border border-yellow-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <p className="text-[10px] text-yellow-600 font-black uppercase tracking-widest">Fats</p>
-                                                    <div className="w-2 h-2 rounded-full bg-yellow-400" />
-                                                </div>
-                                                <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.fat_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
-                                                <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.fat_grams * 9 / plan.calories_target) * 100)}% of total</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-4 bg-white/40 p-6 rounded-2xl border border-white relative z-10">
-                                            <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-2">Detailed Menu & Rules</h5>
-                                            <div className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap font-medium" dir="rtl">
-                                                {plan.training_day_rules}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
                         </div>
-
-
-                        {/* Phase Manager (Goals) */}
-
-                    </div>
-                )}
+                    )
+                }
 
                 {/* Add Protocol Modal */}
                 {
@@ -2016,43 +2065,45 @@ export const ClientDetails = () => {
                         </div>
                     )
                 }
-            </main>
+            </main >
 
             {/* Add Metabolic Profile Modal */}
-            {showAddMetabolic && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="font-bold text-lg">Metabolic Settings</h3>
-                            <button onClick={() => setShowAddMetabolic(false)}><X size={20} /></button>
-                        </div>
-                        <form onSubmit={handleAddMetabolic} className="space-y-4">
-                            <div><label className="block text-sm font-medium text-gray-700">Date</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.date} onChange={e => setNewMetabolic({ ...newMetabolic, date: e.target.value })} /></div>
+            {
+                showAddMetabolic && (
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="font-bold text-lg">Metabolic Settings</h3>
+                                <button onClick={() => setShowAddMetabolic(false)}><X size={20} /></button>
+                            </div>
+                            <form onSubmit={handleAddMetabolic} className="space-y-4">
+                                <div><label className="block text-sm font-medium text-gray-700">Date</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.date} onChange={e => setNewMetabolic({ ...newMetabolic, date: e.target.value })} /></div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div><label className="block text-sm font-medium text-gray-700">RMR (kcal)</label><input type="number" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.rmr_value} onChange={e => setNewMetabolic({ ...newMetabolic, rmr_value: e.target.value })} /></div>
-                                <div><label className="block text-sm font-medium text-gray-700">Method</label>
-                                    <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.rmr_method} onChange={e => setNewMetabolic({ ...newMetabolic, rmr_method: e.target.value })}>
-                                        <option value="Mifflin-St Jeor">Mifflin-St Jeor</option>
-                                        <option value="Harris-Benedict">Harris-Benedict</option>
-                                        <option value="Katch-McArdle">Katch-McArdle</option>
-                                        <option value="Cunningham">Cunningham</option>
-                                    </select>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div><label className="block text-sm font-medium text-gray-700">RMR (kcal)</label><input type="number" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.rmr_value} onChange={e => setNewMetabolic({ ...newMetabolic, rmr_value: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Method</label>
+                                        <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.rmr_method} onChange={e => setNewMetabolic({ ...newMetabolic, rmr_method: e.target.value })}>
+                                            <option value="Mifflin-St Jeor">Mifflin-St Jeor</option>
+                                            <option value="Harris-Benedict">Harris-Benedict</option>
+                                            <option value="Katch-McArdle">Katch-McArdle</option>
+                                            <option value="Cunningham">Cunningham</option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div><label className="block text-sm font-medium text-gray-700">TDEE Range (e.g. 2100-2300)</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.tdee_range} onChange={e => setNewMetabolic({ ...newMetabolic, tdee_range: e.target.value })} /></div>
+                                <div><label className="block text-sm font-medium text-gray-700">TDEE Range (e.g. 2100-2300)</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.tdee_range} onChange={e => setNewMetabolic({ ...newMetabolic, tdee_range: e.target.value })} /></div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div><label className="block text-sm font-medium text-gray-700">Deficit Target</label><input type="number" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.calorie_deficit_target} onChange={e => setNewMetabolic({ ...newMetabolic, calorie_deficit_target: e.target.value })} /></div>
-                                <div><label className="block text-sm font-medium text-gray-700">Kcal/KM</label><input type="number" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.kcal_per_km_assumption} onChange={e => setNewMetabolic({ ...newMetabolic, kcal_per_km_assumption: e.target.value })} /></div>
-                            </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div><label className="block text-sm font-medium text-gray-700">Deficit Target</label><input type="number" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.calorie_deficit_target} onChange={e => setNewMetabolic({ ...newMetabolic, calorie_deficit_target: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Kcal/KM</label><input type="number" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.kcal_per_km_assumption} onChange={e => setNewMetabolic({ ...newMetabolic, kcal_per_km_assumption: e.target.value })} /></div>
+                                </div>
 
-                            <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddMetabolic(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save Profile</button></div>
-                        </form>
+                                <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddMetabolic(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save Profile</button></div>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
         </div >
     );
 };

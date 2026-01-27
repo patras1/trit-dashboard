@@ -4,7 +4,7 @@ import { Users, Search, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
+
 interface Client {
     id: string;
     full_name: string;
@@ -12,7 +12,10 @@ interface Client {
     status: 'active' | 'paused' | 'completed';
     assigned_coach_id: string;
     created_at: string;
+    starting_weight_kg: number;
+    target_weight_kg: number;
     recent_measurements?: any[];
+    psych_checkins?: any[];
 }
 
 interface Coach {
@@ -63,7 +66,7 @@ export const ClientsPage = () => {
         // Search filter
         if (search) {
             const lowerSearch = search.toLowerCase();
-            result = result.filter(c =>
+            result = result.filter((c: Client) =>
                 c.full_name.toLowerCase().includes(lowerSearch) ||
                 c.email.toLowerCase().includes(lowerSearch)
             );
@@ -71,24 +74,15 @@ export const ClientsPage = () => {
 
         // Coach filter
         if (selectedCoachId) {
-            result = result.filter(c => c.assigned_coach_id === selectedCoachId);
+            result = result.filter((c: Client) => c.assigned_coach_id === selectedCoachId);
         }
 
         // Status filter
         if (statusFilter !== 'all') {
-            result = result.filter(c => c.status === statusFilter);
+            result = result.filter((c: Client) => c.status === statusFilter);
         }
 
         setFilteredClients(result);
-    };
-
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'active': return 'bg-green-100 text-green-700';
-            case 'paused': return 'bg-yellow-100 text-yellow-700';
-            case 'completed': return 'bg-blue-100 text-blue-700';
-            default: return 'bg-gray-100 text-gray-700';
-        }
     };
 
     const handleDeleteClient = async (clientId: string, clientName: string) => {
@@ -105,56 +99,7 @@ export const ClientsPage = () => {
         }
     };
 
-    const handleAssignToMe = async () => {
-        if (!user) return;
-        setLoading(true);
-        try {
-            // 1. Ensure I exist as a coach
-            try {
-                await coachService.get(user.id);
-            } catch (e) {
-                // If not found, create
-                await coachService.create({
-                    id: user.id,
-                    name: user.email?.split('@')[0] || 'My Coach Profile',
-                    descriptor: 'Head Coach'
-                });
-            }
 
-            // 2. Fetch ALL clients to find targets (since state 'clients' is filtered)
-            // We bypass the filtered service call and fetch everything
-            const allClients = await clientService.list();
-
-            // 3. Find target clients (Dan Patra, Nimrod)
-            const targets = allClients.filter((c: any) =>
-                c.email === 'dan.patra@gmail.com' ||
-                c.email === 'jj.athlete@example.com'
-            );
-
-            if (targets.length === 0) {
-                alert('No target clients found (checked emails: dan.patra@gmail.com, jj.athlete@example.com)');
-                setLoading(false);
-                return;
-            }
-
-            // 4. Update them
-            let updatedCount = 0;
-            for (const client of targets) {
-                if (client.assigned_coach_id !== user.id) {
-                    await clientService.update(client.id, { assigned_coach_id: user.id });
-                    updatedCount++;
-                }
-            }
-
-            await fetchData();
-            alert(`Successfully assigned ${updatedCount} clients to you.`);
-        } catch (error) {
-            console.error('Failed to assign clients', error);
-            alert('Error assigning clients');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     if (loading) return <div className="p-8 text-center text-primary">{t('common.loading')}</div>;
 
@@ -220,10 +165,7 @@ export const ClientsPage = () => {
                             <span className="hidden md:inline">{t('clients.add_client')}</span>
                         </button>
 
-                        {/* Hidden shortcut for quick fix */}
-                        <button onClick={handleAssignToMe} className="opacity-0 hover:opacity-100 px-2 text-xs text-gray-400">
-                            Fix Assignments
-                        </button>
+
                     </div>
                 </div>
 
@@ -233,17 +175,41 @@ export const ClientsPage = () => {
                         <table className="w-full text-left text-sm">
                             <thead className="bg-gray-50 border-b border-gray-100">
                                 <tr>
-                                    <th className={`px-6 py-4 font-semibold text-gray-600 ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}>{t('clients.table.name')}</th>
-                                    <th className={`px-6 py-4 font-semibold text-gray-600 ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}>{t('clients.table.status')}</th>
-                                    <th className={`px-6 py-4 font-semibold text-gray-600 ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}>{t('clients.table.coach')}</th>
-                                    <th className={`px-6 py-4 font-semibold text-gray-600 ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}>{t('clients.table.joined')}</th>
+                                    <th className={`px-6 py-4 font-semibold text-gray-600 ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}>Client</th>
+                                    <th className="px-6 py-4 font-semibold text-gray-600">Adherence Signal</th>
+                                    <th className="px-6 py-4 font-semibold text-gray-600">Progress (∆ Weight)</th>
+                                    <th className="px-6 py-4 font-semibold text-gray-600">Target Progress</th>
+                                    <th className="px-6 py-4 font-semibold text-gray-600">Last Active</th>
                                     <th className="px-6 py-4"></th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {filteredClients.length > 0 ? (
                                     filteredClients.map((client) => {
-                                        const coach = coaches.find(c => c.id === client.assigned_coach_id);
+                                        const currentWeight = client.recent_measurements?.[0]?.weight_kg || client.starting_weight_kg;
+                                        const weightDiff = client.starting_weight_kg - currentWeight;
+                                        const isLosing = weightDiff > 0;
+
+                                        // Target Progress Calculation
+                                        let targetProgress = 0;
+                                        if (client.starting_weight_kg && client.target_weight_kg) {
+                                            const totalNeeded = client.starting_weight_kg - client.target_weight_kg;
+                                            if (totalNeeded !== 0) {
+                                                targetProgress = Math.min(100, Math.max(0, (weightDiff / totalNeeded) * 100));
+                                            }
+                                        }
+
+                                        // Adherence Logic
+                                        const latestCheckin = client.psych_checkins?.[0];
+                                        let adherenceStatus = 'good'; // green
+                                        if (latestCheckin) {
+                                            if (latestCheckin.stress_level === 'high' || latestCheckin.evening_hunger) adherenceStatus = 'warning'; // orange
+                                            if (latestCheckin.adherence_difficulty === 'very_hard') adherenceStatus = 'risk'; // red
+                                        }
+
+                                        const lastActiveDate = client.recent_measurements?.[0]?.date || client.created_at;
+                                        const daysSinceActive = Math.floor((new Date().getTime() - new Date(lastActiveDate).getTime()) / (1000 * 3600 * 24));
+
                                         return (
                                             <tr
                                                 key={client.id}
@@ -251,21 +217,58 @@ export const ClientsPage = () => {
                                                 onClick={() => navigate(`/clients/${client.id}`)}
                                             >
                                                 <td className={`px-6 py-4 ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}>
-                                                    <div>
-                                                        <p className="font-bold text-text-main">{client.full_name}</p>
-                                                        <p className="text-xs text-text-muted">{client.email}</p>
+                                                    <div className="flex flex-col gap-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <p className="font-bold text-text-main">{client.full_name}</p>
+                                                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter ${client.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                                                                {client.status}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-[11px] text-text-muted">{client.email}</p>
                                                     </div>
                                                 </td>
-                                                <td className={`px-6 py-4 ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}>
-                                                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(client.status)}`}>
-                                                        {t(`clients.status_${client.status}`) || client.status}
-                                                    </span>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <div className={`w-2 h-2 rounded-full ${adherenceStatus === 'good' ? 'bg-green-500' :
+                                                            adherenceStatus === 'warning' ? 'bg-orange-500 animate-pulse' : 'bg-red-500'
+                                                            }`} />
+                                                        <span className="text-xs font-medium">
+                                                            {adherenceStatus === 'good' ? 'Stable' :
+                                                                adherenceStatus === 'warning' ? 'Alert Flagged' : 'High Risk'}
+                                                        </span>
+                                                    </div>
                                                 </td>
-                                                <td className={`px-6 py-4 text-text-muted ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}>
-                                                    {coach?.name || '-'}
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-black text-text-main">{currentWeight.toFixed(1)}kg</span>
+                                                        <span className={`text-xs font-bold ${isLosing ? 'text-green-600' : 'text-blue-600'}`}>
+                                                            {isLosing ? '↓' : '↑'} {Math.abs(weightDiff).toFixed(1)}kg
+                                                        </span>
+                                                    </div>
                                                 </td>
-                                                <td className={`px-6 py-4 text-text-muted ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}>
-                                                    {new Date(client.created_at).toLocaleDateString()}
+                                                <td className="px-6 py-4">
+                                                    <div className="w-full max-w-[120px]">
+                                                        <div className="flex justify-between items-center mb-1">
+                                                            <span className="text-[10px] font-bold text-text-muted">{targetProgress.toFixed(0)}%</span>
+                                                            <span className="text-[10px] font-bold text-text-muted">{client.target_weight_kg}kg</span>
+                                                        </div>
+                                                        <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                                                            <div
+                                                                className="bg-primary h-full transition-all duration-500"
+                                                                style={{ width: `${targetProgress}%` }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex flex-col">
+                                                        <span className={`text-xs font-bold ${daysSinceActive > 7 ? 'text-red-500' : 'text-text-main'}`}>
+                                                            {daysSinceActive === 0 ? 'Today' :
+                                                                daysSinceActive === 1 ? 'Yesterday' :
+                                                                    `${daysSinceActive} days ago`}
+                                                        </span>
+                                                        <span className="text-[10px] text-text-muted">{new Date(lastActiveDate).toLocaleDateString()}</span>
+                                                    </div>
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
                                                     <button
@@ -284,7 +287,7 @@ export const ClientsPage = () => {
                                     })
                                 ) : (
                                     <tr>
-                                        <td colSpan={5} className="px-6 py-12 text-center text-text-muted">
+                                        <td colSpan={6} className="px-6 py-12 text-center text-text-muted">
                                             {t('clients.no_clients_found')}
                                         </td>
                                     </tr>

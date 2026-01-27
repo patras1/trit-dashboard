@@ -68,7 +68,11 @@ export const clientService = {
     async list(coachId?: string) {
         let query = supabase
             .from('clients')
-            .select('*')
+            .select(`
+                *,
+                recent_measurements:client_measurements(weight_kg, date),
+                psych_checkins:client_psychology_checkins(evening_hunger, stress_level, adherence_difficulty, date)
+            `)
             .order('created_at', { ascending: false });
 
         if (coachId) {
@@ -77,7 +81,13 @@ export const clientService = {
 
         const { data, error } = await query;
         if (error) throw error;
-        return data;
+
+        // Sort relations client-side to get latest
+        return (data || []).map(client => ({
+            ...client,
+            recent_measurements: (client.recent_measurements || []).sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+            psych_checkins: (client.psych_checkins || []).sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        }));
     },
 
     async get(clientId: string) {
