@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { clientService } from '../lib/api';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User, Plus, X, Trash2, Pencil, Activity, Thermometer, Pill, FileText, HeartPulse, Target, BookOpen, Brain, Dumbbell, TrendingDown, Clock, History as HistoryIcon } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User, Plus, X, Trash2, Pencil, Activity, Thermometer, Pill, FileText, HeartPulse, Target, BookOpen, Brain, Dumbbell, TrendingDown, TrendingUp, Clock, History as HistoryIcon } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { NewPhaseModal } from './NewPhase';
 
@@ -604,8 +604,8 @@ export const ClientDetails = () => {
                                 <span className="text-xs font-bold text-text-muted">kg</span>
                             </p>
                         </div>
-                        <div className={`p-2 rounded-xl scale-110 ${client.starting_weight_kg - (client.recent_measurements?.[0]?.weight_kg || client.starting_weight_kg) > 0 ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'}`}>
-                            <TrendingDown size={20} />
+                        <div className={`p-2 rounded-xl scale-110 ${client.starting_weight_kg - (client.recent_measurements?.[0]?.weight_kg || client.starting_weight_kg) > 0 ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'}`}>
+                            {client.starting_weight_kg - (client.recent_measurements?.[0]?.weight_kg || client.starting_weight_kg) > 0 ? <TrendingDown size={20} /> : <TrendingUp size={20} />}
                         </div>
                     </div>
 
@@ -674,11 +674,17 @@ export const ClientDetails = () => {
                     {/* Insights / Derived Metrics Row */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                         <div className="bg-white p-4 rounded-xl border border-[#dfe2e2]">
-                            <p className="text-xs text-text-muted font-bold uppercase">Total Loss</p>
-                            <p className="text-2xl font-bold text-primary">{client?.starting_weight_kg && client?.recent_measurements?.[0]?.weight_kg ? (client.starting_weight_kg - client.recent_measurements[0].weight_kg).toFixed(1) : '0'} kg</p>
+                            <p className="text-xs text-text-muted font-bold uppercase">
+                                {client?.recent_measurements?.[0]?.weight_kg >= client.starting_weight_kg ? 'Total Gain' : 'Total Loss'}
+                            </p>
+                            <p className="text-2xl font-bold text-primary">
+                                {client?.starting_weight_kg && client?.recent_measurements?.[0]?.weight_kg
+                                    ? Math.abs(client.starting_weight_kg - client.recent_measurements[0].weight_kg).toFixed(1)
+                                    : '0'} kg
+                            </p>
                             <p className="text-xs text-green-600 font-medium">
                                 {client?.starting_weight_kg && client?.recent_measurements?.[0]?.weight_kg
-                                    ? ((client.starting_weight_kg - client.recent_measurements[0].weight_kg) / (Math.max(1, (new Date().getTime() - new Date(client.created_at).getTime()) / (1000 * 60 * 60 * 24 * 7)))).toFixed(1) + ' kg/wk avg'
+                                    ? Math.abs((client.starting_weight_kg - client.recent_measurements[0].weight_kg) / (Math.max(1, (new Date().getTime() - new Date(client.created_at).getTime()) / (1000 * 60 * 60 * 24 * 7)))).toFixed(1) + ' kg/wk avg'
                                     : '0 kg/wk avg'
                                 }
                             </p>
@@ -1770,49 +1776,51 @@ export const ClientDetails = () => {
                                     </button>
                                 </div>
 
-                                <div className="p-6 space-y-8">
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Hemoglobin (Hb)</p>
-                                            <p className="text-2xl font-black text-blue-800">{selectedBloodTest.hemoglobin || 'N/A'}</p>
-                                            <p className="text-[10px] font-bold text-text-muted mt-1">g/dL</p>
-                                        </div>
-                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">B12</p>
-                                            <p className="text-2xl font-black text-purple-600">{selectedBloodTest.vitamin_b12 || 'N/A'}</p>
-                                            <p className="text-[10px] font-bold text-text-muted mt-1">pg/mL</p>
-                                        </div>
-                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Vitamin D</p>
-                                            <p className="text-2xl font-black text-orange-400">{selectedBloodTest.vitamin_d || 'N/A'}</p>
-                                            <p className="text-[10px] font-bold text-text-muted mt-1">ng/mL</p>
-                                        </div>
-                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Folate</p>
-                                            <p className="text-2xl font-black text-green-700">{selectedBloodTest.folate || 'N/A'}</p>
-                                            <p className="text-[10px] font-bold text-text-muted mt-1">ng/mL</p>
-                                        </div>
-                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Ferritin</p>
-                                            <p className="text-2xl font-black text-orange-600">{selectedBloodTest.ferritin || 'N/A'}</p>
-                                            <p className="text-[10px] font-bold text-text-muted mt-1">ng/mL</p>
-                                        </div>
-                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">Glucose</p>
-                                            <p className="text-2xl font-black text-text-main">{selectedBloodTest.glucose || 'N/A'}</p>
-                                        </div>
-                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">HbA1c</p>
-                                            <p className="text-2xl font-black text-primary">{selectedBloodTest.hba1c ? `${selectedBloodTest.hba1c}%` : 'N/A'}</p>
-                                        </div>
-                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">LDL (Bad)</p>
-                                            <p className="text-2xl font-black text-red-600">{selectedBloodTest.ldl || 'N/A'}</p>
-                                        </div>
-                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-1">HDL (Good)</p>
-                                            <p className="text-2xl font-black text-green-600">{selectedBloodTest.hdl || 'N/A'}</p>
-                                        </div>
+                                <div className="p-6 space-y-6">
+                                    <div className="space-y-3">
+                                        {[
+                                            { label: 'Hemoglobin (Hb)', key: 'hemoglobin', unit: 'g/dL', range: '14.0 - 18.0', min: 14.0, max: 18.0 },
+                                            { label: 'Ferritin', key: 'ferritin', unit: 'ng/mL', range: '30 - 350', min: 30, max: 350 },
+                                            { label: 'B12', key: 'vitamin_b12', unit: 'pg/mL', range: '211 - 911', min: 211, max: 911 },
+                                            { label: 'Vitamin D', key: 'vitamin_d', unit: 'ng/mL', range: '30 - 100', min: 30, max: 100 },
+                                            { label: 'Folate', key: 'folate', unit: 'ng/mL', range: '4.6 - 18.7', min: 4.6, max: 18.7 },
+                                            { label: 'Glucose (Fasting)', key: 'glucose', unit: 'mg/dL', range: '70 - 100', min: 70, max: 100 },
+                                            { label: 'HbA1c', key: 'hba1c', unit: '%', range: '4.0 - 5.7', min: 4.0, max: 5.7 },
+                                            { label: 'LDL Cholesterol', key: 'ldl', unit: 'mg/dL', range: '0 - 100', min: 0, max: 100 },
+                                            { label: 'HDL Cholesterol', key: 'hdl', unit: 'mg/dL', range: '40 - 100', min: 40, max: 100 },
+                                        ].map((marker) => {
+                                            const value = selectedBloodTest[marker.key];
+                                            if (value === undefined || value === null) return null;
+
+                                            const isLow = marker.min !== undefined && value < marker.min;
+                                            const isHigh = marker.max !== undefined && value > marker.max;
+                                            const statusColor = isLow || isHigh ? 'text-red-500' : 'text-green-600';
+                                            const bgColor = isLow || isHigh ? 'bg-red-50/50 border-red-100' : 'bg-white border-gray-100';
+
+                                            return (
+                                                <div key={marker.key} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${bgColor}`}>
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-2 mb-0.5">
+                                                            <p className="text-xs font-black uppercase tracking-widest text-text-muted">{marker.label}</p>
+                                                            {(isLow || isHigh) && (
+                                                                <span className="bg-red-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full tracking-tighter uppercase">
+                                                                    {isLow ? 'LOW' : 'HIGH'}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-[10px] font-bold text-text-muted">
+                                                            Normal Range: <span className="text-text-main">{marker.range}</span> {marker.unit}
+                                                        </p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className={`text-xl font-black ${statusColor}`}>
+                                                            {value}{marker.unit === '%' ? '%' : ''}
+                                                        </p>
+                                                        <p className="text-[9px] font-black text-text-muted uppercase tracking-tighter">{marker.unit}</p>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
 
                                     {selectedBloodTest.clinician_notes && (
