@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { clientService } from '../lib/api';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User, Plus, X, Trash2, Pencil, Activity, Thermometer, Pill, FileText, HeartPulse, Target, BookOpen, Brain, Dumbbell, TrendingDown, TrendingUp, Clock, History as HistoryIcon } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User, Plus, X, Trash2, Pencil, Activity, Thermometer, Pill, FileText, HeartPulse, Target, BookOpen, Brain, Dumbbell, TrendingDown, TrendingUp, History as HistoryIcon, Info } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { NewPhaseModal } from './NewPhase';
 
@@ -595,55 +595,122 @@ export const ClientDetails = () => {
 
                 {/* Middle Stats - Primary KPI Row */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2] flex items-center justify-between">
-                        <div>
-                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Weight Delta</p>
+                    {/* Total Loss/Gain Card */}
+                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2]">
+                        <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">
+                            {client?.recent_measurements?.[0]?.weight_kg >= client.starting_weight_kg ? 'Total Gain' : 'Total Loss'}
+                        </p>
+                        <div className="flex items-center justify-between">
                             <p className="text-2xl font-black text-text-main flex items-baseline gap-1">
-                                {client.starting_weight_kg - client.recent_measurements?.[0]?.weight_kg > 0 ? '-' : '+'}
-                                {Math.abs(client.starting_weight_kg - (client.recent_measurements?.[0]?.weight_kg || client.starting_weight_kg)).toFixed(1)}
+                                {client?.starting_weight_kg && client?.recent_measurements?.[0]?.weight_kg
+                                    ? Math.abs(client.starting_weight_kg - client.recent_measurements[0].weight_kg).toFixed(1)
+                                    : '0'}
                                 <span className="text-xs font-bold text-text-muted">kg</span>
                             </p>
-                        </div>
-                        <div className={`p-2 rounded-xl scale-110 ${client.starting_weight_kg - (client.recent_measurements?.[0]?.weight_kg || client.starting_weight_kg) > 0 ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'}`}>
-                            {client.starting_weight_kg - (client.recent_measurements?.[0]?.weight_kg || client.starting_weight_kg) > 0 ? <TrendingDown size={20} /> : <TrendingUp size={20} />}
-                        </div>
-                    </div>
-
-                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2] flex items-center justify-between">
-                        <div>
-                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Active Phase</p>
-                            <p className="text-lg font-black text-text-main truncate max-w-[120px]">
-                                {goals.find((g: any) => g.status === 'active')?.phase_name || 'No Active Phase'}
-                            </p>
-                        </div>
-                        <div className="p-2 rounded-xl bg-blue-50 text-blue-600 scale-110">
-                            <Target size={20} />
-                        </div>
-                    </div>
-
-                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2] flex items-center justify-between">
-                        <div>
-                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Last Contact</p>
-                            <p className="text-lg font-black text-text-main">
-                                {sessionNotes.length > 0 ? new Date(Math.max(...sessionNotes.map((n: any) => new Date(n.date).getTime()))).toLocaleDateString() : 'N/A'}
-                            </p>
-                        </div>
-                        <div className="p-2 rounded-xl bg-purple-50 text-purple-600 scale-110">
-                            <Clock size={20} />
-                        </div>
-                    </div>
-
-                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2] flex items-center justify-between overflow-hidden">
-                        <div className="z-10">
-                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Adherence Signal</p>
-                            <div className="flex items-center gap-1.5">
-                                {[1, 2, 3, 4, 5].map((i) => (
-                                    <div key={i} className={`w-3 h-3 rounded-full ${i <= 4 ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]' : 'bg-gray-200'}`} />
-                                ))}
+                            <div className={`p-2 rounded-xl scale-110 ${client.starting_weight_kg - (client.recent_measurements?.[0]?.weight_kg || client.starting_weight_kg) > 0 ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'}`}>
+                                {client.starting_weight_kg - (client.recent_measurements?.[0]?.weight_kg || client.starting_weight_kg) > 0 ? <TrendingDown size={20} /> : <TrendingUp size={20} />}
                             </div>
                         </div>
-                        <div className="absolute -right-2 opacity-10 rotate-12">
-                            <Activity size={60} />
+                        <p className="text-xs text-green-600 font-medium mt-1">
+                            {client?.starting_weight_kg && client?.recent_measurements?.[0]?.weight_kg
+                                ? Math.abs((client.starting_weight_kg - client.recent_measurements[0].weight_kg) / (Math.max(1, (new Date().getTime() - new Date(client.created_at).getTime()) / (1000 * 60 * 60 * 24 * 7)))).toFixed(1) + ' kg/wk avg'
+                                : '0 kg/wk avg'
+                            }
+                        </p>
+                    </div>
+
+                    {/* Active Phase Card */}
+                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2]">
+                        <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Active Phase</p>
+                        <p className="text-xl font-black text-text-main truncate mb-1">
+                            {goals.find((g: any) => g.status === 'active')?.phase_name || 'General'}
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <span className={`w-2 h-2 rounded-full ${goals.find((g: any) => g.status === 'active') ? 'bg-primary shadow-[0_0_8px_rgba(34,197,94,0.4)]' : 'bg-gray-300'}`}></span>
+                            <p className="text-xs text-text-muted font-bold truncate">
+                                {goals.find((g: any) => g.status === 'active')?.priority || 'Maintenance'}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Last Contact Card */}
+                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2]">
+                        <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Last Contact</p>
+                        <p className={`text-2xl font-black ${!sessionNotes.length || (new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24) > 14
+                            ? 'text-red-500'
+                            : 'text-text-main'
+                            }`}>
+                            {sessionNotes.length
+                                ? Math.floor((new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24)) + 'd ago'
+                                : 'Never'}
+                        </p>
+                        <p className="text-xs text-text-muted font-bold mt-1">
+                            {sessionNotes.length > 0 && Math.floor((new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24)) > 14 ? 'Check-in Overdue' : 'On Track'}
+                        </p>
+                    </div>
+
+                    {/* Adherence Signal Card (Dynamic) */}
+                    <div className="bg-white p-5 rounded-xl border border-[#dfe2e2] flex items-center justify-between relative group">
+                        <div className="z-10">
+                            <div className="flex items-center gap-1 mb-1">
+                                <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Adherence Signal</p>
+                                <div className="relative group/info">
+                                    <div className="cursor-help text-text-muted hover:text-primary transition-colors">
+                                        <Info size={12} />
+                                    </div>
+                                    <div className="absolute top-full right-0 mt-2 w-72 p-4 bg-[#1e293b] text-white rounded-xl shadow-2xl opacity-0 invisible group-hover/info:opacity-100 group-hover/info:visible transition-all duration-200 z-[100] pointer-events-none border border-slate-700">
+                                        <p className="text-[11px] font-bold text-teal-400 uppercase tracking-wider mb-2">How it's Calculated</p>
+                                        <p className="text-xs text-slate-300 leading-relaxed mb-3">
+                                            The signal starts at <span className="text-white font-bold">5 dots</span> and subtracts points based on "friction" in the latest check-in:
+                                        </p>
+
+                                        <div className="space-y-2 mb-4">
+                                            <div className="flex justify-between items-center text-[11px]">
+                                                <span className="text-slate-400">Motivation (Med/Low)</span>
+                                                <span className="text-red-400 font-bold">-1 / -2</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-[11px]">
+                                                <span className="text-slate-400">Hunger (4-5/5)</span>
+                                                <span className="text-red-400 font-bold">-1 / -2</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-[11px]">
+                                                <span className="text-slate-400">High Stress</span>
+                                                <span className="text-red-400 font-bold">-1</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="pt-3 border-t border-slate-700 mt-2">
+                                            <p className="text-[10px] italic text-slate-400 leading-snug">
+                                                Recent check-in shows <span className="text-teal-400 font-bold">{psychCheckins[0]?.motivation_status || 'N/A'}</span> motivation. Friction dots are removed to highlight adherence risk.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-1.5" title={psychCheckins.length ? `Latest Check-in:\nMotivation: ${psychCheckins[0].motivation_status}\nHunger: ${psychCheckins[0].psychological_hunger_scale}/5\nStress: ${psychCheckins[0].stress_level}` : 'No check-in data'}>
+                                {(() => {
+                                    const latest = psychCheckins[0];
+                                    if (!latest) return [1, 2, 3, 4, 5].map(i => <div key={i} className="w-3 h-3 rounded-full bg-gray-100" />);
+
+                                    let score = 5;
+                                    if (latest.motivation_status === 'medium') score -= 1;
+                                    if (latest.motivation_status === 'low') score -= 2;
+                                    if (latest.psychological_hunger_scale >= 4) score -= 1;
+                                    if (latest.psychological_hunger_scale >= 5) score -= 1;
+                                    if (latest.stress_level === 'high') score -= 1;
+                                    score = Math.max(1, score);
+
+                                    return [1, 2, 3, 4, 5].map((i) => (
+                                        <div key={i} className={`w-3 h-3 rounded-full ${i <= score ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]' : 'bg-gray-200'}`} />
+                                    ));
+                                })()}
+                            </div>
+                        </div>
+                        {/* Clipped background icon */}
+                        <div className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
+                            <div className="absolute -right-2 top-1/2 -translate-y-1/2 opacity-10 rotate-12">
+                                <Activity size={60} />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -671,68 +738,21 @@ export const ClientDetails = () => {
                 </div>
 
                 {activeTab === 'overview' && (<>
-                    {/* Insights / Derived Metrics Row */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                        <div className="bg-white p-4 rounded-xl border border-[#dfe2e2]">
-                            <p className="text-xs text-text-muted font-bold uppercase">
-                                {client?.recent_measurements?.[0]?.weight_kg >= client.starting_weight_kg ? 'Total Gain' : 'Total Loss'}
-                            </p>
-                            <p className="text-2xl font-bold text-primary">
-                                {client?.starting_weight_kg && client?.recent_measurements?.[0]?.weight_kg
-                                    ? Math.abs(client.starting_weight_kg - client.recent_measurements[0].weight_kg).toFixed(1)
-                                    : '0'} kg
-                            </p>
-                            <p className="text-xs text-green-600 font-medium">
-                                {client?.starting_weight_kg && client?.recent_measurements?.[0]?.weight_kg
-                                    ? Math.abs((client.starting_weight_kg - client.recent_measurements[0].weight_kg) / (Math.max(1, (new Date().getTime() - new Date(client.created_at).getTime()) / (1000 * 60 * 60 * 24 * 7)))).toFixed(1) + ' kg/wk avg'
-                                    : '0 kg/wk avg'
-                                }
-                            </p>
-                        </div>
-                        <div className="bg-white p-4 rounded-xl border border-[#dfe2e2]">
-                            <p className="text-xs text-text-muted font-bold uppercase">Active Phase</p>
-                            <p className="text-lg font-bold text-gray-800">{goals.find(g => g.status === 'active')?.phase_name || 'General'}</p>
-                            <div className="flex items-center gap-2">
-                                <span className={`w-2 h-2 rounded-full ${goals.find(g => g.status === 'active') ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                                <p className="text-xs text-text-muted">{goals.find(g => g.status === 'active')?.priority || 'Maintenance'}</p>
-                            </div>
-                        </div>
-                        <div className="bg-white p-4 rounded-xl border border-[#dfe2e2]">
-                            <p className="text-xs text-text-muted font-bold uppercase">Last Contact</p>
-                            <p className={`text-2xl font-bold ${!sessionNotes.length || (new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24) > 14
-                                ? 'text-red-500'
-                                : 'text-gray-800'
-                                }`}>
-                                {sessionNotes.length
-                                    ? Math.floor((new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24)) + 'd ago'
-                                    : 'Never'}
-                            </p>
-                            <p className="text-xs text-text-muted">
-                                {sessionNotes.length > 0 && Math.floor((new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24)) > 14 ? 'Check-in Overdue' : 'On Track'}
-                            </p>
-                        </div>
-                        <div className="bg-white p-4 rounded-xl border border-[#dfe2e2]">
-                            <p className="text-xs text-text-muted font-bold uppercase">Adherence Signal</p>
-                            <p className={`text-lg font-bold ${!psychCheckins.length ? 'text-gray-400' : psychCheckins[0]?.motivation_status === 'high' ? 'text-green-600' : 'text-orange-500'}`}>
-                                {psychCheckins.length ? (
-                                    <span className="flex items-center gap-1">
-                                        {psychCheckins[0].motivation_status === 'high' ? <Activity size={16} /> : <Activity size={16} className="rotate-180" />}
-                                        {psychCheckins[0].motivation_status.toUpperCase()}
-                                    </span>
-                                ) : 'NO DATA'}
-                            </p>
-                            <p className="text-xs text-text-muted">
-                                {psychCheckins.length ? `Hunger: ${psychCheckins[0].psychological_hunger_scale}/5` : 'Needs Check-in'}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Left Column: Metabolic & Strategy Profile */}
                         <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
-                            <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
-                                <Activity size={20} className="text-primary" />
-                                <h3 className="text-text-main text-base font-bold">Metabolic Profile</h3>
+                            <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Activity size={20} className="text-primary" />
+                                    <h3 className="text-text-main text-base font-bold">Metabolic Profile</h3>
+                                </div>
+                                <button
+                                    onClick={() => setShowAddMetabolic(true)}
+                                    className="p-1 text-primary hover:bg-primary/10 rounded transition-colors"
+                                    title="Edit Metabolic Settings"
+                                >
+                                    <Pencil size={16} />
+                                </button>
                             </div>
                             <div className="p-6 space-y-6">
 
@@ -747,6 +767,23 @@ export const ClientDetails = () => {
                                             <p className="text-lg font-bold text-gray-800">{goals.find(g => g.status === 'active')?.expected_weekly_change_kg || 0.5} kg</p>
                                         </div>
                                     </div>
+
+                                    {metabolicProfiles.length > 0 && (
+                                        <div className="grid grid-cols-2 gap-4 pt-2">
+                                            <div>
+                                                <label className="text-[10px] text-text-muted font-bold uppercase block mb-0.5">RMR ({metabolicProfiles[0].rmr_method})</label>
+                                                <p className="text-sm font-black text-text-main">{metabolicProfiles[0].rmr_value} kcal</p>
+                                            </div>
+                                            <div>
+                                                <label className="text-[10px] text-text-muted font-bold uppercase block mb-0.5">Deficit Target</label>
+                                                <p className="text-sm font-black text-text-main">{metabolicProfiles[0].calorie_deficit_target} kcal</p>
+                                            </div>
+                                            <div className="col-span-2">
+                                                <label className="text-[10px] text-text-muted font-bold uppercase block mb-0.5">Est. TDEE Range</label>
+                                                <p className="text-sm font-black text-text-main">{metabolicProfiles[0].tdee_range || 'N/A'}</p>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     <div className="border-t border-gray-100 pt-4">
                                         <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Current Protocol</label>
@@ -786,7 +823,7 @@ export const ClientDetails = () => {
                         </div>
 
                         {/* Right Column: Progress / Measurements History */}
-                        <div className="lg:col-span-2 bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                        <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
                             <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center justify-between">
                                 <h3 className="text-text-main text-base font-bold">Recent Progress</h3>
                                 <button
@@ -1512,50 +1549,6 @@ export const ClientDetails = () => {
                         <div className="space-y-6">
                             {/* Status Check-ins Grid */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                {/* Metabolic Profile Settings */}
-                                <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
-                                    <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <Activity size={20} className="text-orange-500" />
-                                            <h3 className="text-text-main text-base font-bold">Metabolic Profile</h3>
-                                        </div>
-                                        <button
-                                            onClick={() => setShowAddMetabolic(true)}
-                                            className="p-1 text-primary hover:bg-primary/10 rounded transition-colors"
-                                            title="Set Parameters"
-                                        >
-                                            <Pencil size={16} />
-                                        </button>
-                                    </div>
-                                    <div className="p-6">
-                                        {metabolicProfiles.length === 0 ? (
-                                            <div className="text-center py-4">
-                                                <p className="text-text-muted text-sm mb-2">No metabolic profile set.</p>
-                                                <button onClick={() => setShowAddMetabolic(true)} className="text-primary text-sm hover:underline">Calculate Now</button>
-                                            </div>
-                                        ) : (
-                                            <div className="space-y-4">
-                                                {/* Show latest active profile */}
-                                                {metabolicProfiles.slice(0, 1).map((profile: any) => (
-                                                    <div key={profile.id} className="grid grid-cols-2 gap-4">
-                                                        <div className="bg-orange-50 p-3 rounded-lg">
-                                                            <p className="text-[10px] text-orange-600 font-bold uppercase tracking-wider mb-1">RMR ({profile.rmr_method})</p>
-                                                            <p className="text-xl font-black text-gray-800">{profile.rmr_value} <span className="text-xs font-normal text-gray-500">kcal</span></p>
-                                                        </div>
-                                                        <div className="bg-green-50 p-3 rounded-lg">
-                                                            <p className="text-[10px] text-green-600 font-bold uppercase tracking-wider mb-1">Deficit Target</p>
-                                                            <p className="text-xl font-black text-gray-800">{profile.calorie_deficit_target} <span className="text-xs font-normal text-gray-500">kcal</span></p>
-                                                        </div>
-                                                        <div className="bg-blue-50 p-3 rounded-lg col-span-2">
-                                                            <p className="text-[10px] text-blue-600 font-bold uppercase tracking-wider mb-1">Estimated TDEE Range</p>
-                                                            <p className="text-lg font-bold text-gray-800">{profile.tdee_range || 'N/A'}</p>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
 
                                 {/* Behavior & Adherence */}
                                 <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
