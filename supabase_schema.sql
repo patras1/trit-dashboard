@@ -311,6 +311,7 @@ BEGIN
         full_name = COALESCE((updates->>'full_name'), full_name),
         phone = CASE WHEN (updates->>'phone') = '' THEN NULL ELSE COALESCE((updates->>'phone'), phone) END,
         status = COALESCE((updates->>'status'), status),
+        assigned_coach_id = COALESCE((updates->>'assigned_coach_id'), assigned_coach_id),
         gender = COALESCE((updates->>'gender'), gender),
         height_cm = (updates->>'height_cm')::FLOAT,
         target_weight_kg = (updates->>'target_weight_kg')::FLOAT,

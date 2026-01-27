@@ -105,10 +105,15 @@ export const clientService = {
     },
 
     async update(clientId: string, clientData: any) {
+        // Use direct update instead of RPC to ensure all fields (like assigned_coach_id) are handled
         const { data, error } = await supabase
-            .rpc('update_client_profile', { client_id: clientId, updates: clientData });
+            .from('clients')
+            .update(clientData)
+            .eq('id', clientId)
+            .select()
+            .single();
         if (error) throw error;
-        return data;
+        return data; // Return the updated row directly
     },
 
     async delete(clientId: string) {
