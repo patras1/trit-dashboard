@@ -2,9 +2,16 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { clientService } from '../lib/api';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User, Plus, X, Trash2, Pencil, Activity, Thermometer, Pill, FileText, HeartPulse, Target, Utensils, BookOpen, Brain, Dumbbell, TrendingDown, Clock, History as HistoryIcon } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Calendar, Ruler, Weight, User, Plus, X, Trash2, Pencil, Activity, Thermometer, Pill, FileText, HeartPulse, Target, BookOpen, Brain, Dumbbell, TrendingDown, Clock, History as HistoryIcon } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { NewPhaseModal } from './NewPhase';
+
+const uuidv4 = () => {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+};
 
 export const ClientDetails = () => {
     const { id } = useParams<{ id: string }>();
@@ -12,7 +19,7 @@ export const ClientDetails = () => {
     const navigate = useNavigate();
     const [client, setClient] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('overview'); // overview, medical, diary, plan, consultations
+    const [activeTab, setActiveTab] = useState('overview'); // overview, medical, plan, consultations
     const [showEditModal, setShowEditModal] = useState(false);
     const [editClient, setEditClient] = useState<any>({});
 
@@ -43,10 +50,24 @@ export const ClientDetails = () => {
     const [sessionNotes, setSessionNotes] = useState<any[]>([]);
     const [psychCheckins, setPsychCheckins] = useState<any[]>([]);
     const [activityLogs, setActivityLogs] = useState<any[]>([]);
+    const [metabolicProfiles, setMetabolicProfiles] = useState<any[]>([]);
+
     const [showAddSession, setShowAddSession] = useState(false);
+    const [showAddPsychCheckin, setShowAddPsychCheckin] = useState(false);
+    const [showAddActivityLog, setShowAddActivityLog] = useState(false);
+    const [showAddMetabolic, setShowAddMetabolic] = useState(false);
+
+    const [newMetabolic, setNewMetabolic] = useState({
+        date: new Date().toISOString().split('T')[0],
+        rmr_value: '',
+        rmr_method: 'Mifflin-St Jeor',
+        tdee_range: '',
+        calorie_deficit_target: '',
+        kcal_per_km_assumption: '60',
+        is_active: true
+    });
 
     const [showAddMeasurement, setShowAddMeasurement] = useState(false);
-    const [showAddDiary, setShowAddDiary] = useState(false); // Make sure this is here
     const [newMeasurement, setNewMeasurement] = useState({
         weight_kg: '',
         body_fat_percent: '',
@@ -100,14 +121,24 @@ export const ClientDetails = () => {
         clinician_notes: ''
     });
 
-    // Diary Form State
-    const [newDiaryEntry, setNewDiaryEntry] = useState({
-        food_name: '',
-        quantity_grams: '',
-        notes: '',
+    const [newPsychCheckin, setNewPsychCheckin] = useState({
         date: new Date().toISOString().split('T')[0],
-        meal_type: 'snack'
+        motivation_status: 'medium',
+        psychological_hunger_scale: '',
+        stress_level: '',
     });
+
+    const [newActivityLog, setNewActivityLog] = useState({
+        start_date: new Date().toISOString().split('T')[0],
+        activity_type: '',
+        sessions_per_week: '',
+        distance_km_week: '',
+        strength_training: false,
+        strength_split: '',
+        is_current: true
+    });
+
+
 
     const handleAddCondition = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -235,6 +266,92 @@ export const ClientDetails = () => {
         }
     };
 
+    const handleAddPsychCheckin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!id) return;
+        try {
+            await clientService.addPsychCheckin(id, {
+                id: uuidv4(),
+                ...newPsychCheckin,
+                psychological_hunger_scale: newPsychCheckin.psychological_hunger_scale ? parseFloat(newPsychCheckin.psychological_hunger_scale) : 0
+            });
+            setShowAddPsychCheckin(false);
+            setNewPsychCheckin({
+                date: new Date().toISOString().split('T')[0],
+                motivation_status: 'medium',
+                psychological_hunger_scale: '',
+                stress_level: '',
+            });
+            fetchTrackingData(id);
+        } catch (error) {
+            console.error('Failed to add psych checkin', error);
+        }
+    };
+
+    const handleAddActivityLog = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!id) return;
+        try {
+            await clientService.addActivityLog(id, {
+                id: uuidv4(),
+                ...newActivityLog,
+                sessions_per_week: newActivityLog.sessions_per_week ? parseInt(newActivityLog.sessions_per_week) : 0,
+                distance_km_week: newActivityLog.distance_km_week ? parseFloat(newActivityLog.distance_km_week) : null
+            });
+            setShowAddActivityLog(false);
+            setNewActivityLog({
+                start_date: new Date().toISOString().split('T')[0],
+                activity_type: '',
+                sessions_per_week: '',
+                distance_km_week: '',
+                strength_training: false,
+                strength_split: '',
+                is_current: true
+            });
+            fetchTrackingData(id);
+        } catch (error) {
+            console.error('Failed to add activity log', error);
+        }
+    };
+
+    const handleAddMetabolic = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!id) return;
+        try {
+            await clientService.addMetabolicProfile(id, {
+                id: uuidv4(),
+                ...newMetabolic,
+                rmr_value: newMetabolic.rmr_value ? parseInt(newMetabolic.rmr_value) : null,
+                calorie_deficit_target: newMetabolic.calorie_deficit_target ? parseInt(newMetabolic.calorie_deficit_target) : null,
+                kcal_per_km_assumption: newMetabolic.kcal_per_km_assumption ? parseInt(newMetabolic.kcal_per_km_assumption) : 60
+            });
+            setShowAddMetabolic(false);
+            fetchTrackingData(id);
+        } catch (error) {
+            console.error('Failed to add metabolic profile', error);
+        }
+    };
+
+    const handleDeletePsychCheckin = async (checkinId: string) => {
+        if (!confirm('Delete this check-in?')) return;
+        try {
+            await clientService.deletePsychCheckin(checkinId);
+            if (id) fetchTrackingData(id);
+        } catch (error) {
+            console.error('Failed to delete check-in', error);
+        }
+    };
+
+    const handleDeleteActivityLog = async (logId: string) => {
+        if (!confirm('Delete this activity log?')) return;
+        try {
+            await clientService.deleteActivityLog(logId);
+            if (id) fetchTrackingData(id);
+        } catch (error) {
+            console.error('Failed to delete activity log', error);
+        }
+    };
+
     const handleDeleteMeasurement = async (measurementId: string) => {
         if (!confirm('Are you sure you want to delete this entry?')) return;
 
@@ -247,53 +364,7 @@ export const ClientDetails = () => {
         }
     };
 
-    // Diary state
-    // const [showAddDiary, setShowAddDiary] = useState(false); // Moved up
-    const [diaryEntries, setDiaryEntries] = useState<any[]>([]);
 
-    const fetchDiaryEntries = async (clientId: string) => {
-        try {
-            // Fetch all entries (date param optional)
-            const entries = await clientService.getDiary(clientId, '');
-            setDiaryEntries(entries);
-        } catch (error) {
-            console.error('Failed to load diary entries', error);
-        }
-    };
-
-    const handleAddDiary = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!id) return;
-        try {
-            await clientService.addDiaryEntry(id, {
-                ...newDiaryEntry,
-                quantity_grams: parseFloat(newDiaryEntry.quantity_grams)
-            });
-            setShowAddDiary(false);
-            setNewDiaryEntry({
-                food_name: '',
-                quantity_grams: '',
-                notes: '',
-                date: new Date().toISOString().split('T')[0],
-                meal_type: 'snack'
-            });
-            fetchDiaryEntries(id);
-        } catch (error) {
-            console.error('Failed to add diary entry', error);
-            alert('Error adding diary entry');
-        }
-    };
-
-    const handleDeleteDiary = async (entryId: string) => {
-        if (!confirm('Delete this diary entry?')) return;
-        try {
-            await clientService.deleteDiaryEntry(entryId);
-            if (id) fetchDiaryEntries(id);
-        } catch (error) {
-            console.error('Failed to delete diary entry', error);
-            alert('Error deleting diary entry');
-        }
-    };
 
     // Fetch client data and diary entries
     const fetchClientData = async (clientId: string) => {
@@ -305,8 +376,7 @@ export const ClientDetails = () => {
                 // const assignedCoach = coaches.find((c: any) => c.id === clientData.assigned_coach_id);
                 // setCoach(assignedCoach);
             }
-            // Load diary entries for this client
-            await fetchDiaryEntries(clientId);
+
         } catch (error) {
             console.error('Failed to load client details', error);
         } finally {
@@ -321,19 +391,24 @@ export const ClientDetails = () => {
             fetchStrategyData(id);
         } else if (activeTab === 'consultations' && id) {
             fetchTrackingData(id);
+        } else if (activeTab === 'overview' && id) {
+            fetchStrategyData(id);
+            fetchTrackingData(id);
         }
     }, [activeTab, id]);
 
     const fetchTrackingData = async (clientId: string) => {
         try {
-            const [sessions, psych, activity] = await Promise.all([
+            const [sessions, psych, activity, metabolic] = await Promise.all([
                 clientService.getSessionNotes(clientId),
                 clientService.getPsychCheckins(clientId),
-                clientService.getActivityLogs(clientId)
+                clientService.getActivityLogs(clientId),
+                clientService.getMetabolicProfiles(clientId)
             ]);
             setSessionNotes(sessions);
             setPsychCheckins(psych);
             setActivityLogs(activity);
+            setMetabolicProfiles(metabolic);
         } catch (error) {
             console.error('Failed to load tracking data', error);
         }
@@ -578,7 +653,6 @@ export const ClientDetails = () => {
                     {[
                         { id: 'overview', label: 'Overview', icon: User },
                         { id: 'medical', label: 'Medical & Health', icon: HeartPulse },
-                        { id: 'diary', label: 'Food Diary', icon: Calendar },
                         { id: 'plan', label: 'Nutrition Plan', icon: FileText },
                         { id: 'consultations', label: 'Consultations', icon: BookOpen },
                     ].map(tab => (
@@ -1017,62 +1091,7 @@ export const ClientDetails = () => {
                     </div>
                 )}
 
-                {activeTab === 'diary' && (
-                    <div className="space-y-6">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
-                                <Utensils size={20} className="text-primary" />
-                                Food Diary
-                            </h3>
-                            <button
-                                onClick={() => setShowAddDiary(true)}
-                                className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
-                            >
-                                <Plus size={16} />
-                                Add Entry
-                            </button>
-                        </div>
-                        {diaryEntries.length === 0 ? (
-                            <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm text-center">
-                                <p className="text-text-muted">No food diary entries recorded for today.</p>
-                            </div>
-                        ) : (
-                            <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
-                                <table className="w-full text-sm text-left">
-                                    <thead className="bg-gray-50 text-gray-500 font-medium">
-                                        <tr>
-                                            <th className="px-4 py-3">Time</th>
-                                            <th className="px-4 py-3">Meal</th>
-                                            <th className="px-4 py-3">Food Item</th>
-                                            <th className="px-4 py-3">Portion</th>
-                                            <th className="px-4 py-3">Notes</th>
-                                            <th className="px-4 py-3"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-100">
-                                        {diaryEntries.map((entry: any) => (
-                                            <tr key={entry.id} className="hover:bg-gray-50">
-                                                <td className="px-4 py-3 text-text-muted">--</td>
-                                                <td className="px-4 py-3 capitalize">{entry.meal_type}</td>
-                                                <td className="px-4 py-3 font-medium text-text-main">{entry.food_item_id}</td>
-                                                <td className="px-4 py-3">{entry.quantity_grams}g</td>
-                                                <td className="px-4 py-3 text-text-muted">{entry.notes}</td>
-                                                <td className="px-4 py-3 text-right">
-                                                    <button
-                                                        onClick={() => handleDeleteDiary(entry.id)}
-                                                        className="text-gray-400 hover:text-red-500 transition-colors"
-                                                    >
-                                                        <Trash2 size={14} />
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                    </div>
-                )}
+
 
                 {activeTab === 'plan' && (
                     <div className="space-y-6">
@@ -1479,25 +1498,7 @@ export const ClientDetails = () => {
                     )
                 }
 
-                {/* Add Diary Modal */}
-                {
-                    showAddDiary && (
-                        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                            <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h3 className="font-bold text-lg">Add Diary Entry</h3>
-                                    <button onClick={() => setShowAddDiary(false)}><X size={20} /></button>
-                                </div>
-                                <form onSubmit={handleAddDiary} className="space-y-4">
-                                    <div><label className="block text-sm font-medium text-gray-700">Food / Drink</label><input type="text" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newDiaryEntry.food_name} onChange={e => setNewDiaryEntry({ ...newDiaryEntry, food_name: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Quantity (grams)</label><input type="number" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newDiaryEntry.quantity_grams} onChange={e => setNewDiaryEntry({ ...newDiaryEntry, quantity_grams: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Notes</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} value={newDiaryEntry.notes} onChange={e => setNewDiaryEntry({ ...newDiaryEntry, notes: e.target.value })}></textarea></div>
-                                    <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddDiary(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
-                                </form>
-                            </div>
-                        </div>
-                    )
-                }
+
 
                 {/* Consultations Tab Content */}
                 {
@@ -1505,11 +1506,65 @@ export const ClientDetails = () => {
                         <div className="space-y-6">
                             {/* Status Check-ins Grid */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                {/* Metabolic Profile Settings */}
+                                <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                                    <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <Activity size={20} className="text-orange-500" />
+                                            <h3 className="text-text-main text-base font-bold">Metabolic Profile</h3>
+                                        </div>
+                                        <button
+                                            onClick={() => setShowAddMetabolic(true)}
+                                            className="p-1 text-primary hover:bg-primary/10 rounded transition-colors"
+                                            title="Set Parameters"
+                                        >
+                                            <Pencil size={16} />
+                                        </button>
+                                    </div>
+                                    <div className="p-6">
+                                        {metabolicProfiles.length === 0 ? (
+                                            <div className="text-center py-4">
+                                                <p className="text-text-muted text-sm mb-2">No metabolic profile set.</p>
+                                                <button onClick={() => setShowAddMetabolic(true)} className="text-primary text-sm hover:underline">Calculate Now</button>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-4">
+                                                {/* Show latest active profile */}
+                                                {metabolicProfiles.slice(0, 1).map((profile: any) => (
+                                                    <div key={profile.id} className="grid grid-cols-2 gap-4">
+                                                        <div className="bg-orange-50 p-3 rounded-lg">
+                                                            <p className="text-[10px] text-orange-600 font-bold uppercase tracking-wider mb-1">RMR ({profile.rmr_method})</p>
+                                                            <p className="text-xl font-black text-gray-800">{profile.rmr_value} <span className="text-xs font-normal text-gray-500">kcal</span></p>
+                                                        </div>
+                                                        <div className="bg-green-50 p-3 rounded-lg">
+                                                            <p className="text-[10px] text-green-600 font-bold uppercase tracking-wider mb-1">Deficit Target</p>
+                                                            <p className="text-xl font-black text-gray-800">{profile.calorie_deficit_target} <span className="text-xs font-normal text-gray-500">kcal</span></p>
+                                                        </div>
+                                                        <div className="bg-blue-50 p-3 rounded-lg col-span-2">
+                                                            <p className="text-[10px] text-blue-600 font-bold uppercase tracking-wider mb-1">Estimated TDEE Range</p>
+                                                            <p className="text-lg font-bold text-gray-800">{profile.tdee_range || 'N/A'}</p>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
                                 {/* Behavior & Adherence */}
                                 <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
-                                    <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
-                                        <Brain size={20} className="text-secondary" />
-                                        <h3 className="text-text-main text-base font-bold">Behavior & Adherence</h3>
+                                    <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <Brain size={20} className="text-secondary" />
+                                            <h3 className="text-text-main text-base font-bold">Behavior & Adherence</h3>
+                                        </div>
+                                        <button
+                                            onClick={() => setShowAddPsychCheckin(true)}
+                                            className="p-1 text-primary hover:bg-primary/10 rounded transition-colors"
+                                            title="Add Check-in"
+                                        >
+                                            <Plus size={16} />
+                                        </button>
                                     </div>
                                     <div className="p-6">
                                         {psychCheckins.length === 0 ? (
@@ -1520,9 +1575,12 @@ export const ClientDetails = () => {
                                                     <div key={check.id} className="border-b border-gray-100 last:border-0 pb-3 last:pb-0">
                                                         <div className="flex justify-between items-center mb-2">
                                                             <span className="text-xs font-medium text-gray-500">{new Date(check.date).toLocaleDateString()}</span>
-                                                            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${check.motivation_status === 'high' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                                                                Mot: {check.motivation_status}
-                                                            </span>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${check.motivation_status === 'high' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                                                    Mot: {check.motivation_status}
+                                                                </span>
+                                                                <button onClick={() => handleDeletePsychCheckin(check.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={12} /></button>
+                                                            </div>
                                                         </div>
                                                         <div className="grid grid-cols-2 gap-2 text-sm">
                                                             <div>
@@ -1543,23 +1601,35 @@ export const ClientDetails = () => {
 
                                 {/* Activity Tracking */}
                                 <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
-                                    <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
-                                        <Dumbbell size={20} className="text-blue-500" />
-                                        <h3 className="text-text-main text-base font-bold">Activity & Training</h3>
+                                    <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <Dumbbell size={20} className="text-blue-500" />
+                                            <h3 className="text-text-main text-base font-bold">Activity & Training</h3>
+                                        </div>
+                                        <button
+                                            onClick={() => setShowAddActivityLog(true)}
+                                            className="p-1 text-primary hover:bg-primary/10 rounded transition-colors"
+                                            title="Add Activity"
+                                        >
+                                            <Plus size={16} />
+                                        </button>
                                     </div>
                                     <div className="p-6">
                                         {activityLogs.length === 0 ? (
                                             <p className="text-text-muted text-sm">No activity logs active.</p>
                                         ) : (
                                             <div className="space-y-4">
-                                                {activityLogs.slice(0, 1).map((log: any) => (
+                                                {activityLogs.slice(0, 5).map((log: any) => (
                                                     <div key={log.id} className="bg-blue-50/50 p-4 rounded-lg">
                                                         <div className="flex justify-between items-start mb-2">
                                                             <div>
                                                                 <p className="font-bold text-gray-800">{log.activity_type}</p>
                                                                 <p className="text-xs text-gray-500">Started {new Date(log.start_date).toLocaleDateString()}</p>
                                                             </div>
-                                                            {log.is_current && <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold">CURRENT</span>}
+                                                            <div className="flex items-center gap-2">
+                                                                {log.is_current && <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold">CURRENT</span>}
+                                                                <button onClick={() => handleDeleteActivityLog(log.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={12} /></button>
+                                                            </div>
                                                         </div>
                                                         <div className="grid grid-cols-2 gap-4 mt-2">
                                                             <div className="text-center bg-white p-2 rounded border border-blue-100">
@@ -1598,38 +1668,40 @@ export const ClientDetails = () => {
                                     Start Session
                                 </button>
                             </div>
-                            {sessionNotes.map((note: any) => (
-                                <div key={note.id} className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
-                                    <div className="px-6 py-4 border-b border-[#dfe2e2] flex justify-between items-center">
-                                        <h4 className="font-bold text-lg text-text-main">Consultation Notes</h4>
-                                        <div className="text-sm text-text-muted">{new Date(note.date).toLocaleDateString()}</div>
-                                    </div>
-                                    <div className="p-6 space-y-4">
-                                        <div>
-                                            <p className="text-xs font-bold text-gray-500 uppercase">Observations</p>
-                                            <p className="text-gray-800">{note.observations}</p>
+                            {
+                                sessionNotes.map((note: any) => (
+                                    <div key={note.id} className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
+                                        <div className="px-6 py-4 border-b border-[#dfe2e2] flex justify-between items-center">
+                                            <h4 className="font-bold text-lg text-text-main">Consultation Notes</h4>
+                                            <div className="text-sm text-text-muted">{new Date(note.date).toLocaleDateString()}</div>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="bg-orange-50 p-3 rounded-lg border border-orange-100">
-                                                <p className="text-xs font-bold text-orange-600 uppercase mb-1">What Changed</p>
-                                                <p className="text-sm text-gray-800">{note.changes_made || 'No changes.'}</p>
-                                                {note.reason_for_change && (
-                                                    <p className="text-xs text-text-muted mt-2 italic">"{note.reason_for_change}"</p>
-                                                )}
+                                        <div className="p-6 space-y-4">
+                                            <div>
+                                                <p className="text-xs font-bold text-gray-500 uppercase">Observations</p>
+                                                <p className="text-gray-800">{note.observations}</p>
                                             </div>
-                                            <div className="bg-green-50 p-3 rounded-lg border border-green-100">
-                                                <p className="text-xs font-bold text-green-600 uppercase mb-1">What Stayed Same</p>
-                                                <p className="text-sm text-gray-800">{note.constants || '--'}</p>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="bg-orange-50 p-3 rounded-lg border border-orange-100">
+                                                    <p className="text-xs font-bold text-orange-600 uppercase mb-1">What Changed</p>
+                                                    <p className="text-sm text-gray-800">{note.changes_made || 'No changes.'}</p>
+                                                    {note.reason_for_change && (
+                                                        <p className="text-xs text-text-muted mt-2 italic">"{note.reason_for_change}"</p>
+                                                    )}
+                                                </div>
+                                                <div className="bg-green-50 p-3 rounded-lg border border-green-100">
+                                                    <p className="text-xs font-bold text-green-600 uppercase mb-1">What Stayed Same</p>
+                                                    <p className="text-sm text-gray-800">{note.constants || '--'}</p>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-bold text-gray-500 uppercase">Next Checkpoint</p>
+                                                <p className="text-sm text-primary font-medium">{note.next_checkpoint}</p>
                                             </div>
                                         </div>
-                                        <div>
-                                            <p className="text-xs font-bold text-gray-500 uppercase">Next Checkpoint</p>
-                                            <p className="text-sm text-primary font-medium">{note.next_checkpoint}</p>
-                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
+                                ))
+                            }
+                        </div >
                     )
                 }
 
@@ -1884,7 +1956,102 @@ export const ClientDetails = () => {
                         </div>
                     )
                 }
-            </main >
+
+                {/* Add Psych Check-in Modal */}
+                {
+                    showAddPsychCheckin && (
+                        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="font-bold text-lg">Add Behavior Check-in</h3>
+                                    <button onClick={() => setShowAddPsychCheckin(false)}><X size={20} /></button>
+                                </div>
+                                <form onSubmit={handleAddPsychCheckin} className="space-y-4">
+                                    <div><label className="block text-sm font-medium text-gray-700">Date</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newPsychCheckin.date} onChange={e => setNewPsychCheckin({ ...newPsychCheckin, date: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Motivation</label>
+                                        <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newPsychCheckin.motivation_status} onChange={e => setNewPsychCheckin({ ...newPsychCheckin, motivation_status: e.target.value })}>
+                                            <option value="high">High</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="low">Low</option>
+                                        </select>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div><label className="block text-sm font-medium text-gray-700">Hunger (1-5)</label><input type="number" min="1" max="5" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newPsychCheckin.psychological_hunger_scale} onChange={e => setNewPsychCheckin({ ...newPsychCheckin, psychological_hunger_scale: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">Stress</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newPsychCheckin.stress_level} onChange={e => setNewPsychCheckin({ ...newPsychCheckin, stress_level: e.target.value })} /></div>
+                                    </div>
+                                    <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddPsychCheckin(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
+                                </form>
+                            </div>
+                        </div>
+                    )
+                }
+
+                {/* Add Activity Log Modal */}
+                {
+                    showAddActivityLog && (
+                        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="font-bold text-lg">Add Activity Log</h3>
+                                    <button onClick={() => setShowAddActivityLog(false)}><X size={20} /></button>
+                                </div>
+                                <form onSubmit={handleAddActivityLog} className="space-y-4">
+                                    <div><label className="block text-sm font-medium text-gray-700">Start Date</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newActivityLog.start_date} onChange={e => setNewActivityLog({ ...newActivityLog, start_date: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">Activity Type</label><input type="text" required placeholder="e.g. Running, Weightlifting" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newActivityLog.activity_type} onChange={e => setNewActivityLog({ ...newActivityLog, activity_type: e.target.value })} /></div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div><label className="block text-sm font-medium text-gray-700">Sessions/Week</label><input type="number" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newActivityLog.sessions_per_week} onChange={e => setNewActivityLog({ ...newActivityLog, sessions_per_week: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">Distance (km)</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newActivityLog.distance_km_week} onChange={e => setNewActivityLog({ ...newActivityLog, distance_km_week: e.target.value })} /></div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <input type="checkbox" id="strength" checked={newActivityLog.strength_training} onChange={e => setNewActivityLog({ ...newActivityLog, strength_training: e.target.checked })} />
+                                        <label htmlFor="strength" className="text-sm text-gray-700">Strength Training?</label>
+                                    </div>
+                                    {newActivityLog.strength_training && (
+                                        <div><label className="block text-sm font-medium text-gray-700">Split Details</label><input type="text" placeholder="e.g. PPL, Upper/Lower" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newActivityLog.strength_split} onChange={e => setNewActivityLog({ ...newActivityLog, strength_split: e.target.value })} /></div>
+                                    )}
+                                    <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddActivityLog(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
+                                </form>
+                            </div>
+                        </div>
+                    )
+                }
+            </main>
+
+            {/* Add Metabolic Profile Modal */}
+            {showAddMetabolic && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="font-bold text-lg">Metabolic Settings</h3>
+                            <button onClick={() => setShowAddMetabolic(false)}><X size={20} /></button>
+                        </div>
+                        <form onSubmit={handleAddMetabolic} className="space-y-4">
+                            <div><label className="block text-sm font-medium text-gray-700">Date</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.date} onChange={e => setNewMetabolic({ ...newMetabolic, date: e.target.value })} /></div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div><label className="block text-sm font-medium text-gray-700">RMR (kcal)</label><input type="number" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.rmr_value} onChange={e => setNewMetabolic({ ...newMetabolic, rmr_value: e.target.value })} /></div>
+                                <div><label className="block text-sm font-medium text-gray-700">Method</label>
+                                    <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.rmr_method} onChange={e => setNewMetabolic({ ...newMetabolic, rmr_method: e.target.value })}>
+                                        <option value="Mifflin-St Jeor">Mifflin-St Jeor</option>
+                                        <option value="Harris-Benedict">Harris-Benedict</option>
+                                        <option value="Katch-McArdle">Katch-McArdle</option>
+                                        <option value="Cunningham">Cunningham</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div><label className="block text-sm font-medium text-gray-700">TDEE Range (e.g. 2100-2300)</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.tdee_range} onChange={e => setNewMetabolic({ ...newMetabolic, tdee_range: e.target.value })} /></div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div><label className="block text-sm font-medium text-gray-700">Deficit Target</label><input type="number" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.calorie_deficit_target} onChange={e => setNewMetabolic({ ...newMetabolic, calorie_deficit_target: e.target.value })} /></div>
+                                <div><label className="block text-sm font-medium text-gray-700">Kcal/KM</label><input type="number" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.kcal_per_km_assumption} onChange={e => setNewMetabolic({ ...newMetabolic, kcal_per_km_assumption: e.target.value })} /></div>
+                            </div>
+
+                            <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddMetabolic(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save Profile</button></div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div >
     );
 };

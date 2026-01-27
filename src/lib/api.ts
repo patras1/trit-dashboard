@@ -384,6 +384,15 @@ export const clientService = {
         return data;
     },
 
+    async deletePsychCheckin(checkinId: string) {
+        const { error } = await supabase
+            .from('client_psychology_checkins')
+            .delete()
+            .eq('id', checkinId);
+        if (error) throw error;
+        return true;
+    },
+
     async addActivityLog(clientId: string, data: any) {
         const { data: result, error } = await supabase
             .from('client_activity_logs')
@@ -402,6 +411,15 @@ export const clientService = {
             .order('start_date', { ascending: false });
         if (error) throw error;
         return data;
+    },
+
+    async deleteActivityLog(logId: string) {
+        const { error } = await supabase
+            .from('client_activity_logs')
+            .delete()
+            .eq('id', logId);
+        if (error) throw error;
+        return true;
     },
 
     async addMetabolicProfile(clientId: string, data: any) {
