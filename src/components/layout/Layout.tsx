@@ -37,9 +37,13 @@ export const Layout = () => {
                 <div className="p-6 flex flex-col gap-6">
                     {/* Brand */}
                     {/* Brand */}
-                    <div className="flex flex-col gap-0 items-center">
-                        <h1 dir="ltr" className="text-primary text-4xl font-black leading-none tracking-tight">trit.</h1>
-                        <p className="text-text-muted text-lg font-bold">Studio</p>
+                    <div className="flex items-center gap-3 px-2">
+                        <div className="size-8 text-[#4a7874]">
+                            <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
+                            </svg>
+                        </div>
+                        <h2 className="text-[#131515] text-xl font-bold tracking-tight">Trit Studio</h2>
                     </div>
 
                     {/* Nav Links */}
@@ -85,9 +89,13 @@ export const Layout = () => {
             <aside className={`fixed top-0 left-0 h-full w-64 bg-white border-r border-[#dfe2e2] z-50 transform transition-transform duration-300 lg:hidden ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}>
                 <div className="p-6 border-b border-[#dfe2e2] flex items-center justify-between">
-                    <div className="flex flex-col gap-0 items-center">
-                        <h1 dir="ltr" className="text-primary text-4xl font-black leading-none tracking-tight">trit.</h1>
-                        <p className="text-text-muted text-lg font-bold">Studio</p>
+                    <div className="flex items-center gap-2">
+                        <div className="size-6 text-[#4a7874]">
+                            <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
+                            </svg>
+                        </div>
+                        <h2 className="text-[#131515] text-lg font-bold tracking-tight">Trit Studio</h2>
                     </div>
                     <button onClick={closeMobileMenu} className="p-2 text-text-muted hover:text-text-main">
                         <X size={24} />
@@ -122,9 +130,13 @@ export const Layout = () => {
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Mobile Header */}
                 <header className="lg:hidden bg-white border-b border-[#dfe2e2] p-4 flex items-center justify-between">
-                    <div className="flex items-baseline gap-1.5">
-                        <h1 dir="ltr" className="text-2xl font-black text-primary tracking-tight">trit.</h1>
-                        <span className="text-base font-bold text-text-muted">Studio</span>
+                    <div className="flex items-center gap-2">
+                        <div className="size-6 text-[#4a7874]">
+                            <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
+                            </svg>
+                        </div>
+                        <h2 className="text-[#131515] text-lg font-bold tracking-tight">Trit Studio</h2>
                     </div>
                     <button
                         onClick={() => setMobileMenuOpen(true)}

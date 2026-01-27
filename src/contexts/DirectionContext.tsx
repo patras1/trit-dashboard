@@ -1,41 +1,35 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type Direction = 'ltr' | 'rtl';
 
 interface DirectionContextType {
     direction: Direction;
-    setDirection: (dir: Direction) => void;
-    toggleDirection: () => void;
+    toggleDirection: () => void; // Kept for compatibility, now changes language
 }
 
 const DirectionContext = createContext<DirectionContextType | undefined>(undefined);
 
 export const DirectionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [direction, setDirectionState] = useState<Direction>(() => {
-        // Get from localStorage or default to ltr
-        const saved = localStorage.getItem('app-direction');
-        return (saved === 'rtl' || saved === 'ltr') ? saved : 'ltr';
-    });
+    const { i18n } = useTranslation();
+    const [direction, setDirection] = useState<Direction>(
+        i18n.language === 'he' ? 'rtl' : 'ltr'
+    );
 
     useEffect(() => {
-        // Apply direction to document
-        document.documentElement.dir = direction;
-        document.documentElement.lang = direction === 'rtl' ? 'he' : 'en';
-
-        // Save to localStorage
-        localStorage.setItem('app-direction', direction);
-    }, [direction]);
-
-    const setDirection = (dir: Direction) => {
-        setDirectionState(dir);
-    };
+        const newDir = i18n.language === 'he' ? 'rtl' : 'ltr';
+        setDirection(newDir);
+        document.documentElement.dir = newDir;
+        document.documentElement.lang = i18n.language;
+    }, [i18n.language]);
 
     const toggleDirection = () => {
-        setDirectionState(prev => prev === 'ltr' ? 'rtl' : 'ltr');
+        const newLang = i18n.language === 'en' ? 'he' : 'en';
+        i18n.changeLanguage(newLang);
     };
 
     return (
-        <DirectionContext.Provider value={{ direction, setDirection, toggleDirection }}>
+        <DirectionContext.Provider value={{ direction, toggleDirection }}>
             {children}
         </DirectionContext.Provider>
     );

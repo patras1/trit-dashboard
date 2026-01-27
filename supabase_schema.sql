@@ -266,6 +266,7 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+DROP TRIGGER IF EXISTS update_coach_programs_updated_at ON coach_programs;
 CREATE TRIGGER update_coach_programs_updated_at BEFORE UPDATE ON coach_programs FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 
 -- 9. Foods Table (Master Product List)
@@ -283,7 +284,10 @@ CREATE TABLE IF NOT EXISTS foods (
 );
 
 -- 10. Utility Functions & Triggers
+DROP TRIGGER IF EXISTS update_coaches_updated_at ON coaches;
 CREATE TRIGGER update_coaches_updated_at BEFORE UPDATE ON coaches FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_clients_updated_at ON clients;
 CREATE TRIGGER update_clients_updated_at BEFORE UPDATE ON clients FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 
 -- 11. RPC Functions (Server-side Logic)
@@ -324,3 +328,186 @@ BEGIN
     RETURN result;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 12. ROW LEVEL SECURITY (RLS)
+-- Enable RLS on all tables
+ALTER TABLE coaches ENABLE ROW LEVEL SECURITY;
+ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
+ALTER TABLE client_measurements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE client_medical_conditions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE client_medications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE client_blood_tests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE client_goals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE client_nutrition_prescriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE client_protocols ENABLE ROW LEVEL SECURITY;
+ALTER TABLE client_diary_entries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE client_psychology_checkins ENABLE ROW LEVEL SECURITY;
+ALTER TABLE client_activity_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE client_metabolic_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE client_session_notes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE coach_programs ENABLE ROW LEVEL SECURITY;
+
+-- POLICY HELPER: Coach Access Logic
+-- We use a consistent check: Is the user the assigned coach for the client related to this record?
+
+-- COACHES Policies
+-- Universal read access for listing coaches
+DROP POLICY IF EXISTS "Coaches are viewable by everyone" ON coaches;
+CREATE POLICY "Coaches are viewable by everyone" ON coaches FOR SELECT USING (true);
+
+-- Update own profile
+DROP POLICY IF EXISTS "Coaches can update own profile" ON coaches;
+CREATE POLICY "Coaches can update own profile" ON coaches FOR UPDATE USING (auth.uid()::text = id);
+
+-- CLIENTS Policies
+DROP POLICY IF EXISTS "Coaches can view assigned clients" ON clients;
+DROP POLICY IF EXISTS "Coaches can insert assigned clients" ON clients;
+DROP POLICY IF EXISTS "Coaches can update assigned clients" ON clients;
+DROP POLICY IF EXISTS "Coaches can delete assigned clients" ON clients;
+
+CREATE POLICY "Coaches can view assigned clients" ON clients FOR SELECT USING (assigned_coach_id = auth.uid()::text);
+CREATE POLICY "Coaches can insert assigned clients" ON clients FOR INSERT WITH CHECK (assigned_coach_id = auth.uid()::text);
+CREATE POLICY "Coaches can update assigned clients" ON clients FOR UPDATE USING (assigned_coach_id = auth.uid()::text);
+CREATE POLICY "Coaches can delete assigned clients" ON clients FOR DELETE USING (assigned_coach_id = auth.uid()::text);
+
+-- GENERIC POLICY MACROS (Manual Expansion for Postgres 15 compatibility without functions)
+
+-- DATA: Measurements
+DROP POLICY IF EXISTS "Coach view measurements" ON client_measurements;
+CREATE POLICY "Coach view measurements" ON client_measurements FOR SELECT USING (
+    EXISTS (SELECT 1 FROM clients WHERE clients.id = client_id AND clients.assigned_coach_id = auth.uid()::text)
+);
+DROP POLICY IF EXISTS "Coach manage measurements" ON client_measurements;
+CREATE POLICY "Coach manage measurements" ON client_measurements FOR ALL USING (
+    EXISTS (SELECT 1 FROM clients WHERE clients.id = client_id AND clients.assigned_coach_id = auth.uid()::text)
+);
+
+-- DATA: Medical Conditions
+DROP POLICY IF EXISTS "Coach manage medical" ON client_medical_conditions;
+CREATE POLICY "Coach manage medical" ON client_medical_conditions FOR ALL USING (
+    EXISTS (SELECT 1 FROM clients WHERE clients.id = client_id AND clients.assigned_coach_id = auth.uid()::text)
+);
+
+-- DATA: Medications
+DROP POLICY IF EXISTS "Coach manage medications" ON client_medications;
+CREATE POLICY "Coach manage medications" ON client_medications FOR ALL USING (
+    EXISTS (SELECT 1 FROM clients WHERE clients.id = client_id AND clients.assigned_coach_id = auth.uid()::text)
+);
+
+-- DATA: Blood Tests
+DROP POLICY IF EXISTS "Coach manage blood tests" ON client_blood_tests;
+CREATE POLICY "Coach manage blood tests" ON client_blood_tests FOR ALL USING (
+    EXISTS (SELECT 1 FROM clients WHERE clients.id = client_id AND clients.assigned_coach_id = auth.uid()::text)
+);
+
+-- DATA: Goals
+DROP POLICY IF EXISTS "Coach manage goals" ON client_goals;
+CREATE POLICY "Coach manage goals" ON client_goals FOR ALL USING (
+    EXISTS (SELECT 1 FROM clients WHERE clients.id = client_id AND clients.assigned_coach_id = auth.uid()::text)
+);
+
+-- DATA: Prescriptions (Nutrition Plans)
+DROP POLICY IF EXISTS "Coach manage prescriptions" ON client_nutrition_prescriptions;
+CREATE POLICY "Coach manage prescriptions" ON client_nutrition_prescriptions FOR ALL USING (
+    EXISTS (SELECT 1 FROM clients WHERE clients.id = client_id AND clients.assigned_coach_id = auth.uid()::text)
+);
+
+-- DATA: Protocols
+DROP POLICY IF EXISTS "Coach manage protocols" ON client_protocols;
+CREATE POLICY "Coach manage protocols" ON client_protocols FOR ALL USING (
+    EXISTS (SELECT 1 FROM clients WHERE clients.id = client_id AND clients.assigned_coach_id = auth.uid()::text)
+);
+
+-- DATA: Diary Entries
+DROP POLICY IF EXISTS "Coach manage diary" ON client_diary_entries;
+CREATE POLICY "Coach manage diary" ON client_diary_entries FOR ALL USING (
+    EXISTS (SELECT 1 FROM clients WHERE clients.id = client_id AND clients.assigned_coach_id = auth.uid()::text)
+);
+
+-- DATA: Psych Checkins
+DROP POLICY IF EXISTS "Coach manage psych" ON client_psychology_checkins;
+CREATE POLICY "Coach manage psych" ON client_psychology_checkins FOR ALL USING (
+    EXISTS (SELECT 1 FROM clients WHERE clients.id = client_id AND clients.assigned_coach_id = auth.uid()::text)
+);
+
+-- DATA: Activity Logs
+DROP POLICY IF EXISTS "Coach manage activity" ON client_activity_logs;
+CREATE POLICY "Coach manage activity" ON client_activity_logs FOR ALL USING (
+    EXISTS (SELECT 1 FROM clients WHERE clients.id = client_id AND clients.assigned_coach_id = auth.uid()::text)
+);
+
+-- DATA: Metabolic Profiles
+DROP POLICY IF EXISTS "Coach manage metabolic" ON client_metabolic_profiles;
+CREATE POLICY "Coach manage metabolic" ON client_metabolic_profiles FOR ALL USING (
+    EXISTS (SELECT 1 FROM clients WHERE clients.id = client_id AND clients.assigned_coach_id = auth.uid()::text)
+);
+
+-- DATA: Session Notes
+DROP POLICY IF EXISTS "Coach manage session notes" ON client_session_notes;
+CREATE POLICY "Coach manage session notes" ON client_session_notes FOR ALL USING (
+    EXISTS (SELECT 1 FROM clients WHERE clients.id = client_id AND clients.assigned_coach_id = auth.uid()::text)
+);
+
+-- DATA: Coach Programs
+-- Coaches manage their own programs
+DROP POLICY IF EXISTS "Coach manage programs" ON coach_programs;
+CREATE POLICY "Coach manage programs" ON coach_programs FOR ALL USING (coach_id = auth.uid()::text);
+
+
+-- 13. AUDIT LOGGING
+-- Create Table
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    actor_id UUID DEFAULT auth.uid(),
+    action TEXT NOT NULL, -- INSERT, UPDATE, DELETE
+    table_name TEXT NOT NULL,
+    record_id TEXT,
+    old_data JSONB,
+    new_data JSONB,
+    occurred_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "View own audit logs" ON audit_logs;
+CREATE POLICY "View own audit logs" ON audit_logs FOR SELECT USING (actor_id = auth.uid());
+
+-- Audit Trigger Function
+CREATE OR REPLACE FUNCTION log_audit_event()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO audit_logs (actor_id, action, table_name, record_id, old_data, new_data)
+    VALUES (
+        auth.uid(),
+        TG_OP,
+        TG_TABLE_NAME,
+        CASE
+            WHEN TG_OP = 'DELETE' THEN OLD.id::text
+            ELSE NEW.id::text
+        END,
+        CASE WHEN TG_OP = 'INSERT' THEN NULL ELSE row_to_json(OLD)::jsonb END,
+        CASE WHEN TG_OP = 'DELETE' THEN NULL ELSE row_to_json(NEW)::jsonb END
+    );
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Attach Audit Triggers to Sensitive Tables (PHI)
+DROP TRIGGER IF EXISTS audit_clients_chk ON clients;
+CREATE TRIGGER audit_clients_chk AFTER INSERT OR UPDATE OR DELETE ON clients FOR EACH ROW EXECUTE FUNCTION log_audit_event();
+
+DROP TRIGGER IF EXISTS audit_medical_chk ON client_medical_conditions;
+CREATE TRIGGER audit_medical_chk AFTER INSERT OR UPDATE OR DELETE ON client_medical_conditions FOR EACH ROW EXECUTE FUNCTION log_audit_event();
+
+DROP TRIGGER IF EXISTS audit_meds_chk ON client_medications;
+CREATE TRIGGER audit_meds_chk AFTER INSERT OR UPDATE OR DELETE ON client_medications FOR EACH ROW EXECUTE FUNCTION log_audit_event();
+
+DROP TRIGGER IF EXISTS audit_blood_chk ON client_blood_tests;
+CREATE TRIGGER audit_blood_chk AFTER INSERT OR UPDATE OR DELETE ON client_blood_tests FOR EACH ROW EXECUTE FUNCTION log_audit_event();
+
+DROP TRIGGER IF EXISTS audit_measurements_chk ON client_measurements;
+CREATE TRIGGER audit_measurements_chk AFTER INSERT OR UPDATE OR DELETE ON client_measurements FOR EACH ROW EXECUTE FUNCTION log_audit_event();
+
+-- 14. CONSENT & COMPLIANCE FIELDS
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS consent_given BOOLEAN DEFAULT FALSE;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS consent_date TIMESTAMP WITH TIME ZONE;

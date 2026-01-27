@@ -401,6 +401,67 @@ const resources = {
                     "powered_by": "Powered by Coach.ai",
                     "live_preview": "Live Preview"
                 }
+            },
+            "auth": {
+                "login": {
+                    "title": "Welcome back, Coach",
+                    "subtitle": "Access your dashboard to manage client progress and nutrition plans.",
+                    "email_label": "Email Address",
+                    "email_placeholder": "coach@tritstudio.com",
+                    "password_label": "Password",
+                    "forgot_password": "Forgot password?",
+                    "password_placeholder": "••••••••",
+                    "remember_me": "Remember me for 30 days",
+                    "sign_in_button": "Sign In",
+                    "or_continue_with": "Or continue with",
+                    "google_account": "Google Account",
+                    "dont_have_account": "Don't have an account?",
+                    "apply_access": "Apply for early access"
+                },
+                "register": {
+                    "step_1": "STEP 1 OF 3",
+                    "account_details": "Account Details",
+                    "full_name_label": "Full Name",
+                    "full_name_placeholder": "John Doe",
+                    "professional_email_label": "Professional Email",
+                    "email_placeholder": "john@nutritionist.com",
+                    "password_label": "Password",
+                    "password_placeholder": "••••••••",
+                    "password_strength_text": "Minimum 8 characters with a mix of letters and numbers.",
+                    "i_agree": "I agree to the",
+                    "terms_service": "Terms of Service",
+                    "and": "and",
+                    "privacy_policy": "Privacy Policy",
+                    "create_account": "Create Account",
+                    "already_have_account": "Already have an account?",
+                    "log_in": "Log in",
+                    "support": "Support"
+                },
+                "errors": {
+                    "sign_in": "Failed to sign in",
+                    "create_account": "Failed to create account"
+                },
+                "alt": {
+                    "logo": "Trit Studio Logo",
+                    "hero_image": "Digital Nutrition Twin Background",
+                    "coach_avatar": "Coach Avatar"
+                },
+                "hero": {
+                    "tagline": "The Future of AI-Powered Nutrition",
+                    "headline": "Build Your Digital Nutrition Twin",
+                    "description": "Trit Studio lets nutritionists and creators turn their expertise into scalable AI coaches — without losing control, credibility, or personalization.",
+                    "features": {
+                        "avatars_title": "Expert-driven AI Avatars",
+                        "avatars_desc": "Create AI coaches based on your real philosophy, rules, and boundaries.",
+                        "intelligence_title": "Smart nutrition intelligence",
+                        "intelligence_desc": "Automated meal building, ingredient scoring, and daily insights — grounded in nutrition logic, not guesswork.",
+                        "live_title": "Live client intelligence",
+                        "live_desc": "Track adherence, trends, and progress signals in real time across your audience.",
+                        "workspace_title": "One professional workspace",
+                        "workspace_desc": "Clients, programs, subscriptions, and communication — all in one place."
+                    },
+                    "trusted_by": "Trusted by leading nutritionists"
+                }
             }
         }
     },
@@ -756,7 +817,7 @@ const resources = {
                 "live_mode": "מצב תצוגה חיה",
                 "encouraging_tone": "טון מעודד",
                 "user_msg": "\"פספסתי את האימון היום ואני מרגיש די אשם. גם חרגתי קצת בפחמימות. מה כדאי לעשות בשאר היום?\"",
-                "coach_msg_1": "היי! קודם כל, לנשום עמוק. אימון אחד שחמץ לא מגדיר את ההתקדמות שלך. עמדת ביעדי החלבון 12 ימים ברציפות — זו עקביות מדהימה שלא נעלמת בגלל יום אחד.",
+                "coach_msg_1": "היי! קודם כל, לנשום עמוק. אימון אחד שחמץ לא מגדיר את ההתקדמות שלך. עמדת ביעדי החלבון 12 ימים ברציפות — זו עקביות ממהימה שלא נעלמת בגלל יום אחד.",
                 "coach_msg_2": "להמשך היום, אל תנסה 'להרעיב' את עצמך כדי לפצות על הפחמימות. פשוט תתמקד בחלבון איכותי ושתייה. נחזור לתוכנית מחר. זכור, זה מרתון, לא ספרינט! 🏃‍♂️",
                 "coach_msg_3": "תרצה שאתאים את לו\"ז האימונים שלך לשאר השבוע כדי להשלים את האימון?",
                 "ai_coach": "מאמן AI • עכשיו",
@@ -800,6 +861,67 @@ const resources = {
                     "cta": "התחל אימון",
                     "powered_by": "מופעל ע\"י Coach.ai",
                     "live_preview": "תצוגה מקדימה חיה"
+                }
+            },
+            "auth": {
+                "login": {
+                    "title": "ברוך שובך, מאמן",
+                    "subtitle": "היכנס ללוח הבקרה לניהול התקדמות הלקוחות ותוכניות התזונה.",
+                    "email_label": "כתובת אימייל",
+                    "email_placeholder": "coach@tritstudio.com",
+                    "password_label": "סיסמה",
+                    "forgot_password": "שכחת סיסמה?",
+                    "password_placeholder": "••••••••",
+                    "remember_me": "זכור אותי ל-30 יום",
+                    "sign_in_button": "התחבר",
+                    "or_continue_with": "או המשך עם",
+                    "google_account": "חשבון Google",
+                    "dont_have_account": "אין לך חשבון?",
+                    "apply_access": "הגש בקשה לגישה מוקדמת"
+                },
+                "register": {
+                    "step_1": "שלב 1 מתוך 3",
+                    "account_details": "פרטי חשבון",
+                    "full_name_label": "שם מלא",
+                    "full_name_placeholder": "ישראל ישראלי",
+                    "professional_email_label": "אימייל מקצועי",
+                    "email_placeholder": "john@nutritionist.com",
+                    "password_label": "סיסמה",
+                    "password_placeholder": "••••••••",
+                    "password_strength_text": "מינימום 8 תווים עם שילוב של אותיות ומספרים.",
+                    "i_agree": "אני מסכים ל",
+                    "terms_service": "תנאי השימוש",
+                    "and": "ו",
+                    "privacy_policy": "מדיניות הפרטיות",
+                    "create_account": "צור חשבון",
+                    "already_have_account": "כבר יש לך חשבון?",
+                    "log_in": "התחבר",
+                    "support": "תמיכה"
+                },
+                "errors": {
+                    "sign_in": "ההתחברות נכשלה",
+                    "create_account": "יצירת החשבון נכשלה"
+                },
+                "alt": {
+                    "logo": "לוגו Trit Studio",
+                    "hero_image": "רקע תאום דיגיטלי תזונתי",
+                    "coach_avatar": "אווטאר מאמן"
+                },
+                "hero": {
+                    "tagline": "העתיד של תזונה מבוססת AI",
+                    "headline": "בנה את התאום הדיגיטלי התזונתי שלך",
+                    "description": "Trit Studio מאפשר לתזונאים ויוצרים להפוך את המומחיות שלהם למאמני AI סקיילביליים — מבלי לאבד שליטה, אמינות או יחס אישי.",
+                    "features": {
+                        "avatars_title": "אווטארים מבוססי מומחה",
+                        "avatars_desc": "צור מאמני AI המבוססים על הפילוסופיה, החוקים והגבולות האמיתיים שלך.",
+                        "intelligence_title": "אינטליגנציה תזונתית חכמה",
+                        "intelligence_desc": "בניית ארוחות אוטומטית, דירוג רכיבים ותובנות יומיות — מבוסס על היגיון תזונתי, לא ניחושים.",
+                        "live_title": "מודיעין לקוחות חי",
+                        "live_desc": "עקוב אחר היענות, מגמות ואותות התקדמות בזמן אמת בקרב הקהל שלך.",
+                        "workspace_title": "סביבת עבודה מקצועית אחת",
+                        "workspace_desc": "לקוחות, תוכניות, מנויים ותקשורת — הכל במקום אחד."
+                    },
+                    "trusted_by": "בשימוש על ידי התזונאים המובילים"
                 }
             }
         }

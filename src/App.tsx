@@ -9,6 +9,7 @@ import { AddClient } from './pages/AddClient';
 import { ClientDetails } from './pages/ClientDetails';
 import { SettingsPage } from './pages/Settings';
 import { Login } from './pages/Login';
+import { Register } from './pages/Register';
 import { AuthProvider } from './contexts/AuthContext';
 import { DirectionProvider } from './contexts/DirectionContext';
 import { RequireAuth } from './components/auth/RequireAuth';
@@ -21,6 +22,7 @@ function App() {
         <DirectionProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
             <Route path="/" element={
               <RequireAuth>

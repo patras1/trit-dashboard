@@ -24,7 +24,8 @@ export const AddClient = () => {
         target_weight_kg: '',
         activity_level: 'moderate',
         assigned_coach_id: '',
-        status: 'active'
+        status: 'active',
+        consent_given: false
     });
 
     useEffect(() => {
@@ -54,8 +55,9 @@ export const AddClient = () => {
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        const { name, value, type } = e.target;
+        const val = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+        setFormData(prev => ({ ...prev, [name]: val }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -69,7 +71,14 @@ export const AddClient = () => {
                 height_cm: formData.height_cm === '' ? null : parseFloat(formData.height_cm),
                 starting_weight_kg: formData.starting_weight_kg === '' ? null : parseFloat(formData.starting_weight_kg),
                 target_weight_kg: formData.target_weight_kg === '' ? null : parseFloat(formData.target_weight_kg),
+                consent_date: formData.consent_given ? new Date().toISOString() : null
             };
+
+            if (!formData.consent_given) {
+                alert("Implicit consent is required for data processing compliance.");
+                setLoading(false);
+                return;
+            }
             await clientService.create(submissionData);
             navigate('/clients');
         } catch (error) {
@@ -222,6 +231,28 @@ export const AddClient = () => {
                         </div>
                     </div>
 
+                    <div className="h-px bg-gray-100 my-4" />
+
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                        <label className="flex items-start gap-3 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="consent_given"
+                                checked={formData.consent_given}
+                                onChange={handleChange}
+                                className="mt-1 w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+                            />
+                            <div className="space-y-1">
+                                <span className="text-sm font-medium text-text-main block">
+                                    Data Processing Consent (GDPR/HIPAA)
+                                </span>
+                                <span className="text-xs text-text-muted block leading-relaxed">
+                                    I confirm that this client has given explicit consent for Trit to store and process their health data, including medical conditions, body measurements, and nutrition logs, for the purpose of coaching and analysis.
+                                </span>
+                            </div>
+                        </label>
+                    </div>
+
                     <div className="flex justify-end pt-4">
                         <button
                             type="submit"
@@ -234,6 +265,6 @@ export const AddClient = () => {
                     </div>
                 </form>
             </main>
-        </div>
+        </div >
     );
 };

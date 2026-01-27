@@ -1,33 +1,39 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate, Link } from 'react-router-dom';
-import { AlertCircle, UtensilsCrossed, Activity, Network, LogIn } from 'lucide-react';
+import { AlertCircle, UtensilsCrossed, Activity, Network, UserPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 
-export const Login = () => {
+export const Register = () => {
     const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [fullName, setFullName] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
 
         try {
-            const { error } = await supabase.auth.signInWithPassword({
+            const { error } = await supabase.auth.signUp({
                 email,
                 password,
+                options: {
+                    data: {
+                        full_name: fullName,
+                    },
+                },
             });
 
             if (error) throw error;
             navigate('/');
         } catch (error) {
-            const message = error instanceof Error ? error.message : t('auth.errors.sign_in');
+            const message = error instanceof Error ? error.message : t('auth.errors.create_account');
             setError(message);
         } finally {
             setLoading(false);
@@ -36,7 +42,7 @@ export const Login = () => {
 
     return (
         <div className="flex flex-col lg:flex-row w-full min-h-screen font-sans">
-            {/* Left Section: Login Form */}
+            {/* Left Section: Registration Form */}
             <div className="w-full lg:w-1/2 flex flex-col justify-between bg-white dark:bg-[#171b1b] px-8 py-10 md:px-20 lg:px-24">
                 {/* Branding Header */}
                 <header className="flex items-center justify-between gap-3">
@@ -53,16 +59,21 @@ export const Login = () => {
 
                 {/* Form Content */}
                 <div className="max-w-md w-full mx-auto py-12">
-                    <div className="mb-10">
-                        <h1 className="text-[#131515] dark:text-white text-[32px] font-bold leading-tight mb-2">
-                            {t('auth.login.title')}
-                        </h1>
-                        <p className="text-[#6f7b7a] dark:text-gray-400 text-base">
-                            {t('auth.login.subtitle')}
-                        </p>
+                    {/* Step Header */}
+                    <div className="flex justify-between items-end mb-2">
+                        <span className="text-[#4a7874] font-bold text-sm tracking-wider">
+                            {t('auth.register.step_1')}
+                        </span>
+                        <span className="text-gray-400 text-sm font-medium">
+                            {t('auth.register.account_details')}
+                        </span>
+                    </div>
+                    {/* Progress Bar */}
+                    <div className="h-1.5 w-full bg-gray-100 rounded-full mb-8 overflow-hidden">
+                        <div className="h-full bg-[#4a7874] w-1/3 rounded-full"></div>
                     </div>
 
-                    <form onSubmit={handleLogin} className="space-y-5">
+                    <form onSubmit={handleRegister} className="space-y-6">
                         {error && (
                             <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm flex items-center gap-3 border border-red-100">
                                 <AlertCircle size={18} className="shrink-0" />
@@ -70,61 +81,81 @@ export const Login = () => {
                             </div>
                         )}
 
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-[#131515] dark:text-gray-200 text-sm font-semibold">
-                                {t('auth.login.email_label')}
+                        <div className="space-y-2">
+                            <label className="text-[#131515] dark:text-gray-200 text-sm font-bold">
+                                {t('auth.register.full_name_label')}
+                            </label>
+                            <input
+                                type="text"
+                                required
+                                value={fullName}
+                                onChange={(e) => setFullName(e.target.value)}
+                                className="w-full rounded-lg border border-[#dfe2e2] dark:border-gray-700 bg-white dark:bg-gray-800 text-[#131515] dark:text-white h-12 px-4 focus:ring-2 focus:ring-[#4a7874]/20 focus:border-[#4a7874] outline-none transition-all placeholder:text-gray-300"
+                                placeholder={t('auth.register.full_name_placeholder')}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[#131515] dark:text-gray-200 text-sm font-bold">
+                                {t('auth.register.professional_email_label')}
                             </label>
                             <input
                                 type="email"
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full rounded-lg border border-[#dfe2e2] dark:border-gray-700 bg-white dark:bg-gray-800 text-[#131515] dark:text-white h-12 px-4 focus:ring-2 focus:ring-[#4a7874]/20 focus:border-[#4a7874] outline-none transition-all placeholder:text-[#6f7b7a]"
-                                placeholder={t('auth.login.email_placeholder')}
+                                className="w-full rounded-lg border border-[#dfe2e2] dark:border-gray-700 bg-white dark:bg-gray-800 text-[#131515] dark:text-white h-12 px-4 focus:ring-2 focus:ring-[#4a7874]/20 focus:border-[#4a7874] outline-none transition-all placeholder:text-gray-300"
+                                placeholder={t('auth.register.email_placeholder')}
                             />
                         </div>
 
-                        <div className="flex flex-col gap-1.5">
-                            <div className="flex justify-between items-center">
-                                <label className="text-[#131515] dark:text-gray-200 text-sm font-semibold">
-                                    {t('auth.login.password_label')}
-                                </label>
-                                <a className="text-[#4a7874] text-xs font-bold hover:underline" href="#">
-                                    {t('auth.login.forgot_password')}
-                                </a>
-                            </div>
+                        <div className="space-y-2">
+                            <label className="text-[#131515] dark:text-gray-200 text-sm font-bold">
+                                {t('auth.register.password_label')}
+                            </label>
                             <input
                                 type="password"
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full rounded-lg border border-[#dfe2e2] dark:border-gray-700 bg-white dark:bg-gray-800 text-[#131515] dark:text-white h-12 px-4 focus:ring-2 focus:ring-[#4a7874]/20 focus:border-[#4a7874] outline-none transition-all placeholder:text-[#6f7b7a]"
-                                placeholder={t('auth.login.password_placeholder')}
+                                className="w-full rounded-lg border border-[#dfe2e2] dark:border-gray-700 bg-white dark:bg-gray-800 text-[#131515] dark:text-white h-12 px-4 focus:ring-2 focus:ring-[#4a7874]/20 focus:border-[#4a7874] outline-none transition-all placeholder:text-gray-300"
+                                placeholder={t('auth.register.password_placeholder')}
                             />
+                            {/* Password Strength Meter */}
+                            <div className="flex gap-2 mt-3">
+                                <div className={`h-1 flex-1 rounded-full ${password.length > 0 ? 'bg-[#4a7874]' : 'bg-gray-200'}`}></div>
+                                <div className={`h-1 flex-1 rounded-full ${password.length > 8 ? 'bg-[#4a7874]' : 'bg-gray-200'}`}></div>
+                                <div className={`h-1 flex-1 rounded-full ${password.length > 10 ? 'bg-[#4a7874]' : 'bg-gray-200'}`}></div>
+                                <div className={`h-1 flex-1 rounded-full ${password.length > 12 ? 'bg-[#4a7874]' : 'bg-gray-200'}`}></div>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2">
+                                {t('auth.register.password_strength_text')}
+                            </p>
                         </div>
 
-                        <div className="flex items-center gap-2 py-2">
+                        <div className="flex items-center gap-3 py-1">
                             <input
                                 type="checkbox"
-                                id="remember"
-                                className="size-4 rounded border-[#dfe2e2] text-[#4a7874] focus:ring-[#4a7874]"
+                                id="terms"
+                                required
+                                className="size-5 rounded border-gray-300 text-[#4a7874] focus:ring-[#4a7874] transition-colors cursor-pointer"
                             />
-                            <label className="text-sm text-[#6f7b7a] dark:text-gray-400" htmlFor="remember">
-                                {t('auth.login.remember_me')}
+                            <label htmlFor="terms" className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer select-none">
+                                {t('auth.register.i_agree')} <a href="#" className="text-[#4a7874] hover:underline">{t('auth.register.terms_service')}</a> {t('auth.register.and')} <a href="#" className="text-[#4a7874] hover:underline">{t('auth.register.privacy_policy')}</a>.
                             </label>
                         </div>
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-[#4a7874] hover:bg-[#3d6360] text-white font-bold h-12 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                            className="w-full bg-[#4a7874] hover:bg-[#3d6360] text-white font-bold h-12 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed mt-4"
                         >
                             {loading ? (
                                 <span className="animate-spin text-xl">◌</span>
                             ) : (
                                 <>
-                                    <span>{t('auth.login.sign_in_button')}</span>
-                                    <LogIn size={18} />
+                                    <span>{t('auth.register.create_account')}</span>
+                                    <UserPlus size={18} />
                                 </>
                             )}
                         </button>
@@ -149,9 +180,9 @@ export const Login = () => {
                     </form>
 
                     <p className="text-center text-sm text-[#6f7b7a] dark:text-gray-400 mt-8">
-                        {t('auth.login.dont_have_account')}{' '}
-                        <Link to="/register" className="text-[#4a7874] font-bold hover:underline">
-                            {t('auth.login.apply_access')}
+                        {t('auth.register.already_have_account')}{' '}
+                        <Link to="/login" className="text-[#4a7874] font-bold hover:underline">
+                            {t('auth.register.log_in')}
                         </Link>
                     </p>
                 </div>
@@ -170,7 +201,6 @@ export const Login = () => {
                 </footer>
             </div>
 
-            {/* Right Section: Hero & Glassmorphism */}
             <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[#4a7874] items-center justify-center">
                 {/* Background Image */}
                 <div
@@ -266,6 +296,6 @@ export const Login = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
