@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { clientService, coachService } from '../lib/api';
+import { clientService } from '../lib/api';
 import { Users, Search, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -18,10 +18,6 @@ interface Client {
     psych_checkins?: any[];
 }
 
-interface Coach {
-    id: string;
-    name: string;
-}
 
 export const ClientsPage = () => {
     const { t, i18n } = useTranslation();
@@ -29,10 +25,8 @@ export const ClientsPage = () => {
     const { user } = useAuth();
     const [clients, setClients] = useState<Client[]>([]);
     const [filteredClients, setFilteredClients] = useState<Client[]>([]);
-    const [coaches, setCoaches] = useState<Coach[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
-    const [selectedCoachId, setSelectedCoachId] = useState<string>('');
     const [statusFilter, setStatusFilter] = useState<string>('all');
 
     useEffect(() => {
@@ -43,16 +37,12 @@ export const ClientsPage = () => {
 
     useEffect(() => {
         filterClients();
-    }, [search, selectedCoachId, statusFilter, clients]);
+    }, [search, statusFilter, clients]);
 
     const fetchData = async () => {
         try {
-            const [clientsData, coachesData] = await Promise.all([
-                clientService.list(user?.id),
-                coachService.list()
-            ]);
+            const clientsData = await clientService.list(user?.id);
             setClients(clientsData);
-            setCoaches(coachesData);
         } catch (error) {
             console.error('Failed to fetch data:', error);
         } finally {
@@ -70,11 +60,6 @@ export const ClientsPage = () => {
                 c.full_name.toLowerCase().includes(lowerSearch) ||
                 c.email.toLowerCase().includes(lowerSearch)
             );
-        }
-
-        // Coach filter
-        if (selectedCoachId) {
-            result = result.filter((c: Client) => c.assigned_coach_id === selectedCoachId);
         }
 
         // Status filter
@@ -135,18 +120,6 @@ export const ClientsPage = () => {
 
                     <div className="flex items-center gap-3 w-full md:w-auto">
                         <select
-                            value={selectedCoachId}
-                            onChange={(e) => setSelectedCoachId(e.target.value)}
-                            className="px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
-                            disabled={!!user?.id}
-                        >
-                            <option value="">{t('clients.all_coaches')}</option>
-                            {coaches.map(coach => (
-                                <option key={coach.id} value={coach.id}>{coach.name}</option>
-                            ))}
-                        </select>
-
-                        <select
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
                             className="px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
@@ -164,137 +137,140 @@ export const ClientsPage = () => {
                             <Plus size={18} />
                             <span className="hidden md:inline">{t('clients.add_client')}</span>
                         </button>
-
-
                     </div>
                 </div>
 
-                {/* Clients Table */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm">
-                            <thead className="bg-gray-50 border-b border-gray-100">
-                                <tr>
-                                    <th className={`px-6 py-4 font-semibold text-gray-600 ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}>Client</th>
-                                    <th className="px-6 py-4 font-semibold text-gray-600">Adherence Signal</th>
-                                    <th className="px-6 py-4 font-semibold text-gray-600">Progress (∆ Weight)</th>
-                                    <th className="px-6 py-4 font-semibold text-gray-600">Target Progress</th>
-                                    <th className="px-6 py-4 font-semibold text-gray-600">Last Active</th>
-                                    <th className="px-6 py-4"></th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {filteredClients.length > 0 ? (
-                                    filteredClients.map((client) => {
-                                        const currentWeight = client.recent_measurements?.[0]?.weight_kg || client.starting_weight_kg;
-                                        const weightDiff = client.starting_weight_kg - currentWeight;
-                                        const isLosing = weightDiff > 0;
+                {/* Clients Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-8">
+                    {filteredClients.length > 0 ? (
+                        filteredClients.map((client) => {
+                            const currentWeight = client.recent_measurements?.[0]?.weight_kg || client.starting_weight_kg;
+                            const weightDiff = client.starting_weight_kg - currentWeight;
+                            const isLosing = weightDiff > 0;
 
-                                        // Target Progress Calculation
-                                        let targetProgress = 0;
-                                        if (client.starting_weight_kg && client.target_weight_kg) {
-                                            const totalNeeded = client.starting_weight_kg - client.target_weight_kg;
-                                            if (totalNeeded !== 0) {
-                                                targetProgress = Math.min(100, Math.max(0, (weightDiff / totalNeeded) * 100));
-                                            }
-                                        }
+                            // Target Progress Calculation
+                            let targetProgress = 0;
+                            if (client.starting_weight_kg && client.target_weight_kg) {
+                                const totalNeeded = client.starting_weight_kg - client.target_weight_kg;
+                                if (totalNeeded !== 0) {
+                                    targetProgress = Math.min(100, Math.max(0, (weightDiff / totalNeeded) * 100));
+                                }
+                            }
 
-                                        // Adherence Logic
-                                        const latestCheckin = client.psych_checkins?.[0];
-                                        let adherenceStatus = 'good'; // green
-                                        if (latestCheckin) {
-                                            if (latestCheckin.stress_level === 'high' || latestCheckin.evening_hunger) adherenceStatus = 'warning'; // orange
-                                            if (latestCheckin.adherence_difficulty === 'very_hard') adherenceStatus = 'risk'; // red
-                                        }
+                            // Adherence Logic
+                            const latestCheckin = client.psych_checkins?.[0];
+                            let adherenceDots = 5;
+                            if (latestCheckin) {
+                                if (latestCheckin.motivation_status === 'medium') adherenceDots -= 1;
+                                if (latestCheckin.motivation_status === 'low') adherenceDots -= 2;
+                                if (latestCheckin.evening_hunger || latestCheckin.stress_level === 'high') adherenceDots -= 1;
+                                adherenceDots = Math.max(1, adherenceDots);
+                            }
 
-                                        const lastActiveDate = client.recent_measurements?.[0]?.date || client.created_at;
-                                        const daysSinceActive = Math.floor((new Date().getTime() - new Date(lastActiveDate).getTime()) / (1000 * 3600 * 24));
+                            const lastActiveDate = client.recent_measurements?.[0]?.date || client.created_at;
+                            const daysSinceActive = Math.floor((new Date().getTime() - new Date(lastActiveDate).getTime()) / (1000 * 3600 * 24));
 
-                                        return (
-                                            <tr
-                                                key={client.id}
-                                                className="hover:bg-gray-50 transition-colors cursor-pointer group"
-                                                onClick={() => navigate(`/clients/${client.id}`)}
-                                            >
-                                                <td className={`px-6 py-4 ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}>
-                                                    <div className="flex flex-col gap-1">
-                                                        <div className="flex items-center gap-2">
-                                                            <p className="font-bold text-text-main">{client.full_name}</p>
-                                                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter ${client.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                                                                {client.status}
-                                                            </span>
-                                                        </div>
-                                                        <p className="text-[11px] text-text-muted">{client.email}</p>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center gap-1.5">
-                                                        <div className={`w-2 h-2 rounded-full ${adherenceStatus === 'good' ? 'bg-green-500' :
-                                                            adherenceStatus === 'warning' ? 'bg-orange-500 animate-pulse' : 'bg-red-500'
-                                                            }`} />
-                                                        <span className="text-xs font-medium">
-                                                            {adherenceStatus === 'good' ? 'Stable' :
-                                                                adherenceStatus === 'warning' ? 'Alert Flagged' : 'High Risk'}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-black text-text-main">{currentWeight.toFixed(1)}kg</span>
-                                                        <span className={`text-xs font-bold ${isLosing ? 'text-green-600' : 'text-blue-600'}`}>
-                                                            {isLosing ? '↓' : '↑'} {Math.abs(weightDiff).toFixed(1)}kg
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="w-full max-w-[120px]">
-                                                        <div className="flex justify-between items-center mb-1">
-                                                            <span className="text-[10px] font-bold text-text-muted">{targetProgress.toFixed(0)}%</span>
-                                                            <span className="text-[10px] font-bold text-text-muted">{client.target_weight_kg}kg</span>
-                                                        </div>
-                                                        <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                                                            <div
-                                                                className="bg-primary h-full transition-all duration-500"
-                                                                style={{ width: `${targetProgress}%` }}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex flex-col">
-                                                        <span className={`text-xs font-bold ${daysSinceActive > 7 ? 'text-red-500' : 'text-text-main'}`}>
-                                                            {daysSinceActive === 0 ? 'Today' :
-                                                                daysSinceActive === 1 ? 'Yesterday' :
-                                                                    `${daysSinceActive} days ago`}
-                                                        </span>
-                                                        <span className="text-[10px] text-text-muted">{new Date(lastActiveDate).toLocaleDateString()}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleDeleteClient(client.id, client.full_name);
-                                                        }}
-                                                        className="p-2 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
-                                                        title="Delete Client"
-                                                    >
-                                                        <Trash2 size={18} />
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })
-                                ) : (
-                                    <tr>
-                                        <td colSpan={6} className="px-6 py-12 text-center text-text-muted">
-                                            {t('clients.no_clients_found')}
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                            return (
+                                <div
+                                    key={client.id}
+                                    className="bg-white rounded-xl border border-[#dfe2e2] p-5 relative overflow-hidden group cursor-pointer hover:shadow-md transition-all active:scale-[0.98]"
+                                    onClick={() => navigate(`/clients/${client.id}`)}
+                                >
+                                    {/* Header */}
+                                    <div className="flex justify-between items-start mb-4 relative z-10">
+                                        <div className="flex flex-col">
+                                            <h3 className="text-lg font-black text-text-main leading-tight group-hover:text-primary transition-colors">
+                                                {client.full_name}
+                                            </h3>
+                                            <p className="text-xs text-text-muted font-medium">{client.email}</p>
+                                        </div>
+                                        <span className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest ${client.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                                            {client.status}
+                                        </span>
+                                    </div>
+
+                                    {/* Adherence Dots */}
+                                    <div className="flex items-center gap-1 mb-6 relative z-10">
+                                        {[1, 2, 3, 4, 5].map((i) => (
+                                            <div
+                                                key={i}
+                                                className={`w-2 h-2 rounded-full ${i <= adherenceDots ? 'bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.3)]' : 'bg-gray-100'}`}
+                                            />
+                                        ))}
+                                        <span className="text-[10px] font-bold text-text-muted ml-2 uppercase tracking-tighter">
+                                            {adherenceDots >= 4 ? 'Stable' : adherenceDots >= 3 ? 'Caution' : 'Risk'}
+                                        </span>
+                                    </div>
+
+                                    {/* Weights Row */}
+                                    <div className="grid grid-cols-2 gap-4 mb-6 relative z-10">
+                                        <div>
+                                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Current Weight</p>
+                                            <p className="text-xl font-black text-text-main">
+                                                {currentWeight.toFixed(1)}
+                                                <span className="text-xs ml-0.5 text-text-muted">kg</span>
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Total Progress</p>
+                                            <p className={`text-xl font-black ${isLosing ? 'text-green-600' : 'text-blue-600'}`}>
+                                                {isLosing ? '↓' : '↑'} {Math.abs(weightDiff).toFixed(1)}
+                                                <span className="text-xs ml-0.5 opacity-70">kg</span>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Target Progress Bar */}
+                                    <div className="mb-6 relative z-10">
+                                        <div className="flex justify-between items-center mb-1.5">
+                                            <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Goal Progress</span>
+                                            <span className="text-[10px] font-black text-primary bg-primary/10 px-1.5 rounded">{targetProgress.toFixed(0)}%</span>
+                                        </div>
+                                        <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                                            <div
+                                                className="bg-primary h-full transition-all duration-700 ease-out shadow-[0_0_10px_rgba(34,197,94,0.2)]"
+                                                style={{ width: `${targetProgress}%` }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Footer */}
+                                    <div className="flex items-center justify-between pt-4 border-t border-gray-100 relative z-10">
+                                        <div className="flex flex-col">
+                                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest leading-none mb-1">Last Active</p>
+                                            <p className={`text-xs font-black ${daysSinceActive > 7 ? 'text-red-500' : 'text-text-main'}`}>
+                                                {daysSinceActive === 0 ? 'Today' :
+                                                    daysSinceActive === 1 ? 'Yesterday' :
+                                                        `${daysSinceActive} days ago`}
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteClient(client.id, client.full_name);
+                                            }}
+                                            className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                            title="Delete Client"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+
+                                    {/* Clipped background icon */}
+                                    <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
+                                        <div className="absolute -right-2 top-1/2 -translate-y-1/2 opacity-[0.03] rotate-12 group-hover:opacity-[0.06] group-hover:scale-110 transition-all duration-500">
+                                            <Users size={120} />
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })
+                    ) : (
+                        <div className="col-span-full py-20 text-center">
+                            <Users size={48} className="mx-auto text-gray-200 mb-4" />
+                            <p className="text-text-muted font-medium">{t('clients.no_clients_found')}</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
