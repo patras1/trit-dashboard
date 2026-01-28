@@ -239,7 +239,7 @@ export const ClientDetails = () => {
 
     const handleDeleteClient = async () => {
         if (!id || !client) return;
-        if (!confirm(`Are you sure you want to permanently delete ${client.full_name}? This will also delete all their medical records, measurements, and nutrition plans.`)) {
+        if (!confirm(t('client_details.confirm.delete_client', { name: client.full_name }))) {
             return;
         }
 
@@ -340,7 +340,7 @@ export const ClientDetails = () => {
     };
 
     const handleDeletePsychCheckin = async (checkinId: string) => {
-        if (!confirm('Delete this check-in?')) return;
+        if (!confirm(t('client_details.confirm.delete_checkin'))) return;
         try {
             await clientService.deletePsychCheckin(checkinId);
             if (id) fetchTrackingData(id);
@@ -350,7 +350,7 @@ export const ClientDetails = () => {
     };
 
     const handleDeleteActivityLog = async (logId: string) => {
-        if (!confirm('Delete this activity log?')) return;
+        if (!confirm(t('client_details.confirm.delete_activity'))) return;
         try {
             await clientService.deleteActivityLog(logId);
             if (id) fetchTrackingData(id);
@@ -360,7 +360,7 @@ export const ClientDetails = () => {
     };
 
     const handleDeleteMeasurement = async (measurementId: string) => {
-        if (!confirm('Are you sure you want to delete this entry?')) return;
+        if (!confirm(t('client_details.confirm.delete_entry'))) return;
 
         try {
             await clientService.deleteMeasurement(measurementId);
@@ -435,7 +435,7 @@ export const ClientDetails = () => {
     };
 
     const handleGoalStatusChange = async (goalId: string, status: string) => {
-        if (!confirm(`Are you sure you want to mark this phase as ${status}?`)) return;
+        if (!confirm(t('client_details.confirm.mark_phase', { status }))) return;
         try {
             await clientService.updateGoal(goalId, { status: status });
             if (id) fetchStrategyData(id);
@@ -507,7 +507,7 @@ export const ClientDetails = () => {
 
 
     if (loading) return <div className="p-8 text-center">{t('common.loading')}</div>;
-    if (!client) return <div className="p-8 text-center">Client not found</div>;
+    if (!client) return <div className="p-8 text-center">{t('client_details.client_not_found')}</div>;
 
     return (
         <div className="flex flex-col h-full overflow-hidden bg-background-light">
@@ -538,14 +538,14 @@ export const ClientDetails = () => {
                         className="flex items-center gap-2 text-gray-400 hover:text-primary px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
                     >
                         <Pencil size={16} />
-                        Edit Profile
+                        {t('client_details.edit_profile')}
                     </button>
                     <button
                         onClick={handleDeleteClient}
                         className="flex items-center gap-2 text-gray-400 hover:text-red-500 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
                     >
                         <Trash2 size={16} />
-                        Delete Client
+                        {t('client_details.delete_client')}
                     </button>
                 </div>
             </header>
@@ -555,7 +555,7 @@ export const ClientDetails = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative z-20">
                     <div className="bg-white p-4 rounded-xl border border-[#dfe2e2] flex items-center gap-4 relative overflow-hidden group">
                         <div className="z-10 relative">
-                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider mb-2">Status</p>
+                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider mb-2">{t('client_details.status')}</p>
                             <p className="text-lg font-bold text-text-main capitalize">{client.status}</p>
                         </div>
                         {/* Clipped background icon */}
@@ -568,7 +568,7 @@ export const ClientDetails = () => {
 
                     <div className="bg-white p-4 rounded-xl border border-[#dfe2e2] flex items-center gap-4 relative overflow-hidden group">
                         <div className="z-10 relative">
-                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider mb-2">Current Weight</p>
+                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider mb-2">{t('client_details.current_weight')}</p>
                             <p className="text-lg font-bold text-text-main">
                                 {client.recent_measurements && client.recent_measurements.length > 0
                                     ? client.recent_measurements[0].weight_kg
@@ -585,7 +585,7 @@ export const ClientDetails = () => {
 
                     <div className="bg-white p-4 rounded-xl border border-[#dfe2e2] flex items-center gap-4 relative overflow-hidden group">
                         <div className="z-10 relative">
-                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider mb-2">Height</p>
+                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider mb-2">{t('client_details.height')}</p>
                             <p className="text-lg font-bold text-text-main">{client.height_cm} cm</p>
                         </div>
                         {/* Clipped background icon */}
@@ -598,7 +598,7 @@ export const ClientDetails = () => {
 
                     <div className="bg-white p-4 rounded-xl border border-[#dfe2e2] flex items-center gap-4 relative overflow-hidden group">
                         <div className="z-10 relative">
-                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider mb-2">Joined</p>
+                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider mb-2">{t('client_details.joined')}</p>
                             <p className="text-lg font-bold text-text-main">
                                 {new Date(client.created_at).toLocaleDateString()}
                             </p>
@@ -618,7 +618,7 @@ export const ClientDetails = () => {
                     <div className="bg-white p-5 rounded-xl border border-[#dfe2e2] relative overflow-hidden group">
                         <div className="z-10 relative">
                             <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">
-                                {client?.recent_measurements?.[0]?.weight_kg >= client.starting_weight_kg ? 'Total Gain' : 'Total Loss'}
+                                {client?.recent_measurements?.[0]?.weight_kg >= client.starting_weight_kg ? t('client_details.total_gain') : t('client_details.total_loss')}
                             </p>
                             <div className="flex items-center justify-between">
                                 <p className="text-2xl font-black text-text-main flex items-baseline gap-1">
@@ -630,8 +630,8 @@ export const ClientDetails = () => {
                             </div>
                             <p className="text-xs text-green-600 font-medium mt-1">
                                 {client?.starting_weight_kg && client?.recent_measurements?.[0]?.weight_kg
-                                    ? Math.abs((client.starting_weight_kg - client.recent_measurements[0].weight_kg) / (Math.max(1, (new Date().getTime() - new Date(client.created_at).getTime()) / (1000 * 60 * 60 * 24 * 7)))).toFixed(1) + ' kg/wk avg'
-                                    : '0 kg/wk avg'
+                                    ? Math.abs((client.starting_weight_kg - client.recent_measurements[0].weight_kg) / (Math.max(1, (new Date().getTime() - new Date(client.created_at).getTime()) / (1000 * 60 * 60 * 24 * 7)))).toFixed(1) + ' ' + t('client_details.kg_wk_avg')
+                                    : '0 ' + t('client_details.kg_wk_avg')
                                 }
                             </p>
                         </div>
@@ -646,14 +646,14 @@ export const ClientDetails = () => {
                     {/* Active Phase Card */}
                     <div className="bg-white p-5 rounded-xl border border-[#dfe2e2] relative overflow-hidden group">
                         <div className="z-10 relative">
-                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Active Phase</p>
+                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">{t('client_details.active_phase')}</p>
                             <p className="text-xl font-black text-text-main truncate mb-1">
-                                {goals.find((g: any) => g.status === 'active')?.phase_name || 'General'}
+                                {goals.find((g: any) => g.status === 'active')?.phase_name || t('client_details.general')}
                             </p>
                             <div className="flex items-center gap-2">
                                 <span className={`w-2 h-2 rounded-full ${goals.find((g: any) => g.status === 'active') ? 'bg-primary shadow-[0_0_8px_rgba(34,197,94,0.4)]' : 'bg-gray-300'}`}></span>
                                 <p className="text-xs text-text-muted font-bold truncate">
-                                    {goals.find((g: any) => g.status === 'active')?.priority || 'Maintenance'}
+                                    {goals.find((g: any) => g.status === 'active')?.priority || t('client_details.maintenance')}
                                 </p>
                             </div>
                         </div>
@@ -668,17 +668,17 @@ export const ClientDetails = () => {
                     {/* Last Contact Card */}
                     <div className="bg-white p-5 rounded-xl border border-[#dfe2e2] relative overflow-hidden group">
                         <div className="z-10 relative">
-                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Last Contact</p>
+                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">{t('client_details.last_contact')}</p>
                             <p className={`text-2xl font-black ${!sessionNotes.length || (new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24) > 14
                                 ? 'text-red-500'
                                 : 'text-text-main'
                                 }`}>
                                 {sessionNotes.length
-                                    ? Math.floor((new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24)) + 'd ago'
-                                    : 'Never'}
+                                    ? t('client_details.days_ago', { count: Math.floor((new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24)) })
+                                    : t('client_details.never')}
                             </p>
                             <p className="text-xs text-text-muted font-bold mt-1">
-                                {sessionNotes.length > 0 && Math.floor((new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24)) > 14 ? 'Check-in Overdue' : 'On Track'}
+                                {sessionNotes.length > 0 && Math.floor((new Date().getTime() - new Date(sessionNotes[0].date).getTime()) / (1000 * 60 * 60 * 24)) > 14 ? t('client_details.overdue') : t('client_details.on_track')}
                             </p>
                         </div>
                         {/* Clipped background icon */}
@@ -693,41 +693,41 @@ export const ClientDetails = () => {
                     <div className="bg-white p-5 rounded-xl border border-[#dfe2e2] flex items-center justify-between relative group">
                         <div className="z-10">
                             <div className="flex items-center gap-1 mb-1">
-                                <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Adherence Signal</p>
+                                <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">{t('client_details.adherence_signal')}</p>
                                 <div className="relative group/info">
                                     <div className="cursor-help text-text-muted hover:text-primary transition-colors">
                                         <Info size={12} />
                                     </div>
                                     <div className="absolute top-full right-0 mt-2 w-72 p-4 bg-[#1e293b] text-white rounded-xl shadow-2xl opacity-0 invisible group-hover/info:opacity-100 group-hover/info:visible transition-all duration-200 z-[100] pointer-events-none border border-slate-700">
-                                        <p className="text-[11px] font-bold text-teal-400 uppercase tracking-wider mb-2">How it's Calculated</p>
+                                        <p className="text-[11px] font-bold text-teal-400 uppercase tracking-wider mb-2">{t('client_details.adherence_tooltip.title')}</p>
                                         <p className="text-xs text-slate-300 leading-relaxed mb-3">
-                                            The signal starts at <span className="text-white font-bold">5 dots</span> and subtracts points based on "friction" in the latest check-in:
+                                            {t('client_details.adherence_tooltip.description').split('<1>')[0]}<span className="text-white font-bold">{t('client_details.adherence_tooltip.description').split('<1>')[1]?.split('</1>')[0]}</span>{t('client_details.adherence_tooltip.description').split('</1>')[1]}
                                         </p>
 
                                         <div className="space-y-2 mb-4">
                                             <div className="flex justify-between items-center text-[11px]">
-                                                <span className="text-slate-400">Motivation (Med/Low)</span>
-                                                <span className="text-red-400 font-bold">-1 / -2</span>
+                                                <span className="text-slate-400">{t('client_details.adherence_tooltip.motivation')}</span>
+                                                <span className="text-red-400 font-bold">{t('client_details.adherence_tooltip.motivation_penalty')}</span>
                                             </div>
                                             <div className="flex justify-between items-center text-[11px]">
-                                                <span className="text-slate-400">Hunger (4-5/5)</span>
-                                                <span className="text-red-400 font-bold">-1 / -2</span>
+                                                <span className="text-slate-400">{t('client_details.adherence_tooltip.hunger')}</span>
+                                                <span className="text-red-400 font-bold">{t('client_details.adherence_tooltip.hunger_penalty')}</span>
                                             </div>
                                             <div className="flex justify-between items-center text-[11px]">
-                                                <span className="text-slate-400">High Stress</span>
-                                                <span className="text-red-400 font-bold">-1</span>
+                                                <span className="text-slate-400">{t('client_details.adherence_tooltip.stress')}</span>
+                                                <span className="text-red-400 font-bold">{t('client_details.adherence_tooltip.stress_penalty')}</span>
                                             </div>
                                         </div>
 
                                         <div className="pt-3 border-t border-slate-700 mt-2">
                                             <p className="text-[10px] italic text-slate-400 leading-snug">
-                                                Recent check-in shows <span className="text-teal-400 font-bold">{psychCheckins[0]?.motivation_status || 'N/A'}</span> motivation. Friction dots are removed to highlight adherence risk.
+                                                {t('client_details.adherence_tooltip.footer', { motivation: psychCheckins[0]?.motivation_status || 'N/A' }).split('<1>')[0]}<span className="text-teal-400 font-bold">{psychCheckins[0]?.motivation_status || 'N/A'}</span>{t('client_details.adherence_tooltip.footer', { motivation: psychCheckins[0]?.motivation_status || 'N/A' }).split('</1>')[1]}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-1.5" title={psychCheckins.length ? `Latest Check-in:\nMotivation: ${psychCheckins[0].motivation_status}\nHunger: ${psychCheckins[0].psychological_hunger_scale}/5\nStress: ${psychCheckins[0].stress_level}` : 'No check-in data'}>
+                            <div className="flex items-center gap-1.5">
                                 {(() => {
                                     const latest = psychCheckins[0];
                                     if (!latest) return [1, 2, 3, 4, 5].map(i => <div key={i} className="w-3 h-3 rounded-full bg-gray-100" />);
@@ -758,10 +758,10 @@ export const ClientDetails = () => {
                 {/* Tabs */}
                 <div className="flex border-b border-gray-200 mb-6 overflow-x-auto">
                     {[
-                        { id: 'overview', label: 'Overview', icon: User },
-                        { id: 'medical', label: 'Medical & Health', icon: HeartPulse },
-                        { id: 'plan', label: 'Nutrition Plan', icon: FileText },
-                        { id: 'consultations', label: 'Consultations', icon: BookOpen },
+                        { id: 'overview', label: t('client_details.tabs.overview'), icon: User },
+                        { id: 'medical', label: t('client_details.tabs.medical'), icon: HeartPulse },
+                        { id: 'plan', label: t('client_details.tabs.plan'), icon: FileText },
+                        { id: 'consultations', label: t('client_details.tabs.consultations'), icon: BookOpen },
                     ].map(tab => (
                         <button
                             key={tab.id}
@@ -784,12 +784,12 @@ export const ClientDetails = () => {
                             <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center justify-between relative z-10">
                                 <div className="flex items-center gap-2">
                                     <Activity size={20} className="text-primary" />
-                                    <h3 className="text-text-main text-base font-bold">Metabolic Profile</h3>
+                                    <h3 className="text-text-main text-base font-bold">{t('client_details.metabolic_profile.title')}</h3>
                                 </div>
                                 <button
                                     onClick={() => setShowAddMetabolic(true)}
                                     className="p-1 text-primary hover:bg-primary/10 rounded transition-colors"
-                                    title="Edit Metabolic Settings"
+                                    title={t('client_details.edit_metabolic_settings')}
                                 >
                                     <Pencil size={16} />
                                 </button>
@@ -799,11 +799,11 @@ export const ClientDetails = () => {
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="bg-gray-50/80 backdrop-blur-sm p-3 rounded-lg">
-                                            <label className="text-xs text-text-muted block mb-1">Target Calories</label>
+                                            <label className="text-xs text-text-muted block mb-1">{t('client_details.metabolic_profile.target_calories')}</label>
                                             <p className="text-lg font-bold text-primary">{prescriptions.find(p => p.is_active)?.calories_target || 'N/A'}</p>
                                         </div>
                                         <div className="bg-gray-50/80 backdrop-blur-sm p-3 rounded-lg">
-                                            <label className="text-xs text-text-muted block mb-1">Target Change/Wk</label>
+                                            <label className="text-xs text-text-muted block mb-1">{t('client_details.metabolic_profile.target_change')}</label>
                                             <p className="text-lg font-bold text-gray-800">{goals.find(g => g.status === 'active')?.expected_weekly_change_kg || 0.5} kg</p>
                                         </div>
                                     </div>
@@ -811,34 +811,34 @@ export const ClientDetails = () => {
                                     {metabolicProfiles.length > 0 && (
                                         <div className="grid grid-cols-2 gap-4 pt-2">
                                             <div>
-                                                <label className="text-[10px] text-text-muted font-bold uppercase block mb-0.5">RMR ({metabolicProfiles[0].rmr_method})</label>
+                                                <label className="text-[10px] text-text-muted font-bold uppercase block mb-0.5">{t('client_details.metabolic_profile.rmr')} ({metabolicProfiles[0].rmr_method})</label>
                                                 <p className="text-sm font-black text-text-main">{metabolicProfiles[0].rmr_value} kcal</p>
                                             </div>
                                             <div>
-                                                <label className="text-[10px] text-text-muted font-bold uppercase block mb-0.5">Deficit Target</label>
+                                                <label className="text-[10px] text-text-muted font-bold uppercase block mb-0.5">{t('client_details.metabolic_profile.deficit')}</label>
                                                 <p className="text-sm font-black text-text-main">{metabolicProfiles[0].calorie_deficit_target} kcal</p>
                                             </div>
                                             <div className="col-span-2">
-                                                <label className="text-[10px] text-text-muted font-bold uppercase block mb-0.5">Est. TDEE Range</label>
+                                                <label className="text-[10px] text-text-muted font-bold uppercase block mb-0.5">{t('client_details.metabolic_profile.tdee')}</label>
                                                 <p className="text-sm font-black text-text-main">{metabolicProfiles[0].tdee_range || 'N/A'}</p>
                                             </div>
                                         </div>
                                     )}
 
                                     <div className="border-t border-gray-100 pt-4">
-                                        <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Current Protocol</label>
+                                        <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">{t('client_details.metabolic_profile.protocol')}</label>
                                         <div className="space-y-2 text-sm">
                                             <div className="flex justify-between">
-                                                <span className="text-gray-600">Protein</span>
+                                                <span className="text-gray-600">{t('client_details.metabolic_profile.protein')}</span>
                                                 <span className="font-medium">{prescriptions.find(p => p.is_active)?.protein_grams || '-'}g</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-gray-600">Steps/Cardio</span>
+                                                <span className="text-gray-600">{t('client_details.metabolic_profile.steps')}</span>
                                                 <span className="font-medium">{activityLogs.find(a => a.is_current)?.distance_km_week ? `${activityLogs.find(a => a.is_current).distance_km_week}km/wk` : client.activity_level}</span>
                                             </div>
                                             {prescriptions.find(p => p.is_active)?.is_intermittent_fasting && (
                                                 <div className="flex justify-between">
-                                                    <span className="text-gray-600">Fasting</span>
+                                                    <span className="text-gray-600">{t('client_details.metabolic_profile.fasting')}</span>
                                                     <span className="font-medium text-purple-600">{prescriptions.find(p => p.is_active).fasting_protocol}</span>
                                                 </div>
                                             )}
@@ -846,15 +846,15 @@ export const ClientDetails = () => {
                                     </div>
 
                                     <div className="border-t border-gray-100 pt-4">
-                                        <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Red Flags (Latest)</label>
+                                        <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">{t('client_details.metabolic_profile.red_flags')}</label>
                                         {!psychCheckins.length ? (
-                                            <p className="text-sm text-text-muted italic">No recent check-ins.</p>
+                                            <p className="text-sm text-text-muted italic">{t('client_details.metabolic_profile.no_checkins')}</p>
                                         ) : (
                                             <div className="flex flex-wrap gap-2">
-                                                {psychCheckins[0]?.evening_hunger && <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-md font-bold">Evening Hunger</span>}
-                                                {psychCheckins[0]?.stress_level === 'high' && <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-md font-bold">High Stress</span>}
-                                                {psychCheckins[0]?.adherence_difficulty && <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-md font-bold">Diff: {psychCheckins[0].adherence_difficulty}</span>}
-                                                {!psychCheckins[0]?.evening_hunger && psychCheckins[0]?.stress_level !== 'high' && <span className="text-sm text-green-600 font-medium">No alerts flagged.</span>}
+                                                {psychCheckins[0]?.evening_hunger && <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-md font-bold">{t('client_details.evening_hunger')}</span>}
+                                                {psychCheckins[0]?.stress_level === 'high' && <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-md font-bold">{t('client_details.high_stress')}</span>}
+                                                {psychCheckins[0]?.adherence_difficulty && <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-md font-bold">{t('client_details.diff')}: {psychCheckins[0].adherence_difficulty}</span>}
+                                                {!psychCheckins[0]?.evening_hunger && psychCheckins[0]?.stress_level !== 'high' && <span className="text-sm text-green-600 font-medium">{t('client_details.metabolic_profile.no_alerts')}</span>}
                                             </div>
                                         )}
                                     </div>
@@ -865,13 +865,13 @@ export const ClientDetails = () => {
                         {/* Right Column: Progress / Measurements History */}
                         <div className="bg-white rounded-xl border border-[#dfe2e2] relative overflow-hidden group">
                             <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center justify-between relative z-10">
-                                <h3 className="text-text-main text-base font-bold">Recent Progress</h3>
+                                <h3 className="text-text-main text-base font-bold">{t('client_details.progress.title')}</h3>
                                 <button
                                     onClick={() => setShowAddMeasurement(true)}
                                     className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
                                 >
                                     <Plus size={16} />
-                                    <span>Add Progress</span>
+                                    <span>{t('client_details.progress.add_entry')}</span>
                                 </button>
                             </div>
 
@@ -881,10 +881,10 @@ export const ClientDetails = () => {
                                         <table className="w-full text-sm text-left border-separate border-spacing-0">
                                             <thead className="bg-gray-50/50 backdrop-blur-sm text-gray-500 font-medium sticky top-0 z-10 shadow-sm">
                                                 <tr>
-                                                    <th className="px-4 py-3 border-b border-gray-100">Date</th>
-                                                    <th className="px-4 py-3 border-b border-gray-100">Weight (kg)</th>
-                                                    <th className="px-4 py-3 border-b border-gray-100">Body Fat %</th>
-                                                    <th className="px-4 py-3 border-b border-gray-100">Notes</th>
+                                                    <th className="px-4 py-3 border-b border-gray-100">{t('client_details.progress.table.date')}</th>
+                                                    <th className="px-4 py-3 border-b border-gray-100">{t('client_details.progress.table.weight')}</th>
+                                                    <th className="px-4 py-3 border-b border-gray-100">{t('client_details.progress.table.body_fat')}</th>
+                                                    <th className="px-4 py-3 border-b border-gray-100">{t('client_details.progress.table.notes')}</th>
                                                     <th className="px-4 py-3 border-b border-gray-100 w-10"></th>
                                                 </tr>
                                             </thead>
@@ -899,7 +899,7 @@ export const ClientDetails = () => {
                                                             <button
                                                                 onClick={() => handleDeleteMeasurement(m.id)}
                                                                 className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1"
-                                                                title="Delete entry"
+                                                                title={t('client_details.delete_entry')}
                                                             >
                                                                 <Trash2 size={16} />
                                                             </button>
@@ -911,7 +911,7 @@ export const ClientDetails = () => {
                                     </div>
                                 ) : (
                                     <div className="p-6">
-                                        <p className="text-text-muted">No measurements recorded yet.</p>
+                                        <p className="text-text-muted">{t('client_details.progress.no_entries')}</p>
                                     </div>
                                 )}
                             </div>
@@ -923,7 +923,7 @@ export const ClientDetails = () => {
                         {/* Weight Progress Chart */}
                         <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
                             <div className="px-6 py-4 border-b border-[#dfe2e2]">
-                                <h3 className="text-text-main text-base font-bold">Weight Progress</h3>
+                                <h3 className="text-text-main text-base font-bold">{t('client_details.progress.weight_chart')}</h3>
                             </div>
                             <div className="p-6">
                                 <div className="h-64 w-full">
@@ -966,7 +966,7 @@ export const ClientDetails = () => {
                         {/* Body Fat Progress Chart */}
                         <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
                             <div className="px-6 py-4 border-b border-[#dfe2e2]">
-                                <h3 className="text-text-main text-base font-bold">Body Fat % Progress</h3>
+                                <h3 className="text-text-main text-base font-bold">{t('client_details.progress.body_fat_chart')}</h3>
                             </div>
                             <div className="p-6">
                                 <div className="h-64 w-full">
@@ -1017,26 +1017,26 @@ export const ClientDetails = () => {
                                 <div className="flex justify-between items-center px-6 py-4 border-b border-[#dfe2e2]">
                                     <h3 className="text-text-main text-base font-bold flex items-center gap-2">
                                         <Activity size={20} className="text-primary" />
-                                        Medical Conditions
+                                        {t('client_details.medical.conditions')}
                                     </h3>
                                     <button
                                         onClick={() => setShowAddCondition(true)}
                                         className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
                                     >
                                         <Plus size={16} />
-                                        Add Condition
+                                        {t('client_details.medical.add_condition')}
                                     </button>
                                 </div>
                                 {medicalConditions.length === 0 ? (
-                                    <div className="text-center p-8 text-text-muted">No medical conditions recorded.</div>
+                                    <div className="text-center p-8 text-text-muted">{t('client_details.medical.no_conditions')}</div>
                                 ) : (
                                     <table className="w-full text-sm text-left">
                                         <thead className="bg-gray-50 text-gray-500 font-medium">
                                             <tr>
-                                                <th className="px-4 py-3">Diagnosed</th>
-                                                <th className="px-4 py-3">Condition</th>
-                                                <th className="px-4 py-3">Status</th>
-                                                <th className="px-4 py-3">Notes</th>
+                                                <th className="px-4 py-3">{t('client_details.medical.table.diagnosed')}</th>
+                                                <th className="px-4 py-3">{t('client_details.medical.table.condition')}</th>
+                                                <th className="px-4 py-3">{t('client_details.medical.table.status')}</th>
+                                                <th className="px-4 py-3">{t('client_details.medical.table.notes')}</th>
                                                 <th className="px-4 py-3"></th>
                                             </tr>
                                         </thead>
@@ -1048,7 +1048,7 @@ export const ClientDetails = () => {
                                                     <td className="px-4 py-3 capitalize">{item.status}</td>
                                                     <td className="px-4 py-3 text-text-muted">{item.notes}</td>
                                                     <td className="px-4 py-3 text-right">
-                                                        <button onClick={() => { if (confirm('Delete?')) clientService.deleteMedicalCondition(item.id).then(() => fetchMedicalData(id!)) }} className="text-gray-400 hover:text-red-500 transition-colors">
+                                                        <button onClick={() => { if (confirm(t('client_details.confirm.delete'))) clientService.deleteMedicalCondition(item.id).then(() => fetchMedicalData(id!)) }} className="text-gray-400 hover:text-red-500 transition-colors">
                                                             <Trash2 size={14} />
                                                         </button>
                                                     </td>
@@ -1064,26 +1064,26 @@ export const ClientDetails = () => {
                                 <div className="flex justify-between items-center px-6 py-4 border-b border-[#dfe2e2]">
                                     <h3 className="text-text-main text-base font-bold flex items-center gap-2">
                                         <Pill size={20} className="text-primary" />
-                                        Medications
+                                        {t('client_details.medical.medications')}
                                     </h3>
                                     <button
                                         onClick={() => setShowAddMedication(true)}
                                         className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
                                     >
                                         <Plus size={16} />
-                                        Add Medication
+                                        {t('client_details.medical.add_medication')}
                                     </button>
                                 </div>
                                 {medications.length === 0 ? (
-                                    <div className="text-center p-8 text-text-muted">No medications recorded.</div>
+                                    <div className="text-center p-8 text-text-muted">{t('client_details.medical.no_medications')}</div>
                                 ) : (
                                     <table className="w-full text-sm text-left">
                                         <thead className="bg-gray-50 text-gray-500 font-medium">
                                             <tr>
-                                                <th className="px-4 py-3">Start Date</th>
-                                                <th className="px-4 py-3">Medication</th>
-                                                <th className="px-4 py-3">Dosage</th>
-                                                <th className="px-4 py-3">Reason</th>
+                                                <th className="px-4 py-3">{t('client_details.medical.table.start_date')}</th>
+                                                <th className="px-4 py-3">{t('client_details.medical.table.medication')}</th>
+                                                <th className="px-4 py-3">{t('client_details.medical.table.dosage')}</th>
+                                                <th className="px-4 py-3">{t('client_details.medical.table.reason')}</th>
                                                 <th className="px-4 py-3"></th>
                                             </tr>
                                         </thead>
@@ -1095,7 +1095,7 @@ export const ClientDetails = () => {
                                                     <td className="px-4 py-3">{item.dosage}</td>
                                                     <td className="px-4 py-3 text-text-muted">{item.reason}</td>
                                                     <td className="px-4 py-3 text-right">
-                                                        <button onClick={() => { if (confirm('Delete?')) clientService.deleteMedication(item.id).then(() => fetchMedicalData(id!)) }} className="text-gray-400 hover:text-red-500 transition-colors">
+                                                        <button onClick={() => { if (confirm(t('client_details.confirm.delete'))) clientService.deleteMedication(item.id).then(() => fetchMedicalData(id!)) }} className="text-gray-400 hover:text-red-500 transition-colors">
                                                             <Trash2 size={14} />
                                                         </button>
                                                     </td>
@@ -1111,26 +1111,26 @@ export const ClientDetails = () => {
                                 <div className="flex justify-between items-center px-6 py-4 border-b border-[#dfe2e2]">
                                     <h3 className="text-text-main text-base font-bold flex items-center gap-2">
                                         <Thermometer size={20} className="text-primary" />
-                                        Blood Tests
+                                        {t('client_details.medical.blood_tests')}
                                     </h3>
                                     <button
                                         onClick={() => setShowAddBloodTest(true)}
                                         className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
                                     >
                                         <Plus size={16} />
-                                        Add Blood Test
+                                        {t('client_details.medical.add_blood_test')}
                                     </button>
                                 </div>
                                 {bloodTests.length === 0 ? (
-                                    <div className="text-center p-8 text-text-muted">No blood tests recorded.</div>
+                                    <div className="text-center p-8 text-text-muted">{t('client_details.medical.no_blood_tests')}</div>
                                 ) : (
                                     <table className="w-full text-sm text-left">
                                         <thead className="bg-gray-50 text-gray-500 font-medium">
                                             <tr>
-                                                <th className="px-4 py-3">Date</th>
-                                                <th className="px-4 py-3">Glucose</th>
-                                                <th className="px-4 py-3">HbA1c</th>
-                                                <th className="px-4 py-3">Lipids (LDL/HDL)</th>
+                                                <th className="px-4 py-3">{t('client_details.medical.table.date')}</th>
+                                                <th className="px-4 py-3">{t('client_details.medical.table.glucose')}</th>
+                                                <th className="px-4 py-3">{t('client_details.medical.table.hba1c')}</th>
+                                                <th className="px-4 py-3">{t('client_details.medical.table.lipids')}</th>
                                                 <th className="px-4 py-3"></th>
                                             </tr>
                                         </thead>
@@ -1165,7 +1165,7 @@ export const ClientDetails = () => {
                                                         <td className="px-4 py-3 text-right">
                                                             <div className="flex items-center justify-end gap-2">
                                                                 <ChevronRight size={16} className="text-gray-300" />
-                                                                <button onClick={(e) => { e.stopPropagation(); if (confirm('Delete?')) clientService.deleteBloodTest(item.id).then(() => fetchMedicalData(id!)) }} className="p-1 text-gray-400 hover:text-red-500 transition-colors">
+                                                                <button onClick={(e) => { e.stopPropagation(); if (confirm(t('client_details.confirm.delete'))) clientService.deleteBloodTest(item.id).then(() => fetchMedicalData(id!)) }} className="p-1 text-gray-400 hover:text-red-500 transition-colors">
                                                                     <Trash2 size={14} />
                                                                 </button>
                                                             </div>
@@ -1193,22 +1193,22 @@ export const ClientDetails = () => {
                                 <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
                                     <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
                                         <Activity size={20} className="text-primary" />
-                                        <h3 className="text-text-main text-base font-bold">Active Protocols</h3>
+                                        <h3 className="text-text-main text-base font-bold">{t('client_details.plan.active_protocols')}</h3>
                                     </div>
                                     <div className="p-6 space-y-3">
                                         {protocols.filter((p: any) => p.status === 'active').length === 0 ? (
-                                            <p className="text-text-muted text-sm italic">No active protocols.</p>
+                                            <p className="text-text-muted text-sm italic">{t('client_details.plan.no_protocols')}</p>
                                         ) : (
                                             protocols.filter((p: any) => p.status === 'active').map((p: any) => (
                                                 <div key={p.id} className="flex items-center justify-between bg-blue-50 border border-blue-100 rounded-lg p-3">
                                                     <div>
                                                         <p className="font-bold text-sm text-blue-900">{p.name}</p>
-                                                        <p className="text-xs text-blue-700">{p.details || 'No details specified.'}</p>
+                                                        <p className="text-xs text-blue-700">{p.details || t('client_details.no_details')}</p>
                                                     </div>
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-[10px] uppercase font-bold bg-blue-200 text-blue-800 px-2 py-0.5 rounded">Active</span>
-                                                        <button onClick={() => handleUpdateProtocolStatus(p.id, 'paused')} className="text-xs text-gray-500 hover:text-gray-700 underline">Pause</button>
-                                                        <button onClick={() => handleUpdateProtocolStatus(p.id, 'completed')} className="text-xs text-gray-500 hover:text-gray-700 underline">End</button>
+                                                        <span className="text-[10px] uppercase font-bold bg-blue-200 text-blue-800 px-2 py-0.5 rounded">{t('client_details.active')}</span>
+                                                        <button onClick={() => handleUpdateProtocolStatus(p.id, 'paused')} className="text-xs text-gray-500 hover:text-gray-700 underline">{t('client_details.pause')}</button>
+                                                        <button onClick={() => handleUpdateProtocolStatus(p.id, 'completed')} className="text-xs text-gray-500 hover:text-gray-700 underline">{t('client_details.end')}</button>
                                                     </div>
                                                 </div>
                                             ))
@@ -1218,7 +1218,7 @@ export const ClientDetails = () => {
                                             className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm font-bold text-text-muted hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
                                         >
                                             <Plus size={16} />
-                                            Add Specific Protocol
+                                            {t('client_details.plan.add_protocol')}
                                         </button>
                                     </div>
                                 </div>
@@ -1227,7 +1227,7 @@ export const ClientDetails = () => {
                                 <div className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
                                     <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center gap-2">
                                         <Target size={20} className="text-primary" />
-                                        <h3 className="text-text-main text-base font-bold">Phase Manager</h3>
+                                        <h3 className="text-text-main text-base font-bold">{t('client_details.plan.phase_manager')}</h3>
                                     </div>
                                     <div className="p-6 space-y-4">
                                         {goals.map((goal: any) => (
@@ -1242,26 +1242,26 @@ export const ClientDetails = () => {
                                                         </span>
                                                         <p className="font-bold text-sm text-gray-800">{goal.phase_name || goal.priority}</p>
                                                     </div>
-                                                    <p className="text-xs text-gray-500">Target: {goal.target_weight_kg}kg ({goal.target_body_fat_percent}%)</p>
+                                                    <p className="text-xs text-gray-500">{t('client_details.target')}: {goal.target_weight_kg}kg ({goal.target_body_fat_percent}%)</p>
                                                     <p className="text-xs text-text-muted mt-0.5">{new Date(goal.start_date).toLocaleDateString()} - {goal.end_date ? new Date(goal.end_date).toLocaleDateString() : '...'}</p>
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     {goal.status === 'active' && (
                                                         <>
-                                                            <button onClick={() => handleGoalStatusChange(goal.id, 'completed')} className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded border border-gray-300 transition-colors">Complete</button>
-                                                            <button onClick={() => handleGoalStatusChange(goal.id, 'aborted')} className="text-xs bg-white hover:bg-red-50 text-red-600 px-2 py-1 rounded border border-red-200 transition-colors">Abort</button>
+                                                            <button onClick={() => handleGoalStatusChange(goal.id, 'completed')} className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded border border-gray-300 transition-colors">{t('client_details.complete')}</button>
+                                                            <button onClick={() => handleGoalStatusChange(goal.id, 'aborted')} className="text-xs bg-white hover:bg-red-50 text-red-600 px-2 py-1 rounded border border-red-200 transition-colors">{t('client_details.abort')}</button>
                                                         </>
                                                     )}
                                                     {(goal.status === 'pending' || !goal.status) && (
-                                                        <button onClick={() => handleGoalStatusChange(goal.id, 'active')} className="text-xs bg-primary hover:bg-primary-hover text-white px-3 py-1 rounded transition-colors">Start Phase</button>
+                                                        <button onClick={() => handleGoalStatusChange(goal.id, 'active')} className="text-xs bg-primary hover:bg-primary-hover text-white px-3 py-1 rounded transition-colors">{t('client_details.start_phase')}</button>
                                                     )}
                                                     {goal.status === 'aborted' && (
-                                                        <button onClick={() => handleGoalStatusChange(goal.id, 'active')} className="text-xs text-primary hover:underline">Restart</button>
+                                                        <button onClick={() => handleGoalStatusChange(goal.id, 'active')} className="text-xs text-primary hover:underline">{t('client_details.restart')}</button>
                                                     )}
                                                 </div>
                                             </div>
                                         ))}
-                                        {goals.length === 0 && <p className="text-sm text-text-muted text-center py-4">No phases defined.</p>}
+                                        {goals.length === 0 && <p className="text-sm text-text-muted text-center py-4">{t('client_details.plan.no_phases')}</p>}
                                     </div>
                                 </div>
                             </div>
@@ -1274,14 +1274,14 @@ export const ClientDetails = () => {
                                         <div className="flex justify-between items-center mb-6">
                                             <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
                                                 <HistoryIcon size={20} className="text-primary" />
-                                                Plan Change Log
+                                                {t('client_details.plan.change_log')}
                                             </h3>
                                             <button
                                                 onClick={() => setShowAddPhase(true)}
                                                 className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-primary/20 shadow-sm"
                                             >
                                                 <Plus size={14} />
-                                                New
+                                                {t('client_details.plan.new_plan')}
                                             </button>
                                         </div>
                                         <div className="relative border-l-2 border-primary/20 ml-3 pl-6 space-y-6">
@@ -1334,24 +1334,24 @@ export const ClientDetails = () => {
                                             <div className="flex justify-between items-start mb-8 relative z-10">
                                                 <div>
                                                     <div className="flex items-center gap-3 mb-2">
-                                                        <h4 className="font-black text-2xl text-text-main tracking-tight">{plan.phase_name || 'Nutrition Plan'}</h4>
+                                                        <h4 className="font-black text-2xl text-text-main tracking-tight">{plan.phase_name || t('client_details.plan.nutrition_plan')}</h4>
                                                         {plan.is_active ? (
-                                                            <span className="bg-green-500 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">Current Active Plan</span>
+                                                            <span className="bg-green-500 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">{t('client_details.plan.active_plan')}</span>
                                                         ) : (
-                                                            <span className="bg-gray-400 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">Historical Phase</span>
+                                                            <span className="bg-gray-400 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">{t('client_details.plan.historical_phase')}</span>
                                                         )}
                                                     </div>
                                                     <div className="flex items-center gap-2 text-text-muted">
                                                         <Calendar size={14} />
                                                         <p className="text-xs font-medium">
-                                                            Started {new Date(plan.start_date).toLocaleDateString()} • {plan.end_date ? `Ends ${new Date(plan.end_date).toLocaleDateString()}` : 'Ongoing Priority'}
+                                                            {t('client_details.started')} {new Date(plan.start_date).toLocaleDateString()} • {plan.end_date ? `${t('client_details.ends')} ${new Date(plan.end_date).toLocaleDateString()}` : t('client_details.plan.ongoing_priority')}
                                                         </p>
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
                                                     <div className="inline-block bg-primary text-white px-4 py-2 rounded-xl shadow-lg shadow-primary/20">
                                                         <p className="text-3xl font-black leading-none">{plan.calories_target}</p>
-                                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Daily kcal</p>
+                                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">{t('client_details.plan.daily_kcal')}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1359,32 +1359,32 @@ export const ClientDetails = () => {
                                             <div className="grid grid-cols-3 gap-6 mb-10 relative z-10">
                                                 <div className="bg-white/60 backdrop-blur-sm border border-blue-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
                                                     <div className="flex items-center justify-between mb-2">
-                                                        <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest">Protein</p>
+                                                        <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest">{t('client_details.plan.protein')}</p>
                                                         <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
                                                     </div>
                                                     <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.protein_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
-                                                    <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.protein_grams * 4 / plan.calories_target) * 100)}% of total</p>
+                                                    <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.protein_grams * 4 / plan.calories_target) * 100)}{t('client_details.plan.of_total')}</p>
                                                 </div>
                                                 <div className="bg-white/60 backdrop-blur-sm border border-green-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
                                                     <div className="flex items-center justify-between mb-2">
-                                                        <p className="text-[10px] text-green-600 font-black uppercase tracking-widest">Carbs</p>
+                                                        <p className="text-[10px] text-green-600 font-black uppercase tracking-widest">{t('client_details.plan.carbs')}</p>
                                                         <div className="w-2 h-2 rounded-full bg-green-400" />
                                                     </div>
                                                     <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.carbs_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
-                                                    <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.carbs_grams * 4 / plan.calories_target) * 100)}% of total</p>
+                                                    <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.carbs_grams * 4 / plan.calories_target) * 100)}{t('client_details.plan.of_total')}</p>
                                                 </div>
                                                 <div className="bg-white/60 backdrop-blur-sm border border-yellow-100 p-5 rounded-2xl shadow-sm hover:translate-y-[-2px] transition-transform">
                                                     <div className="flex items-center justify-between mb-2">
-                                                        <p className="text-[10px] text-yellow-600 font-black uppercase tracking-widest">Fats</p>
+                                                        <p className="text-[10px] text-yellow-600 font-black uppercase tracking-widest">{t('client_details.plan.fats')}</p>
                                                         <div className="w-2 h-2 rounded-full bg-yellow-400" />
                                                     </div>
                                                     <p className="font-black text-2xl text-gray-900 tracking-tighter">{plan.fat_grams}<span className="text-sm font-normal text-text-muted ml-0.5">g</span></p>
-                                                    <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.fat_grams * 9 / plan.calories_target) * 100)}% of total</p>
+                                                    <p className="text-[10px] text-text-muted mt-1">{Math.round((plan.fat_grams * 9 / plan.calories_target) * 100)}{t('client_details.plan.of_total')}</p>
                                                 </div>
                                             </div>
 
                                             <div className="space-y-4 bg-white/40 p-6 rounded-2xl border border-white relative z-10">
-                                                <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-2">Detailed Menu & Rules</h5>
+                                                <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-2">{t('client_details.plan.menu_rules')}</h5>
                                                 <div className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap font-medium" dir="rtl">
                                                     {plan.training_day_rules}
                                                 </div>
@@ -1407,22 +1407,22 @@ export const ClientDetails = () => {
                         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                             <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="font-bold text-lg">Add New Protocol</h3>
+                                    <h3 className="font-bold text-lg">{t('client_details.modals.add_protocol')}</h3>
                                     <button onClick={() => setShowAddProtocol(false)}><X size={20} /></button>
                                 </div>
                                 <form onSubmit={handleAddProtocol} className="space-y-4">
-                                    <div><label className="block text-sm font-medium text-gray-700">Protocol Name</label><input type="text" required placeholder="e.g. IF 16:8, Refeed Day" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newProtocol.name} onChange={e => setNewProtocol({ ...newProtocol, name: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Type</label>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.protocol_name')}</label><input type="text" required placeholder={t('client_details.forms.protocol_placeholder')} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newProtocol.name} onChange={e => setNewProtocol({ ...newProtocol, name: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.type')}</label>
                                         <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newProtocol.type} onChange={e => setNewProtocol({ ...newProtocol, type: e.target.value })}>
-                                            <option value="nutrition">Nutrition</option>
-                                            <option value="training">Training</option>
-                                            <option value="lifestyle">Lifestyle</option>
-                                            <option value="supplement">Supplement</option>
+                                            <option value="nutrition">{t('client_details.forms.type_nutrition')}</option>
+                                            <option value="training">{t('client_details.forms.type_training')}</option>
+                                            <option value="lifestyle">{t('client_details.forms.type_lifestyle')}</option>
+                                            <option value="supplement">{t('client_details.forms.type_supplement')}</option>
                                         </select>
                                     </div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Details / Rules</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} placeholder="e.g. Fast from 8pm to 12pm daily." value={newProtocol.details} onChange={e => setNewProtocol({ ...newProtocol, details: e.target.value })}></textarea></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.details_rules')}</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} placeholder={t('client_details.forms.details_placeholder')} value={newProtocol.details} onChange={e => setNewProtocol({ ...newProtocol, details: e.target.value })}></textarea></div>
 
-                                    <div className="flex justify-end gap-2 pt-4"><button type="button" onClick={() => setShowAddProtocol(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save Protocol</button></div>
+                                    <div className="flex justify-end gap-2 pt-4"><button type="button" onClick={() => setShowAddProtocol(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">{t('client_details.forms.cancel')}</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">{t('client_details.forms.save_protocol')}</button></div>
                                 </form>
                             </div>
                         </div>
@@ -1435,7 +1435,7 @@ export const ClientDetails = () => {
                         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                             <div className="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                                 <div className="flex items-center justify-between p-4 border-b border-gray-100">
-                                    <h3 className="font-bold text-text-main">Add Progress Entry</h3>
+                                    <h3 className="font-bold text-text-main">{t('client_details.modals.add_progress')}</h3>
                                     <button onClick={() => setShowAddMeasurement(false)} className="text-text-muted hover:text-text-main">
                                         <X size={20} />
                                     </button>
@@ -1443,7 +1443,7 @@ export const ClientDetails = () => {
 
                                 <form onSubmit={handleAddMeasurement} className="p-4 space-y-4">
                                     <div className="space-y-1">
-                                        <label className="text-xs font-medium text-text-muted">Date</label>
+                                        <label className="text-xs font-medium text-text-muted">{t('client_details.forms.date')}</label>
                                         <input
                                             type="date"
                                             required
@@ -1455,7 +1455,7 @@ export const ClientDetails = () => {
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-1">
-                                            <label className="text-xs font-medium text-text-muted">Weight (kg)</label>
+                                            <label className="text-xs font-medium text-text-muted">{t('client_details.forms.weight_kg')}</label>
                                             <input
                                                 type="number"
                                                 step="0.1"
@@ -1466,7 +1466,7 @@ export const ClientDetails = () => {
                                             />
                                         </div>
                                         <div className="space-y-1">
-                                            <label className="text-xs font-medium text-text-muted">Body Fat %</label>
+                                            <label className="text-xs font-medium text-text-muted">{t('client_details.forms.body_fat_percent')}</label>
                                             <input
                                                 type="number"
                                                 step="0.1"
@@ -1478,13 +1478,13 @@ export const ClientDetails = () => {
                                     </div>
 
                                     <div className="space-y-1">
-                                        <label className="text-xs font-medium text-text-muted">Notes</label>
+                                        <label className="text-xs font-medium text-text-muted">{t('client_details.forms.notes')}</label>
                                         <textarea
                                             rows={3}
                                             value={newMeasurement.notes}
                                             onChange={e => setNewMeasurement({ ...newMeasurement, notes: e.target.value })}
                                             className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-1 focus:ring-primary outline-none text-sm resize-none"
-                                            placeholder="Optional progress notes..."
+                                            placeholder={t('client_details.forms.notes_placeholder')}
                                         />
                                     </div>
 
@@ -1494,13 +1494,13 @@ export const ClientDetails = () => {
                                             onClick={() => setShowAddMeasurement(false)}
                                             className="px-4 py-2 text-sm font-medium text-text-muted hover:bg-gray-100 rounded-lg transition-colors"
                                         >
-                                            Cancel
+                                            {t('client_details.forms.cancel')}
                                         </button>
                                         <button
                                             type="submit"
                                             className="px-4 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-lg transition-colors"
                                         >
-                                            Save Entry
+                                            {t('client_details.forms.save_entry')}
                                         </button>
                                     </div>
                                 </form>
@@ -1515,15 +1515,15 @@ export const ClientDetails = () => {
                         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                             <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="font-bold text-lg">Add Medical Condition</h3>
+                                    <h3 className="font-bold text-lg">{t('client_details.modals.add_condition')}</h3>
                                     <button onClick={() => setShowAddCondition(false)}><X size={20} /></button>
                                 </div>
                                 <form onSubmit={handleAddCondition} className="space-y-4">
-                                    <div><label className="block text-sm font-medium text-gray-700">Condition</label><input type="text" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newCondition.condition_name} onChange={e => setNewCondition({ ...newCondition, condition_name: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Date Diagnosed</label><input type="date" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newCondition.diagnosed_date} onChange={e => setNewCondition({ ...newCondition, diagnosed_date: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Status</label><select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newCondition.status} onChange={e => setNewCondition({ ...newCondition, status: e.target.value })}><option value="active">Active</option><option value="managed">Managed</option><option value="resolved">Resolved</option></select></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Notes</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} value={newCondition.notes} onChange={e => setNewCondition({ ...newCondition, notes: e.target.value })}></textarea></div>
-                                    <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddCondition(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.condition')}</label><input type="text" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newCondition.condition_name} onChange={e => setNewCondition({ ...newCondition, condition_name: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.date_diagnosed')}</label><input type="date" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newCondition.diagnosed_date} onChange={e => setNewCondition({ ...newCondition, diagnosed_date: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.status')}</label><select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newCondition.status} onChange={e => setNewCondition({ ...newCondition, status: e.target.value })}><option value="active">{t('client_details.forms.status_active')}</option><option value="managed">{t('client_details.forms.status_managed')}</option><option value="resolved">{t('client_details.forms.status_resolved')}</option></select></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.notes')}</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} value={newCondition.notes} onChange={e => setNewCondition({ ...newCondition, notes: e.target.value })}></textarea></div>
+                                    <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddCondition(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">{t('client_details.forms.cancel')}</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">{t('client_details.forms.save')}</button></div>
                                 </form>
                             </div>
                         </div>
@@ -1536,19 +1536,19 @@ export const ClientDetails = () => {
                         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                             <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="font-bold text-lg">Add Medication</h3>
+                                    <h3 className="font-bold text-lg">{t('client_details.modals.add_medication')}</h3>
                                     <button onClick={() => setShowAddMedication(false)}><X size={20} /></button>
                                 </div>
                                 <form onSubmit={handleAddMedication} className="space-y-4">
-                                    <div><label className="block text-sm font-medium text-gray-700">Medication Name</label><input type="text" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.name} onChange={e => setNewMedication({ ...newMedication, name: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Dosage</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.dosage} onChange={e => setNewMedication({ ...newMedication, dosage: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.medication_name')}</label><input type="text" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.name} onChange={e => setNewMedication({ ...newMedication, name: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.dosage')}</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.dosage} onChange={e => setNewMedication({ ...newMedication, dosage: e.target.value })} /></div>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div><label className="block text-sm font-medium text-gray-700">Start Date</label><input type="date" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.start_date} onChange={e => setNewMedication({ ...newMedication, start_date: e.target.value })} /></div>
-                                        <div><label className="block text-sm font-medium text-gray-700">End Date (Optional)</label><input type="date" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.end_date} onChange={e => setNewMedication({ ...newMedication, end_date: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.start_date')}</label><input type="date" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.start_date} onChange={e => setNewMedication({ ...newMedication, start_date: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.end_date')}</label><input type="date" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.end_date} onChange={e => setNewMedication({ ...newMedication, end_date: e.target.value })} /></div>
                                     </div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Reason</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.reason} onChange={e => setNewMedication({ ...newMedication, reason: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Notes</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} value={newMedication.notes} onChange={e => setNewMedication({ ...newMedication, notes: e.target.value })}></textarea></div>
-                                    <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddMedication(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.reason')}</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMedication.reason} onChange={e => setNewMedication({ ...newMedication, reason: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.notes')}</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} value={newMedication.notes} onChange={e => setNewMedication({ ...newMedication, notes: e.target.value })}></textarea></div>
+                                    <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddMedication(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">{t('client_details.forms.cancel')}</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">{t('client_details.forms.save')}</button></div>
                                 </form>
                             </div>
                         </div>
@@ -1561,29 +1561,29 @@ export const ClientDetails = () => {
                         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                             <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="font-bold text-lg">Add Blood Test</h3>
+                                    <h3 className="font-bold text-lg">{t('client_details.modals.add_blood_test')}</h3>
                                     <button onClick={() => setShowAddBloodTest(false)}><X size={20} /></button>
                                 </div>
                                 <form onSubmit={handleAddBloodTest} className="space-y-4">
-                                    <div><label className="block text-sm font-medium text-gray-700">Date</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.date} onChange={e => setNewBloodTest({ ...newBloodTest, date: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.date')}</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.date} onChange={e => setNewBloodTest({ ...newBloodTest, date: e.target.value })} /></div>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div><label className="block text-sm font-medium text-gray-700">Hemoglobin</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.hemoglobin} onChange={e => setNewBloodTest({ ...newBloodTest, hemoglobin: e.target.value })} /></div>
-                                        <div><label className="block text-sm font-medium text-gray-700">Ferritin</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.ferritin} onChange={e => setNewBloodTest({ ...newBloodTest, ferritin: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">{t('client_details.blood_markers.hemoglobin')}</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.hemoglobin} onChange={e => setNewBloodTest({ ...newBloodTest, hemoglobin: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">{t('client_details.blood_markers.ferritin')}</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.ferritin} onChange={e => setNewBloodTest({ ...newBloodTest, ferritin: e.target.value })} /></div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div><label className="block text-sm font-medium text-gray-700">Vitamin B12</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.vitamin_b12} onChange={e => setNewBloodTest({ ...newBloodTest, vitamin_b12: e.target.value })} /></div>
-                                        <div><label className="block text-sm font-medium text-gray-700">Vitamin D</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.vitamin_d} onChange={e => setNewBloodTest({ ...newBloodTest, vitamin_d: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">{t('client_details.blood_markers.vitamin_b12')}</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.vitamin_b12} onChange={e => setNewBloodTest({ ...newBloodTest, vitamin_b12: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">{t('client_details.blood_markers.vitamin_d')}</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.vitamin_d} onChange={e => setNewBloodTest({ ...newBloodTest, vitamin_d: e.target.value })} /></div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div><label className="block text-sm font-medium text-gray-700">Folate</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.folate} onChange={e => setNewBloodTest({ ...newBloodTest, folate: e.target.value })} /></div>
-                                        <div><label className="block text-sm font-medium text-gray-700">Glucose</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.glucose} onChange={e => setNewBloodTest({ ...newBloodTest, glucose: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">{t('client_details.blood_markers.folate')}</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.folate} onChange={e => setNewBloodTest({ ...newBloodTest, folate: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">{t('client_details.blood_markers.glucose')}</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.glucose} onChange={e => setNewBloodTest({ ...newBloodTest, glucose: e.target.value })} /></div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div><label className="block text-sm font-medium text-gray-700">LDL</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.ldl} onChange={e => setNewBloodTest({ ...newBloodTest, ldl: e.target.value })} /></div>
-                                        <div><label className="block text-sm font-medium text-gray-700">HDL</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.hdl} onChange={e => setNewBloodTest({ ...newBloodTest, hdl: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">{t('client_details.blood_markers.ldl')}</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.ldl} onChange={e => setNewBloodTest({ ...newBloodTest, ldl: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">{t('client_details.blood_markers.hdl')}</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newBloodTest.hdl} onChange={e => setNewBloodTest({ ...newBloodTest, hdl: e.target.value })} /></div>
                                     </div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Clinician Notes / Interpretation</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} value={newBloodTest.clinician_notes} onChange={e => setNewBloodTest({ ...newBloodTest, clinician_notes: e.target.value })}></textarea></div>
-                                    <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddBloodTest(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.blood_markers.clinician_notes')}</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} value={newBloodTest.clinician_notes} onChange={e => setNewBloodTest({ ...newBloodTest, clinician_notes: e.target.value })}></textarea></div>
+                                    <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddBloodTest(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">{t('client_details.forms.cancel')}</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">{t('client_details.forms.save')}</button></div>
                                 </form>
                             </div>
                         </div>
@@ -1604,19 +1604,19 @@ export const ClientDetails = () => {
                                     <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <Brain size={20} className="text-secondary" />
-                                            <h3 className="text-text-main text-base font-bold">Behavior & Adherence</h3>
+                                            <h3 className="text-text-main text-base font-bold">{t('client_details.consultations.behavior')}</h3>
                                         </div>
                                         <button
                                             onClick={() => setShowAddPsychCheckin(true)}
                                             className="p-1 text-primary hover:bg-primary/10 rounded transition-colors"
-                                            title="Add Check-in"
+                                            title={t('client_details.consultations.add_checkin')}
                                         >
                                             <Plus size={16} />
                                         </button>
                                     </div>
                                     <div className="p-6">
                                         {psychCheckins.length === 0 ? (
-                                            <p className="text-text-muted text-sm">No behavior checks logged.</p>
+                                            <p className="text-text-muted text-sm">{t('client_details.consultations.no_behavior')}</p>
                                         ) : (
                                             <div className="space-y-4">
                                                 {psychCheckins.slice(0, 3).map((check: any) => (
@@ -1625,18 +1625,18 @@ export const ClientDetails = () => {
                                                             <span className="text-xs font-medium text-gray-500">{new Date(check.date).toLocaleDateString()}</span>
                                                             <div className="flex items-center gap-2">
                                                                 <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${check.motivation_status === 'high' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                                                                    Mot: {check.motivation_status}
+                                                                    {t('client_details.mot')}: {check.motivation_status}
                                                                 </span>
                                                                 <button onClick={() => handleDeletePsychCheckin(check.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={12} /></button>
                                                             </div>
                                                         </div>
                                                         <div className="grid grid-cols-2 gap-2 text-sm">
                                                             <div>
-                                                                <span className="text-xs text-gray-400 block">Hunger (1-5)</span>
+                                                                <span className="text-xs text-gray-400 block">{t('client_details.hunger_scale')}</span>
                                                                 <span className="font-bold">{check.psychological_hunger_scale}</span>
                                                             </div>
                                                             <div>
-                                                                <span className="text-xs text-text-muted block">Stress</span>
+                                                                <span className="text-xs text-text-muted block">{t('client_details.stress')}</span>
                                                                 <span>{check.stress_level}</span>
                                                             </div>
                                                         </div>
@@ -1652,19 +1652,19 @@ export const ClientDetails = () => {
                                     <div className="px-6 py-4 border-b border-[#dfe2e2] flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <Dumbbell size={20} className="text-blue-500" />
-                                            <h3 className="text-text-main text-base font-bold">Activity & Training</h3>
+                                            <h3 className="text-text-main text-base font-bold">{t('client_details.consultations.activity')}</h3>
                                         </div>
                                         <button
                                             onClick={() => setShowAddActivityLog(true)}
                                             className="p-1 text-primary hover:bg-primary/10 rounded transition-colors"
-                                            title="Add Activity"
+                                            title={t('client_details.consultations.add_activity')}
                                         >
                                             <Plus size={16} />
                                         </button>
                                     </div>
                                     <div className="p-6">
                                         {activityLogs.length === 0 ? (
-                                            <p className="text-text-muted text-sm">No activity logs active.</p>
+                                            <p className="text-text-muted text-sm">{t('client_details.consultations.no_activity')}</p>
                                         ) : (
                                             <div className="space-y-4">
                                                 {activityLogs.slice(0, 5).map((log: any) => (
@@ -1672,26 +1672,26 @@ export const ClientDetails = () => {
                                                         <div className="flex justify-between items-start mb-2">
                                                             <div>
                                                                 <p className="font-bold text-gray-800">{log.activity_type}</p>
-                                                                <p className="text-xs text-gray-500">Started {new Date(log.start_date).toLocaleDateString()}</p>
+                                                                <p className="text-xs text-gray-500">{t('client_details.started')} {new Date(log.start_date).toLocaleDateString()}</p>
                                                             </div>
                                                             <div className="flex items-center gap-2">
-                                                                {log.is_current && <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold">CURRENT</span>}
+                                                                {log.is_current && <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold">{t('client_details.current')}</span>}
                                                                 <button onClick={() => handleDeleteActivityLog(log.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={12} /></button>
                                                             </div>
                                                         </div>
                                                         <div className="grid grid-cols-2 gap-4 mt-2">
                                                             <div className="text-center bg-white p-2 rounded border border-blue-100">
                                                                 <span className="block text-xl font-bold text-blue-600">{log.sessions_per_week}</span>
-                                                                <span className="text-[10px] text-gray-500 uppercase">Sessions/Wk</span>
+                                                                <span className="text-[10px] text-gray-500 uppercase">{t('client_details.sessions_wk')}</span>
                                                             </div>
                                                             <div className="text-center bg-white p-2 rounded border border-blue-100">
                                                                 <span className="block text-xl font-bold text-blue-600">{log.distance_km_week || '--'}</span>
-                                                                <span className="text-[10px] text-gray-500 uppercase">km/Week</span>
+                                                                <span className="text-[10px] text-gray-500 uppercase">{t('client_details.km_week')}</span>
                                                             </div>
                                                         </div>
                                                         {log.strength_training && (
                                                             <div className="mt-3 pt-3 border-t border-blue-100 text-sm">
-                                                                <span className="font-bold text-gray-700 block mb-1">Strength Program</span>
+                                                                <span className="font-bold text-gray-700 block mb-1">{t('client_details.strength_program')}</span>
                                                                 <span>{log.strength_split}</span>
                                                             </div>
                                                         )}
@@ -1706,43 +1706,43 @@ export const ClientDetails = () => {
                             <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-[#dfe2e2]">
                                 <h3 className="font-bold text-lg text-text-main flex items-center gap-2">
                                     <BookOpen size={20} className="text-primary" />
-                                    Session Decisions Log
+                                    {t('client_details.consultations.decisions_log')}
                                 </h3>
                                 <button
                                     onClick={() => setShowAddSession(true)}
                                     className="flex items-center gap-1.5 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
                                 >
                                     <Plus size={16} />
-                                    Start Session
+                                    {t('client_details.consultations.start_session')}
                                 </button>
                             </div>
                             {
                                 sessionNotes.map((note: any) => (
                                     <div key={note.id} className="bg-white rounded-xl border border-[#dfe2e2] overflow-hidden">
                                         <div className="px-6 py-4 border-b border-[#dfe2e2] flex justify-between items-center">
-                                            <h4 className="font-bold text-lg text-text-main">Consultation Notes</h4>
+                                            <h4 className="font-bold text-lg text-text-main">{t('client_details.consultation_notes')}</h4>
                                             <div className="text-sm text-text-muted">{new Date(note.date).toLocaleDateString()}</div>
                                         </div>
                                         <div className="p-6 space-y-4">
                                             <div>
-                                                <p className="text-xs font-bold text-gray-500 uppercase">Observations</p>
+                                                <p className="text-xs font-bold text-gray-500 uppercase">{t('client_details.consultations.observations')}</p>
                                                 <p className="text-gray-800">{note.observations}</p>
                                             </div>
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="bg-orange-50 p-3 rounded-lg border border-orange-100">
-                                                    <p className="text-xs font-bold text-orange-600 uppercase mb-1">What Changed</p>
-                                                    <p className="text-sm text-gray-800">{note.changes_made || 'No changes.'}</p>
+                                                    <p className="text-xs font-bold text-orange-600 uppercase mb-1">{t('client_details.consultations.what_changed')}</p>
+                                                    <p className="text-sm text-gray-800">{note.changes_made || t('client_details.consultations.no_changes')}</p>
                                                     {note.reason_for_change && (
                                                         <p className="text-xs text-text-muted mt-2 italic">"{note.reason_for_change}"</p>
                                                     )}
                                                 </div>
                                                 <div className="bg-green-50 p-3 rounded-lg border border-green-100">
-                                                    <p className="text-xs font-bold text-green-600 uppercase mb-1">What Stayed Same</p>
+                                                    <p className="text-xs font-bold text-green-600 uppercase mb-1">{t('client_details.consultations.what_stayed')}</p>
                                                     <p className="text-sm text-gray-800">{note.constants || '--'}</p>
                                                 </div>
                                             </div>
                                             <div>
-                                                <p className="text-xs font-bold text-gray-500 uppercase">Next Checkpoint</p>
+                                                <p className="text-xs font-bold text-gray-500 uppercase">{t('client_details.consultations.next_checkpoint')}</p>
                                                 <p className="text-sm text-primary font-medium">{note.next_checkpoint}</p>
                                             </div>
                                         </div>
@@ -1759,26 +1759,26 @@ export const ClientDetails = () => {
                         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                             <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl p-6 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="font-bold text-lg">New Consultation Log</h3>
+                                    <h3 className="font-bold text-lg">{t('client_details.modals.add_session')}</h3>
                                     <button onClick={() => setShowAddSession(false)}><X size={20} /></button>
                                 </div>
                                 <form onSubmit={handleAddSession} className="space-y-4">
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div><label className="block text-sm font-medium text-gray-700">Date</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newSession.date} onChange={e => setNewSession({ ...newSession, date: e.target.value })} /></div>
-                                        <div><label className="block text-sm font-medium text-gray-700">Next Checkpoint</label><input type="text" placeholder="e.g. 2 weeks" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newSession.next_checkpoint} onChange={e => setNewSession({ ...newSession, next_checkpoint: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.date')}</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newSession.date} onChange={e => setNewSession({ ...newSession, date: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.next_checkpoint')}</label><input type="text" placeholder={t('client_details.forms.checkpoint_placeholder')} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newSession.next_checkpoint} onChange={e => setNewSession({ ...newSession, next_checkpoint: e.target.value })} /></div>
                                     </div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Key Observations</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} placeholder="Client mood, compliance, physical changes..." value={newSession.observations} onChange={e => setNewSession({ ...newSession, observations: e.target.value })}></textarea></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.key_observations')}</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={3} placeholder={t('client_details.forms.observations_placeholder')} value={newSession.observations} onChange={e => setNewSession({ ...newSession, observations: e.target.value })}></textarea></div>
 
                                     <div className="border-t pt-4">
-                                        <h4 className="font-bold text-sm mb-2">Decisions</h4>
+                                        <h4 className="font-bold text-sm mb-2">{t('client_details.forms.decisions')}</h4>
                                         <div className="grid grid-cols-2 gap-4">
-                                            <div><label className="block text-sm font-medium text-gray-700">What Changed?</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} placeholder="Adjusted calories..." value={newSession.changes_made} onChange={e => setNewSession({ ...newSession, changes_made: e.target.value })}></textarea></div>
-                                            <div><label className="block text-sm font-medium text-gray-700">Why?</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} placeholder="Weight stalled for 2 weeks..." value={newSession.reason_for_change} onChange={e => setNewSession({ ...newSession, reason_for_change: e.target.value })}></textarea></div>
+                                            <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.what_changed')}</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} placeholder={t('client_details.forms.changed_placeholder')} value={newSession.changes_made} onChange={e => setNewSession({ ...newSession, changes_made: e.target.value })}></textarea></div>
+                                            <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.why')}</label><textarea className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" rows={2} placeholder={t('client_details.forms.why_placeholder')} value={newSession.reason_for_change} onChange={e => setNewSession({ ...newSession, reason_for_change: e.target.value })}></textarea></div>
                                         </div>
-                                        <div className="mt-2"><label className="block text-sm font-medium text-gray-700">What Stayed the Same?</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" placeholder="Training split, supplements..." value={newSession.constants} onChange={e => setNewSession({ ...newSession, constants: e.target.value })} /></div>
+                                        <div className="mt-2"><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.what_stayed')}</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" placeholder={t('client_details.forms.stayed_placeholder')} value={newSession.constants} onChange={e => setNewSession({ ...newSession, constants: e.target.value })} /></div>
                                     </div>
 
-                                    <div className="flex justify-end gap-2 pt-4 border-t"><button type="button" onClick={() => setShowAddSession(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save Session Log</button></div>
+                                    <div className="flex justify-end gap-2 pt-4 border-t"><button type="button" onClick={() => setShowAddSession(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">{t('client_details.forms.cancel')}</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">{t('client_details.forms.save_session')}</button></div>
                                 </form>
                             </div>
                         </div>
@@ -1809,7 +1809,7 @@ export const ClientDetails = () => {
                                             <Thermometer size={24} />
                                         </div>
                                         <div>
-                                            <h2 className="text-xl font-black text-text-main">Blood Analysis Results</h2>
+                                            <h2 className="text-xl font-black text-text-main">{t('client_details.modals.blood_analysis')}</h2>
                                             <p className="text-text-muted text-sm">{new Date(selectedBloodTest.date).toLocaleDateString(undefined, { dateStyle: 'long' })}</p>
                                         </div>
                                     </div>
@@ -1846,12 +1846,12 @@ export const ClientDetails = () => {
                                                             <p className="text-xs font-black uppercase tracking-widest text-text-muted">{marker.label}</p>
                                                             {(isLow || isHigh) && (
                                                                 <span className="bg-red-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full tracking-tighter uppercase">
-                                                                    {isLow ? 'LOW' : 'HIGH'}
+                                                                    {isLow ? t('client_details.low') : t('client_details.high')}
                                                                 </span>
                                                             )}
                                                         </div>
                                                         <p className="text-[10px] font-bold text-text-muted">
-                                                            Normal Range: <span className="text-text-main">{marker.range}</span> {marker.unit}
+                                                            {t('client_details.normal_range')}: <span className="text-text-main">{marker.range}</span> {marker.unit}
                                                         </p>
                                                     </div>
                                                     <div className="text-right">
@@ -1867,7 +1867,7 @@ export const ClientDetails = () => {
 
                                     {selectedBloodTest.clinician_notes && (
                                         <div className="bg-blue-50 p-5 rounded-2xl border border-blue-100">
-                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">Clinician Interpretation</h4>
+                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">{t('client_details.clinician_interpretation')}</h4>
                                             <p className="text-sm font-medium text-blue-900 leading-relaxed italic">
                                                 "{selectedBloodTest.clinician_notes}"
                                             </p>
@@ -1880,7 +1880,7 @@ export const ClientDetails = () => {
                                         onClick={() => setSelectedBloodTest(null)}
                                         className="px-8 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-all shadow-lg"
                                     >
-                                        Done
+                                        {t('client_details.done')}
                                     </button>
                                 </div>
                             </div>
@@ -1895,14 +1895,14 @@ export const ClientDetails = () => {
                                 <div className="flex justify-between items-center mb-6">
                                     <h3 className="font-bold text-lg flex items-center gap-2">
                                         <Pencil size={20} className="text-primary" />
-                                        Edit Patient Profile
+                                        {t('client_details.modals.edit_profile')}
                                     </h3>
                                     <button onClick={() => setShowEditModal(false)}><X size={20} /></button>
                                 </div>
                                 <form onSubmit={handleUpdateClient} className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <label className="block text-sm font-bold text-text-main mb-1">Full Name</label>
+                                            <label className="block text-sm font-bold text-text-main mb-1">{t('client_details.forms.full_name')}</label>
                                             <input
                                                 type="text"
                                                 required
@@ -1912,7 +1912,7 @@ export const ClientDetails = () => {
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-bold text-text-main mb-1">Email Address</label>
+                                            <label className="block text-sm font-bold text-text-main mb-1">{t('client_details.forms.email')}</label>
                                             <input
                                                 type="email"
                                                 required
@@ -1922,7 +1922,7 @@ export const ClientDetails = () => {
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-bold text-text-main mb-1">Birth Date</label>
+                                            <label className="block text-sm font-bold text-text-main mb-1">{t('client_details.forms.birth_date')}</label>
                                             <input
                                                 type="date"
                                                 className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
@@ -1931,41 +1931,41 @@ export const ClientDetails = () => {
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-bold text-text-main mb-1">Status</label>
+                                            <label className="block text-sm font-bold text-text-main mb-1">{t('client_details.forms.status')}</label>
                                             <select
                                                 className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
                                                 value={editClient.status}
                                                 onChange={e => setEditClient({ ...editClient, status: e.target.value })}
                                             >
-                                                <option value="active">Active</option>
-                                                <option value="paused">Paused</option>
-                                                <option value="completed">Completed</option>
+                                                <option value="active">{t('client_details.forms.status_active')}</option>
+                                                <option value="paused">{t('client_details.forms.status_paused')}</option>
+                                                <option value="completed">{t('client_details.forms.status_completed')}</option>
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-bold text-text-main mb-1">Sex (At Birth)</label>
+                                            <label className="block text-sm font-bold text-text-main mb-1">{t('client_details.forms.sex')}</label>
                                             <select
                                                 className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
                                                 value={editClient.sex}
                                                 onChange={e => setEditClient({ ...editClient, sex: e.target.value })}
                                             >
-                                                <option value="">Select Sex</option>
-                                                <option value="male">Male</option>
-                                                <option value="female">Female</option>
+                                                <option value="">{t('client_details.forms.select_sex')}</option>
+                                                <option value="male">{t('client_details.forms.male')}</option>
+                                                <option value="female">{t('client_details.forms.female')}</option>
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-bold text-text-main mb-1">Gender Identity</label>
+                                            <label className="block text-sm font-bold text-text-main mb-1">{t('client_details.forms.gender_identity')}</label>
                                             <input
                                                 type="text"
                                                 className="w-full rounded-lg border border-gray-200 p-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
                                                 value={editClient.gender}
                                                 onChange={e => setEditClient({ ...editClient, gender: e.target.value })}
-                                                placeholder="e.g. Male, Female, Non-binary"
+                                                placeholder={t('client_details.forms.gender_placeholder')}
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-bold text-text-main mb-1">Height (cm)</label>
+                                            <label className="block text-sm font-bold text-text-main mb-1">{t('client_details.forms.height_cm')}</label>
                                             <input
                                                 type="number"
                                                 step="0.1"
@@ -1975,7 +1975,7 @@ export const ClientDetails = () => {
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-bold text-text-main mb-1">Target Weight (kg)</label>
+                                            <label className="block text-sm font-bold text-text-main mb-1">{t('client_details.forms.target_weight')}</label>
                                             <input
                                                 type="number"
                                                 step="0.1"
@@ -1992,13 +1992,13 @@ export const ClientDetails = () => {
                                             onClick={() => setShowEditModal(false)}
                                             className="px-6 py-2 border border-gray-200 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors"
                                         >
-                                            Cancel
+                                            {t('client_details.forms.cancel')}
                                         </button>
                                         <button
                                             type="submit"
                                             className="px-6 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary-hover transition-colors shadow-sm"
                                         >
-                                            Save Changes
+                                            {t('client_details.forms.save_changes')}
                                         </button>
                                     </div>
                                 </form>
@@ -2013,23 +2013,23 @@ export const ClientDetails = () => {
                         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                             <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="font-bold text-lg">Add Behavior Check-in</h3>
+                                    <h3 className="font-bold text-lg">{t('client_details.modals.add_behavior')}</h3>
                                     <button onClick={() => setShowAddPsychCheckin(false)}><X size={20} /></button>
                                 </div>
                                 <form onSubmit={handleAddPsychCheckin} className="space-y-4">
-                                    <div><label className="block text-sm font-medium text-gray-700">Date</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newPsychCheckin.date} onChange={e => setNewPsychCheckin({ ...newPsychCheckin, date: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Motivation</label>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.date')}</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newPsychCheckin.date} onChange={e => setNewPsychCheckin({ ...newPsychCheckin, date: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.motivation')}</label>
                                         <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newPsychCheckin.motivation_status} onChange={e => setNewPsychCheckin({ ...newPsychCheckin, motivation_status: e.target.value })}>
-                                            <option value="high">High</option>
-                                            <option value="medium">Medium</option>
-                                            <option value="low">Low</option>
+                                            <option value="high">{t('client_details.forms.motivation_high')}</option>
+                                            <option value="medium">{t('client_details.forms.motivation_medium')}</option>
+                                            <option value="low">{t('client_details.forms.motivation_low')}</option>
                                         </select>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div><label className="block text-sm font-medium text-gray-700">Hunger (1-5)</label><input type="number" min="1" max="5" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newPsychCheckin.psychological_hunger_scale} onChange={e => setNewPsychCheckin({ ...newPsychCheckin, psychological_hunger_scale: e.target.value })} /></div>
-                                        <div><label className="block text-sm font-medium text-gray-700">Stress</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newPsychCheckin.stress_level} onChange={e => setNewPsychCheckin({ ...newPsychCheckin, stress_level: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.hunger_scale')}</label><input type="number" min="1" max="5" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newPsychCheckin.psychological_hunger_scale} onChange={e => setNewPsychCheckin({ ...newPsychCheckin, psychological_hunger_scale: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.stress')}</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newPsychCheckin.stress_level} onChange={e => setNewPsychCheckin({ ...newPsychCheckin, stress_level: e.target.value })} /></div>
                                     </div>
-                                    <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddPsychCheckin(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
+                                    <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddPsychCheckin(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">{t('client_details.forms.cancel')}</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">{t('client_details.forms.save')}</button></div>
                                 </form>
                             </div>
                         </div>
@@ -2042,24 +2042,24 @@ export const ClientDetails = () => {
                         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                             <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="font-bold text-lg">Add Activity Log</h3>
+                                    <h3 className="font-bold text-lg">{t('client_details.modals.add_activity')}</h3>
                                     <button onClick={() => setShowAddActivityLog(false)}><X size={20} /></button>
                                 </div>
                                 <form onSubmit={handleAddActivityLog} className="space-y-4">
-                                    <div><label className="block text-sm font-medium text-gray-700">Start Date</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newActivityLog.start_date} onChange={e => setNewActivityLog({ ...newActivityLog, start_date: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Activity Type</label><input type="text" required placeholder="e.g. Running, Weightlifting" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newActivityLog.activity_type} onChange={e => setNewActivityLog({ ...newActivityLog, activity_type: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.start_date')}</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newActivityLog.start_date} onChange={e => setNewActivityLog({ ...newActivityLog, start_date: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.activity_type')}</label><input type="text" required placeholder={t('client_details.forms.activity_placeholder')} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newActivityLog.activity_type} onChange={e => setNewActivityLog({ ...newActivityLog, activity_type: e.target.value })} /></div>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div><label className="block text-sm font-medium text-gray-700">Sessions/Week</label><input type="number" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newActivityLog.sessions_per_week} onChange={e => setNewActivityLog({ ...newActivityLog, sessions_per_week: e.target.value })} /></div>
-                                        <div><label className="block text-sm font-medium text-gray-700">Distance (km)</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newActivityLog.distance_km_week} onChange={e => setNewActivityLog({ ...newActivityLog, distance_km_week: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.sessions_week')}</label><input type="number" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newActivityLog.sessions_per_week} onChange={e => setNewActivityLog({ ...newActivityLog, sessions_per_week: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.distance_km')}</label><input type="number" step="0.1" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newActivityLog.distance_km_week} onChange={e => setNewActivityLog({ ...newActivityLog, distance_km_week: e.target.value })} /></div>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <input type="checkbox" id="strength" checked={newActivityLog.strength_training} onChange={e => setNewActivityLog({ ...newActivityLog, strength_training: e.target.checked })} />
-                                        <label htmlFor="strength" className="text-sm text-gray-700">Strength Training?</label>
+                                        <label htmlFor="strength" className="text-sm text-gray-700">{t('client_details.forms.strength_training')}</label>
                                     </div>
                                     {newActivityLog.strength_training && (
-                                        <div><label className="block text-sm font-medium text-gray-700">Split Details</label><input type="text" placeholder="e.g. PPL, Upper/Lower" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newActivityLog.strength_split} onChange={e => setNewActivityLog({ ...newActivityLog, strength_split: e.target.value })} /></div>
+                                        <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.split_details')}</label><input type="text" placeholder={t('client_details.forms.split_placeholder')} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newActivityLog.strength_split} onChange={e => setNewActivityLog({ ...newActivityLog, strength_split: e.target.value })} /></div>
                                     )}
-                                    <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddActivityLog(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save</button></div>
+                                    <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddActivityLog(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">{t('client_details.forms.cancel')}</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">{t('client_details.forms.save')}</button></div>
                                 </form>
                             </div>
                         </div>
@@ -2073,15 +2073,15 @@ export const ClientDetails = () => {
                     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                         <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="font-bold text-lg">Metabolic Settings</h3>
+                                <h3 className="font-bold text-lg">{t('client_details.modals.metabolic_settings')}</h3>
                                 <button onClick={() => setShowAddMetabolic(false)}><X size={20} /></button>
                             </div>
                             <form onSubmit={handleAddMetabolic} className="space-y-4">
-                                <div><label className="block text-sm font-medium text-gray-700">Date</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.date} onChange={e => setNewMetabolic({ ...newMetabolic, date: e.target.value })} /></div>
+                                <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.date')}</label><input type="date" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.date} onChange={e => setNewMetabolic({ ...newMetabolic, date: e.target.value })} /></div>
 
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div><label className="block text-sm font-medium text-gray-700">RMR (kcal)</label><input type="number" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.rmr_value} onChange={e => setNewMetabolic({ ...newMetabolic, rmr_value: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Method</label>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.rmr_kcal')}</label><input type="number" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.rmr_value} onChange={e => setNewMetabolic({ ...newMetabolic, rmr_value: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.method')}</label>
                                         <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.rmr_method} onChange={e => setNewMetabolic({ ...newMetabolic, rmr_method: e.target.value })}>
                                             <option value="Mifflin-St Jeor">Mifflin-St Jeor</option>
                                             <option value="Harris-Benedict">Harris-Benedict</option>
@@ -2091,14 +2091,14 @@ export const ClientDetails = () => {
                                     </div>
                                 </div>
 
-                                <div><label className="block text-sm font-medium text-gray-700">TDEE Range (e.g. 2100-2300)</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.tdee_range} onChange={e => setNewMetabolic({ ...newMetabolic, tdee_range: e.target.value })} /></div>
+                                <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.tdee_range')}</label><input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.tdee_range} onChange={e => setNewMetabolic({ ...newMetabolic, tdee_range: e.target.value })} /></div>
 
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div><label className="block text-sm font-medium text-gray-700">Deficit Target</label><input type="number" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.calorie_deficit_target} onChange={e => setNewMetabolic({ ...newMetabolic, calorie_deficit_target: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-medium text-gray-700">Kcal/KM</label><input type="number" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.kcal_per_km_assumption} onChange={e => setNewMetabolic({ ...newMetabolic, kcal_per_km_assumption: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.deficit_target')}</label><input type="number" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.calorie_deficit_target} onChange={e => setNewMetabolic({ ...newMetabolic, calorie_deficit_target: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-medium text-gray-700">{t('client_details.forms.kcal_km')}</label><input type="number" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2" value={newMetabolic.kcal_per_km_assumption} onChange={e => setNewMetabolic({ ...newMetabolic, kcal_per_km_assumption: e.target.value })} /></div>
                                 </div>
 
-                                <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddMetabolic(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancel</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">Save Profile</button></div>
+                                <div className="flex justify-end gap-2"><button type="button" onClick={() => setShowAddMetabolic(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">{t('client_details.forms.cancel')}</button><button type="submit" className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover">{t('client_details.forms.save_profile')}</button></div>
                             </form>
                         </div>
                     </div>
